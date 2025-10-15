@@ -39,25 +39,30 @@ IF NOT FAIL
           ENDIF 
       EndIf 
 EndIf 
-IF NOT ${System} EQ "WinUAE" 
-    IF NOT ${System} EQ "RealAmiga" 
-        c:ce >NIL: S:OneTimeRun 
-        IF WARN 
-            ASK "Running One Time Scripts. Press Enter to Continue" 
-            Echo >T:RunTimeScript "Failat 21" 
-            List >>T:RunTimeScript S:OneTimeRun PAT=~(#?.info) LFORMAT="Echo *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES
-            Execute T:RunTimeScript
-            Delete >NIL: T:RunTimeScript 
-       ENDIF 
-   ENDIF 
+
+c:ce >NIL: S:OneTimeRun 
+IF WARN 
+	echo "Running One Time Scripts." 
+	Echo >T:RunTimeScript "Failat 21" 
+	IF ${System} EQ "WinUAE" 
+		List >>T:RunTimeScript S:OneTimeRun PAT=~(#?.info|#?_pistorm) LFORMAT="Echo *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES
+	Else
+		IF NOT ${System} EQ "RealAmiga" 
+			List >>T:RunTimeScript S:OneTimeRun PAT=~(#?.info|) LFORMAT="Echo *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES
+		ENDIF
+	ENDIF
+	Execute T:RunTimeScript
+    Delete >NIL: T:RunTimeScript 
 ENDIF 
+
 if ${FIRSTTIMEBOOT} EQ "TRUE"
 	if NOT ${System} EQ "WINUAE"
 		echo "FALSE" > SYS:PREFS/ENV-ARCHIVE/FIRSTTIMEBOOT
 	endif
 endif
 IF ${Reboot} EQ "TRUE" 
-      Ask "Press Enter and the Amiga will Reboot" 
+      echo "The Amiga will Reboot in 3 seconds!"
+	  wait 3	  
       Diskchange SDH0:
       reboot 
 ENDIF
