@@ -629,11 +629,13 @@ function Update-UI {
     if (($DiskPartitionWindow) -or ($Buttons)){
         if ($Script:GUIActions.OutputPath){
             $WPF_DP_Button_SaveImage.Background = 'Green'
-            $WPF_DP_Button_SaveImage.Foreground = 'White'
+            $WPF_DP_Button_SaveImage.Foreground = 'White'            
+            $WPF_DP_Button_SaveImage_Label.Text =  Get-FormattedPathforGUI -PathtoTruncate $Script:GUIActions.OutputPath -Length 25
         }
         else{
             $WPF_DP_Button_SaveImage.Background = '#FFDDDDDD'
-            $WPF_DP_Button_SaveImage.Foreground = "Black"         
+            $WPF_DP_Button_SaveImage.Foreground = "Black" 
+            $WPF_DP_Button_SaveImage_Label.Text =  "No location selected"                   
         }
     }
 

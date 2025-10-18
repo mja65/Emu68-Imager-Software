@@ -267,6 +267,7 @@ mc:Ignorable="d">
                    <TextBlock Text="Set Location for Image" TextWrapping="Wrap" TextAlignment="Center"/>
                </Button>
 
+        <TextBox x:Name="Button_SaveImage_Label" HorizontalAlignment="Left" Margin="310,32,0,0" TextWrapping="Wrap" Text="No location selected" VerticalAlignment="Top" Width="180" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
 
            </Grid>
        </GroupBox>
