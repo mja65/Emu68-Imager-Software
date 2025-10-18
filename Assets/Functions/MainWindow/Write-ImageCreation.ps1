@@ -33,30 +33,6 @@ function Write-ImageCreation {
         $OutputTypetoUse = "Physical Disk"
      }
      
-     if ($Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries | Where-Object {$_.Partition.ImportedPartitionMethod -eq 'Direct'}){
-        $PartitionstoImport_Direct = $true
-     }
-     else {
-        $PartitionstoImport_Direct = $false
-     }
-     
-     if ($Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries| Where-Object {$_.Partition.ImportedPartitionMethod -eq 'Derived'}){
-        $PartitionstoImport_Derived = $true
-     }
-     else {
-        $PartitionstoImport_Derived = $false
-     }
-
-     $Script:Settings.TotalNumberofTasks = 22
-
-     if ($PartitionstoImport_Direct -eq $true){
-        $Script:Settings.TotalNumberofTasks ++
-     }
-     
-     if ($PartitionstoImport_Derived -eq $true){
-        $Script:Settings.TotalNumberofTasks ++        
-     }
-
      $Script:Settings.CurrentTaskNumber = 0 
 
      if ($Script:GUIActions.InstallOSFiles -eq $false){
@@ -183,18 +159,6 @@ function Write-ImageCreation {
      }
      
      Write-TaskCompleteMessage 
-
-     if ($PartitionstoImport_Direct -eq $true){
-        $Script:Settings.CurrentTaskNumber ++
-        $Script:Settings.CurrentTaskName = "Importing partitions to disk"
-        
-        Write-StartTaskMessage
-
-        Write-InformationMessage -Message "This step could take a LONG time depending on the size of the partition!"
-
-        Write-TaskCompleteMessage 
-     
-     }
      
      if ($OutputTypetoUse -eq 'VHDImage'){
         $IsMounted = (Get-DiskImage -ImagePath $Script:GUIActions.OutputPath -ErrorAction Ignore).Attached
