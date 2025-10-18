@@ -50,8 +50,8 @@ function Write-IconPositions {
                     if ($DrawerHeighttoUse){
                          $arguments += @("--drawer-height", $DrawerHeighttoUse)
                     }
-                        Write-InformationMessage -Message "Setting coordinate details for:$PathtoInfofile"
-                        & $Script:ExternalProgramSettings.HSTAmigaPath $arguments                   
+                        Write-AmigaIconPositiontoInfoFile -Arguments $arguments -IconPath $PathtoInfofile
+            
                 }
             }
         }

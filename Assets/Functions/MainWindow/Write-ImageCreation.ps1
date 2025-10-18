@@ -120,6 +120,13 @@ function Write-ImageCreation {
 
      Get-CopyFilestoAmigaDiskCommands -OutputLocationType $OutputTypetoUse #Commands not run yet
 
+   #   $Script:Settings.CurrentSubTaskNumber ++
+   #   $Script:Settings.CurrentSubTaskName = "Adjusting icon positions"
+   #   Write-StartSubTaskMessage
+     
+   #   Write-IconPositions
+     
+     
      if (($OutputTypetoUse -eq "Physical Disk") -or ($OutputTypetoUse -eq "VHDImage")){
         $Script:Settings.CurrentSubTaskNumber ++
         $Script:Settings.CurrentSubTaskName = "Processing Commands on Disk (this may take a few minutes depending on the size of your disk)"
