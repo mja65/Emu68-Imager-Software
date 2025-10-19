@@ -465,7 +465,7 @@ function Update-UI {
                        $WPF_DP_SimpleMode_ID76Size_Label.Visibility = "Visible"
                        $WPF_DP_SimpleMode_ID76Size_Value.Visibility = "Visible"
                        $WPF_DP_SimpleMode_Legend_FAT32SizeDefault.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_Legend_ID76Size.Visibility = "Visible"
+                       #$WPF_DP_SimpleMode_Legend_ID76Size.Visibility = "Visible"
                        $WPF_DP_SimpleMode_Legend_WorkbenchSizeDefault.Visibility = "Visible"
                        $WPF_DP_SimpleMode_Legend_WorkSize.Visibility = "Visible"
                        $WPF_DP_SimpleMode_WorkbenchSize_Label.Visibility = "Visible"
