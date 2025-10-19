@@ -38,7 +38,7 @@ Architecture is: $($Script:Settings.Architecture)
         #$LogEntry| Out-File -FilePath $Script:Settings.LogLocation
 
         if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
-            $Script:Settings.HSTDetailedLogLocation = "$($Script:Settings.LogFolder)\$LogNameDateTime`_Emu68HSTLog.txt"
+            $Script:Settings.HSTDetailedLogLocation = "$($Script:Settings.LogFolder)\$LogNameDateTime`_Emu68ImagerHSTLog.txt"
             $LogEntry =     @"
 Emu68 Imager Log - HST Detailed Log
         
