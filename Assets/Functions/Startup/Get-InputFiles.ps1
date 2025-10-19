@@ -15,5 +15,6 @@ function Get-InputFiles {
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.FileSystemsCSV.GID -ExistingCSV $Script:Settings.FileSystemsCSV.Path
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.DiskDefaultsCSV.GID -ExistingCSV $Script:Settings.DiskDefaultsCSV.Path
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.IconPositionsCSV.GID -ExistingCSV $Script:Settings.IconPositionsCSV.Path
+    Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.DocumentationURLsCSV.GID -ExistingCSV $Script:Settings.DocumentationURLsCSV.Path
 
 }
