@@ -56,7 +56,7 @@ Write-Emu68ImagerLog -start
 
 Show-Disclaimer
 
-$Script:Settings.TotalNumberofTasks = 3
+$Script:Settings.TotalNumberofTasks = 22
 
 $Script:Settings.CurrentTaskNumber ++
 $Script:Settings.CurrentTaskName = "Checking Prerequisites for Using Emu68 Imager"
