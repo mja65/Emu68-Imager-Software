@@ -61,6 +61,7 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUIActions.OutputType = "Disk"        
             
                 #$Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
+                $WPF_DP_MediaSelect_DropDown.SelectedItem = $null
             
                 Remove-Variable -Scope Script -Name 'WPF_DP_Partition*'
             
