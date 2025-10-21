@@ -118,7 +118,7 @@
         <Button x:Name="Button_LoadSettings" Content="Load Settings" HorizontalAlignment="Left" Margin="10,370,0,0" VerticalAlignment="Top" Height="20" Width="100"/>
         <Button x:Name="Button_SaveSettings" Content="Save Settings" HorizontalAlignment="Left" Margin="10,400,0,0" VerticalAlignment="Top" Height="20" Width="100"/>
         <Label x:Name="Label_Title" Content="Emu68 Imager" HorizontalAlignment="Left" Margin="7,5,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold"/>
-        <Label x:Name="Label_VersionStatus" Content="Emu68 Imager" HorizontalAlignment="Right" Margin="7,5,0,0" VerticalAlignment="Top" FontSize="20"/>
+        <TextBox x:Name="Label_VersionStatus" Visibility="Visible" HorizontalAlignment="Right" Margin="0,5,0,0" VerticalAlignment="Top" TextWrapping="Wrap" Text="XXXX"  FontSize="18" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
         <Button x:Name="Button_Run" Content="Missing information in order to run tool! Press button to see further details" Background = '#FFFF0000' Foreground = '#FF000000' HorizontalAlignment="Center" Margin="0,910,0,0" VerticalAlignment="Top" Height="40" Width="900" />
     </Grid>
 
