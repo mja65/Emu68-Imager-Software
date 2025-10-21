@@ -25,7 +25,7 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUIActions.ImageSizeSelected = $null
                 $Script:GUIActions.DiskSizeSelected = $null
                 $Script:GUIActions.OutputType = "Image"          
-                $Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
+                #$Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
              
                 Remove-Variable -Scope Script -Name 'WPF_DP_Partition*'
             
@@ -60,7 +60,7 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUIActions.DiskSizeSelected = $null
                 $Script:GUIActions.OutputType = "Disk"        
             
-                $Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
+                #$Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
             
                 Remove-Variable -Scope Script -Name 'WPF_DP_Partition*'
             
