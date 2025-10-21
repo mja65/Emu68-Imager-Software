@@ -22,10 +22,11 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries = $null
                 $Script:GUIActions.OutputPath = $null
                 $Script:GUIActions.InstallOSFiles = $true
+                $Script:GUIActions.ImageSizeSelected = $null
                 $Script:GUIActions.DiskSizeSelected = $null
                 $Script:GUIActions.OutputType = "Image"          
                 $Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
-            
+             
                 Remove-Variable -Scope Script -Name 'WPF_DP_Partition*'
             
                 if (test-path variable:script:WPF_DP_Disk_GPTMBR) {
@@ -55,6 +56,7 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries = $null
                 $Script:GUIActions.OutputPath = $null
                 $Script:GUIActions.InstallOSFiles = $true
+                $Script:GUIActions.ImageSizeSelected = $null
                 $Script:GUIActions.DiskSizeSelected = $null
                 $Script:GUIActions.OutputType = "Disk"        
             
