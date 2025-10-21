@@ -118,7 +118,6 @@ function Read-SettingsFile {
    # Remove existing Partitions 
 
     $WPF_DP_MediaSelect_Type_DropDown.SelectedItem = ""
-    $WPF_DP_Input_DiskSize_Value.text =  ""
 
    $Script:GUICurrentStatus.ProcessImageStatus = $false
 
@@ -288,13 +287,16 @@ function Read-SettingsFile {
     }
     elseif ($Script:GUIActions.OutputType -eq "Image"){
         $WPF_DP_MediaSelect_Type_DropDown.SelectedItem = "Image"
+        $Script:GUIActions.ImageSizeSelected = $true
+
     }
 
-    if ($WPF_DP_Disk_GPTMBR.DiskSizeBytes) {
-        $SizeToPopulate = (Get-ConvertedSize -Size $WPF_DP_Disk_GPTMBR.DiskSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 4)
-        $WPF_DP_Input_DiskSize_Value.text =  $SizeToPopulate.Size
-        $WPF_DP_Input_DiskSize_SizeScale_Dropdown.SelectedItem = $SizeToPopulate.Scale
-    }
+
+    # if ($WPF_DP_Disk_GPTMBR.DiskSizeBytes) {
+    #     $SizeToPopulate = (Get-ConvertedSize -Size $WPF_DP_Disk_GPTMBR.DiskSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 4)
+    #     $WPF_DP_Input_DiskSize_Value.text =  $SizeToPopulate.Size
+    #     $WPF_DP_Input_DiskSize_SizeScale_Dropdown.SelectedItem = $SizeToPopulate.Scale
+    # }
 
     Update-UI -MainWindowButtons -Emu68Settings -DiskPartitionWindow -UpdateInputBoxes -Buttons -PhysicalvsImage -CheckforRunningImage -freespacealert
 

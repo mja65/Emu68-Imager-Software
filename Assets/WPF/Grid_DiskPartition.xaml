@@ -258,12 +258,12 @@ mc:Ignorable="d">
 
        <GroupBox x:Name="DiskSizeImage_GroupBox" Header="Image Values" Width="510" Height="100" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Hidden">
            <Grid>
+                    <Button x:Name="Button_SetImageSize" HorizontalAlignment="Left" Margin="20,21,0,0" VerticalAlignment="Top" Width="100" Height="45" Background='#FFDDDDDD' Foreground="Black" BorderBrush="Transparent">
+                        <TextBlock Text="Set Size for Image" TextWrapping="Wrap" TextAlignment="Center"/>
+                    </Button>
+                    <TextBox x:Name="Button_SetImageSize_Label" HorizontalAlignment="Left" Margin="130,32,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="180" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
 
-               <TextBox x:Name="Input_DiskSize_Label" HorizontalAlignment="Left" Margin="7,16,0,0" TextWrapping="Wrap" Text="Select Size of Image" VerticalAlignment="Top" Width="126" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
-               <TextBox x:Name="Input_DiskSize_Value" HorizontalAlignment="Left" Margin="7,40,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70" Visibility="Visible" Height="20"/>
-               <ComboBox x:Name="Input_DiskSize_SizeScale_Dropdown" HorizontalAlignment="Left" Margin="85,40,0,0" VerticalAlignment="Top" Width="50" Visibility="Visible" Height="20"/>
-
-               <Button x:Name="Button_SaveImage" HorizontalAlignment="Left" Margin="200,21,0,0" VerticalAlignment="Top" Width="100" Height="45" Background='#FFDDDDDD' Foreground="Black" BorderBrush="Transparent">
+              <Button x:Name="Button_SaveImage" HorizontalAlignment="Left" Margin="200,21,0,0" VerticalAlignment="Top" Width="100" Height="45" Background='#FFDDDDDD' Foreground="Black" BorderBrush="Transparent">
                    <TextBlock Text="Set Location for Image" TextWrapping="Wrap" TextAlignment="Center"/>
                </Button>
 

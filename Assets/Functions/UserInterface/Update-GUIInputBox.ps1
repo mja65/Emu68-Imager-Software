@@ -8,15 +8,8 @@ function Update-GUIInputBox {
         [Switch]$MBRMove_SpaceatEnd,
         [Switch]$AmigaMove_SpaceatBeginning,
         [Switch]$AmigaMove_SpaceatEnd,
-        [Switch]$SetDiskValues,
         $DiskType        
     )
-
-    if (($SetDiskValues) -and (-not ($DiskType))){
-        Write-ErrorMessage -Message "Error in coding - Update-GUIInputBox!"
-        $WPF_MainWindow.Close()
-        exit
-    } 
 
     # $InputBox = $WPF_DP_SelectedSize_Input
     # $DropDownBox = $WPF_DP_SelectedSize_Input_SizeScale_Dropdown
@@ -71,16 +64,6 @@ function Update-GUIInputBox {
     }
     
     if ($InputBox.InputEntry -eq  $true -and $InputBox.InputEntryChanged -eq $true){
-        if ($SetDiskValues){
-            if (-not $Script:GUIActions.DiskSizeSelected -eq $true){
-                Set-InitialDiskValues -SizeBytes ((Get-ConvertedSize -Size ($WPF_DP_Input_DiskSize_Value.Text) -ScaleFrom ($WPF_DP_Input_DiskSize_SizeScale_Dropdown.SelectedItem) -Scaleto 'B').Size) -DiskType $DiskType
-            }
-            else{
-               Set-RevisedDiskValues -SizeBytes ((Get-ConvertedSize -Size ($WPF_DP_Input_DiskSize_Value.Text) -ScaleFrom ($WPF_DP_Input_DiskSize_SizeScale_Dropdown.SelectedItem) -Scaleto 'B').Size)
-            }
-            $InputBox.Background = 'White'
-            Update-UI -UpdateInputBoxes -freespacealert
-        }
         if (($MBRResize) -or ($AmigaResize)){                    
             if ($MBRResize){
                 # Write-debug 'Changing size based on input - MBR'

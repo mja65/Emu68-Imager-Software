@@ -1,0 +1,17 @@
+<Window x:Name="Window" 
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:local="clr-namespace:WpfApp14"
+            mc:Ignorable="d"
+         Title="Set Image Size" Height="200" Width="255" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" Topmost="True" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid x:Name ="Main" Background="#FFE5E5E5">
+        <TextBox x:Name="Input_ImageSize_Label" HorizontalAlignment="Center" Margin="0,5,0,0" TextWrapping="Wrap" Text="Select Size of Image" VerticalAlignment="Top" Width="135" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
+        <TextBox x:Name="Input_ImageSize_Value" HorizontalAlignment="Left" Margin="5,30,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Visible" Height="20"/>
+        <ComboBox x:Name="Input_ImageSize_SizeScale_Dropdown" HorizontalAlignment="Left" Margin="130,30,0,0" VerticalAlignment="Top" Width="50" Visibility="Visible" Height="20"/>
+        <Button x:Name="OK_Button" Content="OK" HorizontalAlignment="Right" Margin="0,0,5,5" VerticalAlignment="Bottom" Width="50" Height="20"/>
+        <Button x:Name="Cancel_Button" Content="Cancel" HorizontalAlignment="Left" Margin="5,0,0,5" VerticalAlignment="Bottom" Width="50" Height="20"/>
+        <TextBox x:Name="ErrorMessage_Label" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="Red" VerticalAlignment="Top" Width="230" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" Text="" Margin="0,55,0,0"/>
+         </Grid>
+</Window>

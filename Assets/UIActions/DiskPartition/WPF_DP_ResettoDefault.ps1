@@ -10,11 +10,11 @@ $WPF_DP_ResettoDefault.Add_Click({
             $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = $null
             $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries = $null
             $Script:GUIActions.OutputPath = $null
+            $Script:GUIActions.ImageSizeSelected = $null
             $Script:GUIActions.OutputType = $null
             $Script:GUIActions.InstallOSFiles = $true
             $Script:GUIActions.DiskSizeSelected = $null
         
-            $Script:WPF_DP_Input_DiskSize_Value.Text = $null
             $Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
         
             Remove-Variable -Scope Script -Name 'WPF_DP_Partition*'

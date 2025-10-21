@@ -637,6 +637,17 @@ function Update-UI {
             $WPF_DP_Button_SaveImage.Foreground = "Black" 
             $WPF_DP_Button_SaveImage_Label.Text =  "No location selected"                   
         }
+
+        if (($Script:GUIActions.OutputType -eq "Image") -and ($Script:GUIActions.ImageSizeSelected -eq $true)){
+                $WPF_DP_Button_SetImageSize.Background = 'Green'
+                $WPF_DP_Button_SetImageSize.Foreground = 'White'  
+                $WPF_DP_Button_SetImageSize_Label.Text = "$((Get-ConvertedSize -Size $Script:WPF_DP_Disk_GPTMBR.DiskSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 2).size) $((Get-ConvertedSize -Size $Script:WPF_DP_Disk_GPTMBR.DiskSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 2).scale)"                
+            }
+            else {
+                $WPF_DP_Button_SetImageSize.Background = '#FFDDDDDD'
+                $WPF_DP_Button_SetImageSize.Foreground = "Black"       
+                $WPF_DP_Button_SetImageSize_Label.Text = ""                      
+            }
     }
 
     If ($FreeSpaceAlert){
