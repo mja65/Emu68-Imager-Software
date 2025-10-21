@@ -70,7 +70,7 @@ kernel=Emu68-pistorm32lite
 [all]
 # PiStorm16 Boot
 [gpio24=1]
-kernel=kernel/Emu68-pistorm16
+kernel=Emu68-pistorm16
 [ROMPATH]
 
 [all]
