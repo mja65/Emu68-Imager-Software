@@ -63,6 +63,11 @@ $WPF_DP_Button_AddNewAmigaPartition.add_click({
     }
     $AvailableFreeSpace = (Get-AmigaNearestSizeBytes -RoundDown $AvailableFreeSpace)
     #Write-debug "Available free space rounded down is: $AvailableFreeSpace"
+
+    if ($AvailableFreeSpace -gt $Script:SDCardMinimumsandMaximums.PFS3Maximum) {
+        $AvailableFreeSpace = $Script:SDCardMinimumsandMaximums.PFS3Maximum
+    }
+
     $MinimumFreeSpace = (Get-AmigaNearestSizeBytes -RoundDown $Script:SDCardMinimumsandMaximums.PFS3Minimum)
     if ($AvailableFreeSpace -lt $MinimumFreeSpace){
         $null = Show-WarningorError -Msg_Header 'No Free Space' -Msg_Body 'Insufficient freespace to create partition!' -BoxTypeError -ButtonType_OK
