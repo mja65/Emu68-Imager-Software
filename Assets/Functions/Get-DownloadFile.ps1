@@ -5,24 +5,18 @@ function Get-DownloadFile {
         $NumberofAttempts
     )
 
-    # $DownloadURL = "http://aminet.net/comm/net/AmiSpeedTest.lha"
-    # $OutputLocation = "C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Temp\WebPackagesDownload\SysInfo.lha"
-    # $NumberofAttempts = 1
-
-    #$OutputLocation = ".\Temp\StartupFiles\HSTImager.zip"
-    #$NumberofAttempts = 3
-    #$DownloadURL = "https://github.com/henrikstengaard/hst-imager/releases/dfdgfdgownload/1.2.437/hst-imager_v1.2.437-7d8644e_console_windows_x64.zip" 
-    #$DownloadURL = "http://download.d0.se/pub/SysInfo.lha" 
-    #$DownloadURL = "http://dopus.free.fr/betas/DOpus417pre21.lzx"
-
+#    $NumberofAttempts = 2
+#    $DownloadURL = "https://mja65.github.io/Emu68-Imager/images/Version2/StartupAdvancedMode.png"
+#    $OutputLocation = 'E:\PiStorm\Docs\'
+   
     $client = [System.Net.Http.HttpClient]::new()
     $client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerShellHttpClient")
     
-    $attempt = 0
+    $attempt = 1
     $success = $false
     
-    while (-not $success -and $attempt -lt $NumberofAttempts) {
-        $attempt++
+    while (-not $success -and $attempt -le $NumberofAttempts) {
+      
         try {
             if ($attempt -gt 1){
                 Write-InformationMessage -Message ('Trying Download again. Retry Attempt # '+$attempt)
@@ -54,13 +48,8 @@ function Get-DownloadFile {
             }
         }
         catch {
-            if ($attempt -lt $NumberofAttempts) {
-                Write-InformationMessage -message 'Download failed! Retrying in 3 seconds'
-                 Start-Sleep -Seconds 3
-            }
-            else {
-                return $false
-            }
+            Write-InformationMessage -message 'Download failed! Retrying in 3 seconds'
+            Start-Sleep -Seconds 3
         }
         finally {
             if ($stream){
@@ -73,8 +62,9 @@ function Get-DownloadFile {
             }  
             
         }
+        $attempt++          
     }
 
-    return $true      
+    return $success      
 
 }
