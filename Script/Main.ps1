@@ -130,6 +130,8 @@ If ($Script:GUICurrentStatus.OperationMode -eq "Simple"){
     $WPF_Window_Button_LoadSettings.Visibility = "Hidden"
     $WPF_Window_Button_SaveSettings.Visibility = "Hidden"
     $WPF_Window_Button_PackageSelection.Visibility = "Hidden"
+    $WPF_Window_LoadandSaveSettings_Label.Visibility = "Hidden"
+
 }
 
 update-ui -MainWindowButtons
