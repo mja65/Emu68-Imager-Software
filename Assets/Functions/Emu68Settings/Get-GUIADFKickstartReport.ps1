@@ -21,7 +21,7 @@ function Get-GUIADFKickstartReport {
     # $GridLinesVisibility ='None' 
     # $FieldsSorted = ('Status','ADF Name','Path')
 
-    $WPF_ADFKickstartReporting = Get-XAML -WPFPrefix 'WPF_ADFKickstartReporting_' -XMLFile '.\Assets\WPF\SetupEmu68\Window_ADFKickstartReporting.xaml' -ActionsPath '.\Assets\UIActions\SetupEmu68\ADFKickstartReporting\' -AddWPFVariables
+    $WPF_ADFKickstartReporting = Get-XAML -WPFPrefix 'WPF_ADFKickstartReporting_' -XMLFile '.\Assets\WPF\SetupEmu68\Window_ADFKickstartReporting.xaml' -ActionsPath '.\Assets\UIActions\StartPage\ADFKickstartReporting\' -AddWPFVariables
 
     $WPF_ADFKickstartReporting.Top=300
     $WPF_ADFKickstartReporting.Left=300
