@@ -295,7 +295,3 @@ function New-GUIPartition {
 
     return $NewPartition
 }
-
-# $WPF_DP_Partition_ID76_1.Children[4].Fill
-
-# $WPF_DP_Partition_FAT32_2.Children[4].Fill

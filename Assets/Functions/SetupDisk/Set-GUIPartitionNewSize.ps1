@@ -231,7 +231,3 @@ function Set-GUIPartitionNewSize {
     return $true
     
 }
-# elseif ($PartitionToCheck.PartitionSizeBytes - $BytestoChange -lt $SDCardMinimumsandMaximums.FAT32Minimum){
-#     $BytestoChange = $PartitionToCheck.PartitionSizeBytes -$SDCardMinimumsandMaximums.FAT32Minimum
-#     $SizePixelstoChange = ($BytestoChange/$BytestoPixelFactor)*-1 
-# }

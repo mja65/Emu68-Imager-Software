@@ -56,7 +56,3 @@ function Confirm-RequiredSources {
     return ($OSandPackagesSources | Select-Object 'Source','SourceLocation','RequiredFlagUserSelectable' -Unique)
 
 }
-
-#-and $_.PackageName -match "OS Install"
-
-#@{label='ADF_Name';expression={$_.SourceLocation}},'PackageNameFriendlyName' 

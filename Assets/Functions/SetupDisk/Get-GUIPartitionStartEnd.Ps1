@@ -37,19 +37,3 @@ function Get-GUIPartitionStartEnd {
  
     return $ValuetoReturn                  
 }
-
-    # if (-not $ListofPartitions){ # No Partitions at all
-    #     return $ValuetoReturn 
-    # }
-    # $Counter = 0
-    # else{
-    #     Foreach ($Partition in $ListofPartitions){
-    #         If ($Counter -eq 0){
-    #             $ValuetoReturn.StartingPositionPixels = $Partition.Value.Margin.Left
-    #         }          
-    #         $ValuetoReturn.EndingPositionPixels += (Get-GUIPartitionWidth -Partition $Partition.Value)
-    #         $ValuetoReturn.EndingPositionBytes +=  $Partition.Value.PartitionSizeBytes
-    #         $Counter ++
-    #     }
-    # }
-    # return $ValuetoReturn        
