@@ -8,6 +8,6 @@
         Title="Pre-requisite checks" Height="200" Width="910" HorizontalAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" ResizeMode="NoResize">
     <Grid Background="#FFAAAAAA">
         <Button x:Name="Button_Acknowledge" HorizontalContentAlignment="Center" Content="Acknowledge" HorizontalAlignment="Center" Margin="0,100,0,0" VerticalAlignment="Top" Height="40" Width="320" BorderBrush="Black" UseLayoutRounding="False" Background="#FF6688BB"/>
-        <TextBox x:Name="TextBox_Message" HorizontalContentAlignment="Center" HorizontalAlignment="center" Margin="0,60,0,0" Background="Transparent" TextWrapping="Wrap" Text="You must run the tool in Administrator Mode!" VerticalAlignment="Top" Width="600" IsReadOnly="True"  FontSize="24" FontWeight="Bold" Foreground="Red" BorderThickness="0,0,0,0" SelectionOpacity="0"/>
+        <TextBox x:Name="TextBox_Message" HorizontalContentAlignment="Center" HorizontalAlignment="center" Margin="0,20,0,0" Background="Transparent" TextWrapping="Wrap" Text="You must run the tool in Administrator Mode!" VerticalAlignment="Top" Width="800" IsReadOnly="True"  FontSize="24" FontWeight="Bold" Foreground="Red" BorderThickness="0,0,0,0" SelectionOpacity="0"/>
     </Grid>
 </Window>
