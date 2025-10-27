@@ -36,6 +36,11 @@ function Test-AccesstoServers {
         FatalError = 0
     }
 
+    $ServerList += [PSCustomObject]@{
+        ServerName = "download.d0.se"
+        FatalError = 0
+    }    
+    
 
     $ErrorCount = 0
     $FatalErrorCount = 0
