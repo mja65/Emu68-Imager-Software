@@ -1,36 +1,35 @@
 function Get-GithubRelease {
     param (
-        $GithubRelease,
+        $GithubRepository,
+        $GithubReleaseType,
         $Tag_Name,
         $Name,
         $LocationforDownload,
-        $Sort_Flag,
-        $OnlyReleaseVersions
+        $FileNameforDownload
     )
   
-
-    # $DownloadURL = "https://github.com/henrikstengaard/hst-imager/releases/download/1.2.437/hst-imager_v1.2.437-7d8644e_console_windows_x64.zip" 
-    # $OutputLocation = ".\Temp\StartupFiles\HSTImager.zip"
-    # $NumberofAttempts = 3
-
-
-    # $GithubRelease = "https://api.github.com/repos/henrikstengaard/hst-imager/releases" 
-    # $Tag_Name = "1.2.437" 
-    # $Name = "_console_windows_x64.zip" 
-    # $LocationforDownload =  "$($Script:Settings.TempFolder)\StartupFiles\HSTImager.zip" 
-    # $Sort_Flag= ''
-
-    # $GithubRelease = "https://api.github.com/repos/rondoval/emu68-genet-driver/releases" 
-    # $Tag_Name = "1.2.437" 
-    # $Name = "_console_windows_x64.zip" 
-    # $LocationforDownload =  "$($Script:Settings.TempFolder)\StartupFiles\HSTImager.zip" 
-    # $Sort_Flag= ''
-
-    if (-not(Test-Path (split-path $LocationforDownload -parent))){
-        $null = New-Item -Path (split-path $LocationforDownload -parent) -Force -ItemType Directory
+    # $LocationforDownload = "E:\PiStorm\"
+    
+    # $GithubRepository = "https://api.github.com/repos/michalsc/Emu68-tools/releases"
+    # $GithubReleaseType = 'nightly'
+    # $Tag_Name = ""
+    # $Name = "Emu68-tools"
+    # $FileNameforDownload = "Emu68-Tools.zip"
+    
+    # $GithubRepository = "https://api.github.com/repos/michalsc/Emu68/releases"
+    # $GithubReleaseType = 'Release'
+    # $Tag_Name = ""
+    # $Name = "Emu68-pistorm32lite."
+    # $FileNameforDownload = "Emu68PiStorm32lite.zip"
+    
+    
+    if (-not(Test-Path (split-path $LocationforDownload))){
+        $null = New-Item -Path (split-path $LocationforDownload) -Force -ItemType Directory
     }
 
-    Write-InformationMessage -Message "Retrieving Github information for: $GithubRelease"
+    $PathforDownload = "$LocationforDownload$FileNameforDownload"
+
+    Write-InformationMessage -Message "Retrieving Github information for: $GithubRepository"
 
     $client = [System.Net.Http.HttpClient]::new()
     $client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerShellHttpClient")
@@ -40,7 +39,7 @@ function Get-GithubRelease {
     $IsSuccess = $null
            
     do {
-        $GithubDetails = $client.GetStringAsync($GithubRelease).Result | ConvertFrom-Json
+        $GithubDetails = $client.GetStringAsync($GithubRepository).Result | ConvertFrom-Json
         if ($GithubDetails){
             $IsSuccess = $true  
         }
@@ -55,23 +54,29 @@ function Get-GithubRelease {
     )
 
     if ( -not $GithubDetails){
-        Write-ErrorMessage 'Error accessing Github! Quitting Progream'
+        Write-ErrorMessage 'Error accessing Github! Quitting Program'
         exit
     }  
-    if ($OnlyReleaseVersions -eq 'TRUE'){
-    
-        $GithubDetails_Sorted = $GithubDetails | Where-Object { $_.tag_name -ne 'nightly' -and ($_.draft).tostring() -eq 'False' -and ($_.prerelease).tostring() -eq 'False' -and ($_.name).tostring() -notmatch 'Release Candidate'} | Sort-Object -Property 'tag_name' -Descending | Select-Object -ExpandProperty assets
+
+    If (($GithubReleaseType -eq "Release") -or ($GithubReleaseType -eq "Release-NoArchive")){
+        if ($Tag_Name){
+            $GithubDetails_ForDownload = $GithubDetails | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name }             
+        }
+        else {
+            $GithubDetails_Sorted = $GithubDetails | Where-Object { $_.tag_name -ne 'nightly' -and ($_.draft).tostring() -eq 'False' -and ($_.prerelease).tostring() -eq 'False' -and ($_.name).tostring() -notmatch 'Release Candidate'} | Sort-Object -Property 'tag_name' -Descending | Select-Object -ExpandProperty assets 
+            $GithubDetails_ForDownload = $GithubDetails_Sorted  | Where-Object { $_.name -match $Name } | Select-Object -First 1
+        }
+    }
+    elseif ($GithubReleaseType -eq "nightly"){
+        $GithubDetails_Sorted = $GithubDetails | Where-Object { $_.tag_name -eq 'nightly'}  | Select-Object -ExpandProperty assets | Sort-Object -Property "updated_at" -Descending 
         $GithubDetails_ForDownload = $GithubDetails_Sorted  | Where-Object { $_.name -match $Name } | Select-Object -First 1
-    }
+    } 
     else {
-        if ($Sort_Flag -eq 'Sort'){
-            $GithubDetails_ForDownload = $GithubDetails | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name } | Sort-Object -Property updated_at -Descending
-            $GithubDetails_ForDownload = $GithubDetails | Where-Object { $_.tag_name -eq 'nightly' } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name } | Sort-Object -Property updated_at -Descending
-        }
-        else{
-            $GithubDetails_ForDownload = $GithubDetails | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name }
-        }
+        Write-Error "Error with input! Exiting!"
+        exit
+
     }
+
     $GithubDownloadURL = $GithubDetails_ForDownload[0].browser_download_url 
     Write-InformationMessage -Message ('Downloading Files for URL: '+$GithubDownloadURL)
     # Write-debug "GithubDownload: $GithubDownloadURL LocationforDownload: $LocationforDownload"

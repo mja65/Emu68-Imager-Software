@@ -185,6 +185,7 @@ function Get-InputCSVs {
                         Source = $_.Source
                         GithubReleaseType = $_.GithubReleaseType
                         GithubName = $_.GithubName
+                        GithubRelease = $_.GithubRelease
                         InstallType = $_.InstallType
                         SourceLocation = $_.SourceLocation
                         BackupSourceLocation = $_.BackupSourceLocation
@@ -236,6 +237,7 @@ function Get-InputCSVs {
                     Source = $_.Source
                     GithubReleaseType = $_.GithubReleaseType
                     GithubName = $_.GithubName
+                    GithubRelease = $_.GithubRelease                    
                     InstallType = $_.InstallType
                     SourceLocation = $_.SourceLocation
                     BackupSourceLocation = $_.BackupSourceLocation

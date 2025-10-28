@@ -21,13 +21,7 @@ function Get-PackagesfromInternet {
         Write-StartSubTaskMessage 
         if ($Line.Source -eq "Github"){
             $GithubDownloadLocation = $Settings.WebPackagesDownloadLocation
-            if (($Line.GithubReleaseType -eq "Release") -or ($Line.GithubReleaseType -eq "Release-NoArchive")){
-                $GithubOnlyReleaseVersions = 'TRUE'
-            }
-            else{
-                $GithubOnlyReleaseVersions = $null
-            }
-            if (-not(Get-GithubRelease -OnlyReleaseVersions $GithubOnlyReleaseVersions -GithubRelease $line.SourceLocation -Tag_Name $line.GithubReleaseType -Name $line.GithubName -LocationforDownload "$GithubDownloadLocation\$($line.FileDownloadName)" -Sort_Flag '')){
+            if (-not(Get-GithubRelease -GithubRepository $line.SourceLocation -GithubReleaseType $Line.GithubReleaseType -Tag_Name $line.GithubRelease -Name $line.GithubName -LocationforDownload "$GithubDownloadLocation\" -FileNameforDownload "$($line.FileDownloadName)")){
                 Write-ErrorMessage -Message "Error downloading $($line.GithubName)! Cannot continue!"
                 return $false
             }

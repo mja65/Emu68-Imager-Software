@@ -27,13 +27,13 @@ function Get-StartupFiles {
                 Write-InformationMessage "Downloading $($_.PackageName)"
                 if ($_.Source -eq 'Web'){
                     if (-not (Get-AmigaFileWeb -URL $_.SourceLocation -LocationforDL "$($Script:Settings.TempFolder)\StartupFiles" -NameofDL $_.FileDownloadName)){
-                        Write-ErrorMessage "Error downloading $PackageName! Cannot continue!"
+                        Write-ErrorMessage "Error downloading $($_.PackageName)! Cannot continue!"
                         return $false
                     }
                 }
                 elseif ($_.Source -eq 'Github'){
-                    if (-not(Get-GithubRelease -GithubRelease $_.SourceLocation -Tag_Name $_.GithubRelease -Name $_.GithubName -LocationforDownload "$($Script:Settings.TempFolder)\StartupFiles\$($_.FileDownloadName)" -Sort_Flag '')){
-                        Write-ErrorMessage -Message 'Error downloading HST-Imager! Cannot continue!'
+                    if (-not(Get-GithubRelease -GithubRepository $_.SourceLocation -GithubReleaseType $_.GithubReleaseType -Tag_Name $_.GithubRelease -Name $_.GithubName -LocationforDownload "$($Script:Settings.TempFolder)\StartupFiles\"-FileNameforDownload "$($_.FileDownloadName)")){
+                        Write-ErrorMessage -Message "Error downloading $($_.PackageName)! Cannot continue!"
                         return $false
                     }
                 }
