@@ -107,7 +107,7 @@ elseif ($Script:GUICurrentStatus.OperationMode -eq "Simple"){
 }
 
 $WPF_Window_Label_Title.Content = "Emu68 Imager v$([string]$Script:Settings.Version)" 
-$WPF_Window_Label_VersionStatus.Text = Get-Emu68ImagerCurrentVersion -GithubRelease "https://api.github.com/repos/mja65/Emu68Imager/releases" 
+$WPF_Window_Label_VersionStatus.Text = Get-Emu68ImagerCurrentVersion -GithubRelease  $Script:Settings.Emu68GithubRepository 
 
 If ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
     $WPF_StartPage = Get-XAML -WPFPrefix 'WPF_StartPage_' -XMLFile '.\Assets\WPF\Grid_StartPageAdvancedMode.xaml' -ActionsPath '.\Assets\UIActions\StartPage\' -AddWPFVariables

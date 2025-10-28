@@ -102,6 +102,7 @@ $Script:Settings = [PSCustomObject]@{
     HSTDetailedLogLocation = $null
     QuickStart_URL = "https://mja65.github.io/Emu68-Imager/quickstart.html"
     Documentation_URL = "https://mja65.github.io/Emu68-Imager/"
+    Emu68GithubRepository = "https://api.github.com/repos/mja65/Emu68Imager/releases"
     #DefaultImageLocation = 
     # LogDateTime = (Get-Date -Format yyyyMMddHHmmss).tostring()
     # TempFolder = '.\Temp\'
