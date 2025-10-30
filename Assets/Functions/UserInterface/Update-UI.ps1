@@ -330,9 +330,10 @@ function Update-UI {
                         $WPF_DP_DiskGrid_Amiga.Children.Remove($WPF_DP_DiskGrid_Amiga.Children[$i])
                     }
                     $WPF_DP_DiskGrid_Amiga.AddChild(((Get-Variable -Name ($Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionName+'_AmigaDisk')).value))
-                    if (-not ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries)){
+                    if ((-not ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries)) -or ($Script:GUICurrentStatus.ForceRecheckAmigaPartitionsandBoundaries -eq $true)) {
                         $WPF_DP_DiskGrid_Amiga.UpdateLayout()
-                        $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -Amiga)                               
+                        $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -Amiga)     
+                        $Script:GUICurrentStatus.ForceRecheckAmigaPartitionsandBoundaries = $false                          
                     }                    
                 }
                 else{

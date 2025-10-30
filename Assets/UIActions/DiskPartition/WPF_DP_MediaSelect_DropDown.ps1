@@ -1,6 +1,7 @@
 if (-not $Script:GUIActions.ListofRemovableMedia){
     $Script:GUIActions.ListofRemovableMedia = Get-RemovableMedia
     #$WPF_DP_MediaSelect_DropDown.ItemsSource = ($Script:GUIActions.ListofRemovableMedia)
+    $WPF_DP_MediaSelect_Dropdown.Items.Clear()
     foreach ($Disk in $Script:GUIActions.ListofRemovableMedia){
         $WPF_DP_MediaSelect_DropDown.AddChild($Disk.FriendlyName)       
     }
