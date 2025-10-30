@@ -40,6 +40,7 @@ $WPF_StartPage_ADFpath_Button_Check.Add_Click({
          }
          else {
             $Script:GUICurrentStatus.PackagesChanged = $null
+            $Script:GUICurrentStatus.IconsChanged = $null
          }
          Update-UI -Emu68Settings -CheckforRunningImage
     }

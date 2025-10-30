@@ -4,7 +4,7 @@ function Read-SettingsFile {
     )
     
     
-   # $SettingsFile = "C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Settings\Test2.e68"
+   # $SettingsFile = "C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Settings\teestdisk.e68"
 
    $ReadSettings = get-content -Path $SettingsFile
 
@@ -149,6 +149,7 @@ function Read-SettingsFile {
     $Script:GUIActions.FoundInstallMediatoUse = $null
     $Script:GUIActions.FoundKickstarttoUse = $null
     $Script:GUIActions.ListofRemovableMedia = $null
+    $Script:GUIActions.SelectedIconSet = $null
 
     $LoadedSettings | ForEach-Object {
         if ($_.Setting -eq 'DiskTypeSelected'){
@@ -201,20 +202,38 @@ function Read-SettingsFile {
         $array += $line.PackageNameFriendlyName
         $array += $line.PackageNameGroup
         $array += $line.PackageNameDescription
+        $array += $line.InstallMediaFlag
         [void]$Script:GUIActions.AvailablePackages.Rows.Add($array)
     }
     
     $Script:GUIActions.AvailableIconSets.Clear() 
-     
+    
+    $IndexForSelectedIconSet = $null
+    $Counter = 0
+
     foreach ($line in  $AvailableIconSets){
        $Array = @()
        $array += $line.IconSet
        $array += $line.IconSetDescription
        $array += $line.IconSetDefaultInstall
-      # $array += $line.IconSetUserSelected
+       $array += $line.IconSetUserSelected
        [void]$Script:GUIActions.AvailableIconSets.Rows.Add($array)
+       if ($Script:GUIActions.SelectedIconSet -eq $line.IconSet){
+        $IndexForSelectedIconSet = $Counter
+       }
+       $Counter ++
     }
+   
+        $WPF_PackageSelection_Datagrid_Packages.ItemsSource = $Script:GUIActions.AvailablePackages.DefaultView  
+        $WPF_PackageSelection_Datagrid_IconSets.ItemsSource = $Script:GUIActions.AvailableIconSets.DefaultView
 
+        if ($IndexForSelectedIconSet -ne $null){
+            $WPF_PackageSelection_Datagrid_IconSets.SelectedIndex  =  $IndexForSelectedIconSet
+            $WPF_PackageSelection_CurrentlySelectedIconSet_Value.text = $WPF_PackageSelection_Datagrid_IconSets.SelectedItem.IconSet
+
+        }
+
+        
     $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $false
 
     $WPF_StartPage_ScreenMode_Dropdown.SelectedItem = $Script:GUIActions.ScreenModetoUseFriendlyName
@@ -222,65 +241,68 @@ function Read-SettingsFile {
     $WPF_StartPage_Password_Textbox.Text = $Script:GUIActions.Password
     $WPF_StartPage_SSID_Textbox.Text = $Script:GUIActions.SSID
     
-    Set-InitialDiskValues -DiskType $DiskTypetouse -SizeBytes $GPTMBR.DiskSizeBytes -LoadSettings
+    if ($DiskTypetouse){
+        Set-InitialDiskValues -DiskType $DiskTypetouse -SizeBytes $GPTMBR.DiskSizeBytes -LoadSettings
+        $WPF_DP_Disk_GPTMBR.NumberofPartitionsMBR = $GPTMBR.NumberofPartitionsMBR
+        $WPF_DP_Disk_GPTMBR.NextPartitionMBRNumber = $GPTMBR.NextPartitionMBRNumber
 
-    $WPF_DP_Disk_GPTMBR.NumberofPartitionsMBR = $GPTMBR.NumberofPartitionsMBR
-    $WPF_DP_Disk_GPTMBR.NextPartitionMBRNumber = $GPTMBR.NextPartitionMBRNumber
-              
-    $MBRPartitions | ForEach-Object {
-        if ($_.PartitionType -eq 'MBR' -and $_.PartitionSubType -eq 'FAT32'){
-            if ($_.DefaultGPTMBRPartition -eq 'True'){
-                Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -DefaultPartition $true -SizeBytes ($($_.PartitionSizeBytes)) -VolumeName $_.VolumeName -StartingPositionBytes ($($_.StartingPositionBytes))                             
-            }
-            elseif ($_.ImportedPartition -eq 'True') { 
-                Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -PathtoImportedPartition $_.ImportedPartitionPath -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) -VolumeName $_.VolumeName
-            }
-            else {
-                Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) -VolumeName $_.VolumeName
-            } 
-        }
-        elseif ($_.PartitionType -eq 'MBR' -and $_.PartitionSubType -eq 'ID76'){
-            if ($_.DefaultGPTMBRPartition -eq 'True'){
-                Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -DefaultPartition $true -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) 
-                Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name
-            }
-            elseif ($_.ImportedPartition -eq 'True') {
-                Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -PathtoImportedPartition $_.ImportedPartitionPath -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes))
-                Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name -ImportedDisk
-            }
-            else {
-                Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes))
-                Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name 
-            }
-
-            foreach ($AmigaDisk in $RDB) {
-                if ($AmigaDisk.Name -eq "$($_.Name)_AmigaDisk"){
-                    (Get-Variable -name "$($_.Name)_AmigaDisk").Value.NextPartitionNumber = [int]$AmigaDisk.NextPartitionNumber
-                    (Get-Variable -name "$($_.Name)_AmigaDisk").Value.ID76PartitionParent = $AmigaDisk.ID76PartitionParent
-                    break
+        $MBRPartitions | ForEach-Object {
+            if ($_.PartitionType -eq 'MBR' -and $_.PartitionSubType -eq 'FAT32'){
+                if ($_.DefaultGPTMBRPartition -eq 'True'){
+                    Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -DefaultPartition $true -SizeBytes ($($_.PartitionSizeBytes)) -VolumeName $_.VolumeName -StartingPositionBytes ($($_.StartingPositionBytes))                             
                 }
+                elseif ($_.ImportedPartition -eq 'True') { 
+                    Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -PathtoImportedPartition $_.ImportedPartitionPath -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) -VolumeName $_.VolumeName
+                }
+                else {
+                    Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) -VolumeName $_.VolumeName
+                } 
+            }
+            elseif ($_.PartitionType -eq 'MBR' -and $_.PartitionSubType -eq 'ID76'){
+                if ($_.DefaultGPTMBRPartition -eq 'True'){
+                    Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -DefaultPartition $true -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) 
+                    Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name
+                }
+                elseif ($_.ImportedPartition -eq 'True') {
+                    Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -PathtoImportedPartition $_.ImportedPartitionPath -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes))
+                    Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name -ImportedDisk
+                }
+                else {
+                    Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes))
+                    Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name 
+                }
+    
+                foreach ($AmigaDisk in $RDB) {
+                    if ($AmigaDisk.Name -eq "$($_.Name)_AmigaDisk"){
+                        (Get-Variable -name "$($_.Name)_AmigaDisk").Value.NextPartitionNumber = [int]$AmigaDisk.NextPartitionNumber
+                        (Get-Variable -name "$($_.Name)_AmigaDisk").Value.ID76PartitionParent = $AmigaDisk.ID76PartitionParent
+                        break
+                    }
+                } 
+            }
+            
+        }  
+      
+        $RDBPartitions | ForEach-Object {
+            $AmigaDiskName = ($_.Name.Substring(0,($_.Name.IndexOf('_AmigaDisk_')+10)))
+            if ($_.DefaultAmigaWorkbenchPartition -eq 'True'){
+                Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -PartitionTypeAmiga 'Workbench' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask           
+    
+            }
+            elseif ($_.DefaultAmigaWorkPartition -eq 'True'){
+                Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -PartitionTypeAmiga 'Work' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask -ImportedFilesPath $_.ImportedFilesPath -ImportedFilesSpaceBytes $_.ImportedFilesSpaceBytes  
+            }
+            elseif ($_.ImportedPartition -eq 'True'){
+                Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask   
+            }
+            else {
+                Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask -ImportedFilesPath $_.ImportedFilesPath -ImportedFilesSpaceBytes $_.ImportedFilesSpaceBytes  
             } 
-        }
-        
-    }  
-  
-    $RDBPartitions | ForEach-Object {
-        $AmigaDiskName = ($_.Name.Substring(0,($_.Name.IndexOf('_AmigaDisk_')+10)))
-        if ($_.DefaultAmigaWorkbenchPartition -eq 'True'){
-            Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -PartitionTypeAmiga 'Workbench' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask           
+    
+        }            
+    }
 
-        }
-        elseif ($_.DefaultAmigaWorkPartition -eq 'True'){
-            Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -PartitionTypeAmiga 'Work' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask -ImportedFilesPath $_.ImportedFilesPath -ImportedFilesSpaceBytes $_.ImportedFilesSpaceBytes  
-        }
-        elseif ($_.ImportedPartition -eq 'True'){
-            Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask   
-        }
-        else {
-            Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask -ImportedFilesPath $_.ImportedFilesPath -ImportedFilesSpaceBytes $_.ImportedFilesSpaceBytes  
-        } 
-
-    }            
+              
 
     if ($Script:GUIActions.OutputType -eq "Disk"){
         $WPF_DP_MediaSelect_Type_DropDown.SelectedItem = "Disk"
@@ -290,16 +312,21 @@ function Read-SettingsFile {
         $Script:GUIActions.ImageSizeSelected = $true
 
     }
-
-
-    # if ($WPF_DP_Disk_GPTMBR.DiskSizeBytes) {
+    
+        # if ($WPF_DP_Disk_GPTMBR.DiskSizeBytes) {
     #     $SizeToPopulate = (Get-ConvertedSize -Size $WPF_DP_Disk_GPTMBR.DiskSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 4)
     #     $WPF_DP_Input_DiskSize_Value.text =  $SizeToPopulate.Size
     #     $WPF_DP_Input_DiskSize_SizeScale_Dropdown.SelectedItem = $SizeToPopulate.Scale
     # }
 
-    Update-UI -MainWindowButtons -Emu68Settings -DiskPartitionWindow -UpdateInputBoxes -Buttons -PhysicalvsImage -CheckforRunningImage -freespacealert
+    if ($DiskTypetouse){
+        Update-UI -MainWindowButtons -Emu68Settings -DiskPartitionWindow -UpdateInputBoxes -Buttons -PhysicalvsImage -CheckforRunningImage -freespacealert
 
+    }
+    else{
+    Update-UI -MainWindowButtons -Emu68Settings UpdateInputBoxes -Buttons -PhysicalvsImage -CheckforRunningImage
+    }
+        
     return $true
 
 }

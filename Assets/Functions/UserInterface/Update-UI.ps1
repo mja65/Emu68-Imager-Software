@@ -22,7 +22,7 @@ function Update-UI {
 
     
     if ($PackageSelectionWindow){
-        if ($Script:GUICurrentStatus.PackagesChanged -ne $true){
+        if ($Script:GUICurrentStatus.PackagesChanged -ne $true -and $Script:GUICurrentStatus.IconsChanged -ne $true){
             $WPF_PackageSelection_PackageSelection_Label.Text = "Note: If you make changes on this screen after you have performed checks on the installation media you will need to reperform those checks"
             
         }

@@ -15,12 +15,15 @@ function Write-AvailableIconsets {
        [void]$Script:GUIActions.AvailableIconSets.Rows.Add($array)
     }
     
-    $UserSelectableIconSets | ForEach-Object {
-        if ($_.IconSetDefaultInstall -eq $true){
-            $Script:GUIActions.SelectedIconSet = $_.IconSet
-            if ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
-                $WPF_PackageSelection_CurrentlySelectedIconSet_Value.text = $_.IconSet
+    if (-not ($Script:GUIActions.SelectedIconSet)){
+        $UserSelectableIconSets | ForEach-Object {
+            if ($_.IconSetDefaultInstall -eq $true){
+                $Script:GUIActions.SelectedIconSet = $_.IconSet
+                if ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
+                    $WPF_PackageSelection_CurrentlySelectedIconSet_Value.text = $_.IconSet
+                }
             }
         }
     }
+
 }

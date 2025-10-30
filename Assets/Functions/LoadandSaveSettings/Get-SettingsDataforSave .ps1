@@ -28,7 +28,9 @@ function Get-SettingsDataforSave {
     $Output += "Setting;ROMLocation;$($Script:GUIActions.ROMLocation)"
     $Output += "Setting;SelectedIconSet;$($Script:GUIActions.SelectedIconSet)"
     $Output += "Setting;InstallOSFiles;$($Script:GUIActions.InstallOSFiles)"
-
+    $Output += "Setting;DefaultPackagesSelected;$($Script:GUIActions.DefaultPackagesSelected)"
+    $Output += "Setting;DefaultIconsetSelected;$($Script:GUIActions.DefaultIconsetSelected)"
+   
     $Output += "GPTMBR Disk Details:"
     $Output += "GPTMBRHeader;Type;GPTMBRDisk;DiskType;DiskSizeBytes;MBROverheadBytes;NumberofPartitionsMBR;NextPartitionMBRNumber"
     if ($WPF_DP_Disk_GPTMBR){
@@ -61,7 +63,11 @@ function Get-SettingsDataforSave {
     else {
         $Output += "MBRPartitionDetails;NOTAVAILABLE"
     }
-
+    
+    if (-not ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries)){
+        $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -Amiga)
+    }     
+            
     $Output += "RDB Partition Details:"
     $Output += "RDBPartitionHeader;Type;Name;ImportedPartitionMethod;ImportedPartition;ImportedFilesSpaceBytes;StartingPositionBytes;PartitionSizeBytes;PartitionType;ImportedFilesPath;DefaultAmigaWorkbenchPartition;PartitionTypeGPTMBRorAmiga;DefaultAmigaWorkPartition;ImportedPartitionPath;VolumeName;VolumeNameOriginalImportedValue;Bootable;BootableOriginalImportedValue;DosType;DosTypeOriginalImportedValue;NoMount;NoMountOriginalImportedValue;Priority;PriorityOriginalImportedValue;MaxTransfer;MaxTransferOriginalImportedValue;DeviceName;DeviceNameOriginalImportedValue;Buffers;BuffersOriginalImportedValue;Mask;MaskOriginalValue"    
     $RDBPartitions = $Script:GUICurrentStatus.AmigaPartitionsandBoundaries
