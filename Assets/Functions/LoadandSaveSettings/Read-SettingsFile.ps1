@@ -268,9 +268,11 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
    # $ImportFilesHeader = ('Type','Partition','FullPath','Size','CreationTime','Source','PathHeader')
    
    # Remove existing Partitions 
-
-    $WPF_DP_MediaSelect_Type_DropDown.SelectedItem =$null
-
+   
+   $WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
+   
+   $WPF_DP_MediaSelect_Dropdown.SelectedItem = $null
+   
     Remove-Variable -Scope Script -Name 'WPF_DP_Partition*'
     
     if (test-path variable:script:WPF_DP_Disk_GPTMBR) {
