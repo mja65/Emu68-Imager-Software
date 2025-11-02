@@ -28,9 +28,14 @@ function Get-IconPositionScript {
            $Remainder = "$DrawerXtoUse$DrawerYtoUse$DrawerWidthToUse$DrawerHeightToUse"
            $IconPosScript += "iconpos >NIL: `"SYS:$($_.File)`" type=$($_.Type) $($_.IconX) $($_.IconY) $Remainder"
         }
+       
+        if  ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries){
+            $ListofDisks = $Script:GUICurrentStatus.AmigaPartitionsandBoundaries
+        }
+        else {
+            $ListofDisks = (Get-AllGUIPartitionBoundaries -Amiga)
+        }
 
-        $ListofDisks = $Script:GUICurrentStatus.AmigaPartitionsandBoundaries
-        
         $HashTableforDefaultDisks = @{} # Clear Hash
         Get-InputCSVs -Diskdefaults | ForEach-Object {
             $HashTableforDefaultDisks[$_.DeviceName] = @($_.IconX,$_.IconY) 
