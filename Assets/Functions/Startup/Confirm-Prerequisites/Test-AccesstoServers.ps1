@@ -34,6 +34,11 @@ function Test-AccesstoServers {
         ServerName = "ibrowse-dev.net"
         FatalError = 0
     }
+    
+    $ServerList += [PSCustomObject]@{
+    ServerName = "mja65.github.io"
+    FatalError = 0
+}
 
     $ErrorCount = 0
     $FatalErrorCount = 0
