@@ -18,6 +18,12 @@ function Write-AmigaFilestoInterimDrive {
 #    $CopyRemainingFiles = $true
 #    $wifiprefs = $true
 
+    Write-Emu68ImagerLog -Continue
+
+    if ($Script:GUIActions.OutputType -eq 'Image' -and ($Script:GUIActions.OutputPath.Substring($Script:GUIActions.OutputPath.Length-3) -eq 'img')){
+        $Script:Settings.TotalNumberofTasks ++
+    }
+
     $Script:Settings.CurrentTaskName = "Determining list of OS files, local install files, and files from internet to be installed"
 
     Write-StartTaskMessage

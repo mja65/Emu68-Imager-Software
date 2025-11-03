@@ -61,35 +61,45 @@ Log created at: $DateandTime
 
     }
     elseif($Continue){ 
+
+        if ($Script:GUIActions.WifiPassword) {
+                $WifiPasswordtoReturn = "Populated"
+        }
+        else {
+            $WifiPasswordtoReturn = "Not Populated"
+        }
+        if ($Script:GUIActions.SSID) {
+                $SSIDtoReturn = "Populated"
+        }
+        else {
+            $SSIDtoReturn = "Not Populated"
+        }
+       
         $LogEntry =     @"
 
 Parameters used: 
 
-Script:HSTDiskName =  [$Script:HSTDiskName]
-Script:DiskFriendlyName = [$Script:DiskFriendlyName]
-Script:ScreenModetoUse = [$Script:ScreenModetoUse]
-Script:ScreenModetoUseFriendlyName = [$Script:ScreenModetoUseFriendlyName]
-Script:KickstartVersiontoUse = [$Script:KickstartVersiontoUse]
-Script:SizeofFAT32 = [$Script:SizeofFAT32]
-Script:SizeofImage = [$Script:SizeofImage]
-Script:SizeofDisk = [$Script:SizeofDisk]
-Script:SizeofPartition_System = [$Script:SizeofPartition_System]
-Script:SizeofPartition_Other = [$Script:SizeofPartition_Other]
-Script:ImageOnly = [$Script:ImageOnly]
-Script:SetDiskupOnly = [$Script:SetDiskupOnly]
-Script:WorkingPath = [$Script:WorkingPath]
-Script:WorkingPathDefault = [$Script:WorkingPathDefault]
-Script:ROMPath = [$Script:ROMPath]
-Script:ADFPath = [$Script:ADFPath]
-Script:LocationofImage = [$Script:LocationofImage]
-Script:TransferLocation = [$Script:TransferLocation]
-Script:WriteMethod = [$Script:WriteMethod]
-Script:DeleteAllWorkingPathFiles = [$Script:DeleteAllWorkingPathFiles]
+Operation Mode = [$($Script:GUICurrentStatus.OperationMode)]
+RunMode = [$($Script:GUICurrentStatus.RunMode)]
+Default Packages Selected = [$($Script:GUIActions.DefaultPackagesSelected)]
+Default IconSet Selected = [$($Script:GUIActions.DefaultIconsetSelected)]
+Icon Set Selected = [$($Script:GUIActions.SelectedIconset)]
+OS to be installed = [$($Script:GUIActions.KickstartVersiontoUse)]
+Script Path = [$($Script:GUIActions.ScriptPath)]
+Output Path = [$($Script:GUIActions.OutputPath)]
+OutputType = [$($Script:GUIActions.OutputType)]
+Install OS Files = [$($Script:GUIActions.InstallOSFiles)]
+ScreenMode to Use = [$($Script:GUIActions.ScreenModetoUse)]
+Install Media Location (blank is default) = [$($Script:GUIActions.InstallMediaLocation)]  
+Kickstart ROM Location (blank is default) [$($Script:GUIActions.ROMLocation)]
+SSID [$SSIDtoReturn)]
+WifiPassword [$WifiPasswordtoReturn)] 
+
 
 Activity Commences:
 
 "@
-
+     
         $utf8NoBOM = New-Object System.Text.UTF8Encoding($false)
         $streamWriter = New-Object System.IO.StreamWriter($Script:Settings.LogLocation, $true, $utf8NoBOM)
 
