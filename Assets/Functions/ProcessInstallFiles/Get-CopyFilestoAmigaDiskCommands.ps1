@@ -60,7 +60,7 @@ function Get-CopyFilestoAmigaDiskCommands {
 
     }
     else {
-        Write-Warning -Message "Not creating disk.info files for Amiga disks as icons not available (you haven't installed an OS)"
+        Write-WarningMessage -Message "Not creating disk.info files for Amiga disks as icons not available (you haven't installed an OS)"
         
     }
 

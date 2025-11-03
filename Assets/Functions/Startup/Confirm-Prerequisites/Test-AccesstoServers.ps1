@@ -52,7 +52,7 @@ function Test-AccesstoServers {
             Write-InformationMessage "Connection to $($server.Servername) successful"
         }
         else {
-            Write-ErrorMessage -Message "Connection to $($server.Servername) unsuccessful! Possible connection issues with site."
+            Write-WarningMessage -Message "Connection to $($server.Servername) unsuccessful! Possible connection issues with site."
             $ErrorCount ++
             $FatalErrorCount += $server.FatalError
         }

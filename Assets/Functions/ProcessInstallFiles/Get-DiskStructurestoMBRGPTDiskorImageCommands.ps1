@@ -165,7 +165,7 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
                                        }                                     
                                    }
                                    else {
-                                    Write-Warning -Message "Not creating .info file for imported files folder as icons not available (you haven't installed an OS)"
+                                    Write-WarningMessage -Message "Not creating .info file for imported files folder as icons not available (you haven't installed an OS)"
                                    }
                                }
                                else {

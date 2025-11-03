@@ -33,7 +33,7 @@ function Copy-EMU68BootFiles {
             }
         }
         else {
-            Write-Warning -Message "Not creating disk.info file for Emu68Boot folder as icons not available (you haven't installed an OS)"
+            Write-WarningMessage -Message "Not creating disk.info file for Emu68Boot folder as icons not available (you haven't installed an OS)"
         }
 
     }
@@ -75,7 +75,7 @@ function Copy-EMU68BootFiles {
             $null = Copy-Item "$DiskIconsPath\Emu68BootDrive\disk.info" -Destination "$Emu68BootPath"
         }
         else {
-            Write-Warning -Message "Not creating disk.info file for Emu68Boot folder as icons not available (you haven't installed an OS)"
+            Write-WarningMessage -Message "Not creating disk.info file for Emu68Boot folder as icons not available (you haven't installed an OS)"
         }
 
     }
