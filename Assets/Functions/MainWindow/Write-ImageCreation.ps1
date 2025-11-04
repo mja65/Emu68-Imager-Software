@@ -104,9 +104,9 @@ function Write-ImageCreation {
      
      $Script:Settings.TotalNumberofSubTasks = 4
 
-     if ($OutputTypetoUse -eq "IMGImage"){
-        $Script:Settings.TotalNumberofSubTasks --
-     }
+   #   if ($OutputTypetoUse -eq "IMGImage"){
+   #      $Script:Settings.TotalNumberofSubTasks --
+   #   }
 
      $Script:Settings.CurrentSubTaskNumber = 0
 
