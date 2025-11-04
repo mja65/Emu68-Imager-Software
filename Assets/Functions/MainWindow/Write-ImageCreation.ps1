@@ -4,7 +4,7 @@ function Write-ImageCreation {
     )
     
     if ($Script:GUICurrentStatus.RunMode -eq 'CommandLine'){
-       get-process -id $Pid | set-windowstate -State SHOWDEFAULT
+       get-process -id $Pid | set-windowstate -State SHOWDEFAULT -SuppressErrors
      }
 
      $Script:GUICurrentStatus.ProgressBarMarkers = $Script:Settings.ProgressBarMarkers | Where-Object {(([System.Version]$Script:GUIActions.KickstartVersiontoUse).Major -eq ([System.Version]$_.KickstartVersion).major -and ([System.Version]$Script:GUIActions.KickstartVersiontoUse).Minor -eq ([System.Version]$_.KickstartVersion).Minor)}

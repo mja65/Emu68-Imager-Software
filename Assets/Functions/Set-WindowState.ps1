@@ -106,6 +106,7 @@ public static extern bool SetForegroundWindow(IntPtr hWnd);
                 if (-not $SuppressErrors) {
                     Write-Error "Main Window handle is '0'"
                 } else {
+                    Write-ErrorMessage -Message "Could not change Window State! Are you running directly by double clicking Emu68Imager.cmd?"
                     Write-Verbose ("Skipping '{0}' with id '{1}', because Main Window handle is '0'" -f $process.ProcessName, $process.Id)
                 }
 
