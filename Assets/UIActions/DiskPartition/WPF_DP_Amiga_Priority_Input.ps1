@@ -15,8 +15,10 @@ $WPF_DP_Amiga_Priority_Input.add_LostFocus({
     
     if ($WPF_DP_Amiga_Priority_Input.ValueWhenEnterorButtonPushed -ne $WPF_DP_Amiga_Priority_Input.Text -and $WPF_DP_Amiga_Priority_Input.InputEntryChanged){
         # Write-debug 'Lost Focus - Performing action for WPF_DP_Amiga_Priority_Input'
-        $Script:GUICurrentStatus.SelectedAmigaPartition.Priority = $WPF_DP_Amiga_Priority_Input.Text
-        Update-UITextbox -Partition $script:GUICurrentStatus.SelectedAmigaPartition -TextBoxControl $WPF_DP_Amiga_Priority_Input -Value 'Priority' -CanChangeParameter 'CanChangePriority'
+        if ($Script:GUICurrentStatus.SelectedAmigaPartition){
+            $Script:GUICurrentStatus.SelectedAmigaPartition.Priority = $WPF_DP_Amiga_Priority_Input.Text
+            Update-UITextbox -Partition $script:GUICurrentStatus.SelectedAmigaPartition -TextBoxControl $WPF_DP_Amiga_Priority_Input -Value 'Priority' -CanChangeParameter 'CanChangePriority'
+        }
 
     }
     else {
@@ -39,8 +41,10 @@ $WPF_DP_Amiga_Priority_Input.Add_KeyDown({
             # Write-debug "WPF_DP_Amiga_Priority_Input: Recording value of: $($WPF_DP_Amiga_Priority_Input.ValueWhenEnterorButtonPushed) and actioning. EntryType is: $($WPF_DP_Amiga_Priority_Input.EntryType) InputEntry is: $($WPF_DP_Amiga_Priority_Input.InputEntry) InputEntryChanged is: $($WPF_DP_Amiga_Priority_Input.InputEntryChanged) InputEntryInvalid is: $($WPF_DP_Amiga_Priority_Input.InputEntryInvalid) InputEntryScaleChanged is: $($WPF_DP_Amiga_Priority_Input.InputEntryScaleChanged) ValueWhenEnterorButtonPushed is: $($WPF_DP_Amiga_Priority_Input.ValueWhenEnterorButtonPushed)" 
 
             $WPF_DP_Amiga_Priority_Input.InputEntry = $true
-            $Script:GUICurrentStatus.SelectedAmigaPartition.Priority = $WPF_DP_Amiga_Priority_Input.Text
-            Update-UITextbox -Partition $script:GUICurrentStatus.SelectedAmigaPartition -TextBoxControl $WPF_DP_Amiga_Priority_Input -Value 'Priority' -CanChangeParameter 'CanChangePriority'
+            if ($Script:GUICurrentStatus.SelectedAmigaPartition){
+                $Script:GUICurrentStatus.SelectedAmigaPartition.Priority = $WPF_DP_Amiga_Priority_Input.Text
+                Update-UITextbox -Partition $script:GUICurrentStatus.SelectedAmigaPartition -TextBoxControl $WPF_DP_Amiga_Priority_Input -Value 'Priority' -CanChangeParameter 'CanChangePriority'
+            }
 
         }
         else {
