@@ -27,7 +27,6 @@ $WPF_Window_Button_SetupDisk.Add_Click({
                     if  (-not ($HashTableforInstallMedia.ContainsKey($_.SourceLocation) -and $_.Source -eq 'ADF')){
                         # Write-debug "Install Media requirements changed"
                         $Script:GUIActions.FoundInstallMediatoUse = $null
-                        break               
                     } 
                  }
             }
@@ -46,7 +45,6 @@ $WPF_Window_Button_SetupDisk.Add_Click({
         for ($i = 0; $i -lt $WPF_Window_Main.Children.Count; $i++) {        
             if ($WPF_Window_Main.Children[$i].Name -eq $WPF_Partition.Name){
                 $IsChild = $true
-                break
             }
         }
     
