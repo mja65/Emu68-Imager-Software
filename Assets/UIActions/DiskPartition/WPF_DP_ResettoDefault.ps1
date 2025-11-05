@@ -5,6 +5,13 @@ $WPF_DP_ResettoDefault.Add_Click({
        
         if ((Show-WarningorError -Msg_Header $Msg_Header -Msg_Body $Msg_Body -BoxTypeWarning -ButtonType_OKCancel) -eq 'OK'){
             
+            # if ($Script:GUIActions.InstallOSFiles -eq $true){
+
+            # }
+            # else {
+                
+            # }
+
             $Script:GUICurrentStatus.SelectedAmigaPartition = $null
             $Script:GUICurrentStatus.SelectedGPTMBRPartition = $null
             $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = $null
@@ -23,7 +30,7 @@ $WPF_DP_ResettoDefault.Add_Click({
                 Remove-Variable -Scope Script -Name 'WPF_DP_Disk_GPTMBR'
             }
         
-            Update-UI -DiskPartitionWindow -freespacealert -HighlightSelectedPartitions
+            Update-UI -DiskPartitionWindow -freespacealert -HighlightSelectedPartitions -MainWindowButtons -Emu68Settings
         
         }
         else {

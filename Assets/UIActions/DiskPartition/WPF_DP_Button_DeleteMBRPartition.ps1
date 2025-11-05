@@ -4,13 +4,13 @@ $WPF_DP_Button_DeleteMBRPartition.add_click({
     }
     # $Script:GUICurrentStatus.SelectedGPTMBRPartition = 'WPF_DP_Partition_MBR_2'
     if ($Script:GUICurrentStatus.SelectedGPTMBRPartition){
-        If (($Script:GUICurrentStatus.SelectedGPTMBRPartition.DefaultGPTMBRPartition -eq $true) -and ($Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'ID76')){
+        If (($Script:GUIActions.InstallOSFiles -eq $true) -and ($Script:GUICurrentStatus.SelectedGPTMBRPartition.DefaultGPTMBRPartition -eq $true) -and ($Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'ID76')){
 
 $MessageBody = 
 @"
 You have selected the default ID 0x76 Amiga Partition for deletion! If you really want to do this you will not be installing ANY OS files! 
 
-All currently selected Kickstart ROMs, Workbench install files, and user selected packages will be unselected. If you change your mind after deleting and want to create an image with an installed OS you will need to restart the Imager and repeform those steps. 
+All currently selected Kickstart ROMs, Workbench install files, and user selected packages will be unselected. If you change your mind after deleting and want to create an image with an installed OS you will need to you will need to reset the disk and reperform those steps. 
 
 Press OK to continue otherwise cancel
 "@   
