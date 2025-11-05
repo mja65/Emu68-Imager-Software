@@ -12,8 +12,7 @@ function Get-Emu68ImagerCurrentVersion {
     
     $Counter = 0
     $IsSuccess = $null
-
-
+  
     do {
         $GithubDetails = $client.GetStringAsync($GithubRelease).Result
         if ($GithubDetails){
@@ -37,16 +36,29 @@ function Get-Emu68ImagerCurrentVersion {
         $VersionFound = ($GithubDetails | Select-Object -First 1).tag_name      
                
         if([system.version]$VersionFound -gt $Script:Settings.Version){
-            $VersionInformationtoReport = "Version found on server: $VersionFound. Your version of Emu68 Imager needs updating!"
 
-    
+            $VersionInformationtoReport = [PSCustomObject]@{
+                TexttoReport  = "Version found on server: $VersionFound. Your version of Emu68 Imager needs updating!"
+                IsUptoDate = $false
+            }
+            
         }
         else {
-            $VersionInformationtoReport = "Version of Emu68 Imager on server: $VersionFound. Your version of Emu68 Imager is up to date."
+            
+            $VersionInformationtoReport = [PSCustomObject]@{
+                TexttoReport  = "Version of Emu68 Imager on server: $VersionFound. Your version of Emu68 Imager is up to date."
+                IsUptoDate = $true
+            }
+
         }
     }
     else {
-        $VersionInformationtoReport  = "Version of Emu68 Imager on server: Could not access Github!"
+        
+        $VersionInformationtoReport = [PSCustomObject]@{
+            TexttoReport  = "Version of Emu68 Imager on server: Could not access Github!"
+            IsUptoDate = $null
+        }      
+
     }
     
     return $VersionInformationtoReport 

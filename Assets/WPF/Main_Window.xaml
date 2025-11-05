@@ -120,6 +120,11 @@
         <Button x:Name="Button_SaveSettings" Content="Save Settings" HorizontalAlignment="Left" Margin="10,410,0,0" VerticalAlignment="Top" Height="30" Width="120"/>
         <Label x:Name="Label_Title" Content="Emu68 Imager" HorizontalAlignment="Left" Margin="7,5,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold"/>
          <TextBox x:Name="Label_VersionStatus" Visibility="Visible" HorizontalAlignment="Right" Margin="0,5,0,0" VerticalAlignment="Top" TextWrapping="Wrap" Text="XXXX"  FontSize="18" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
+        <TextBlock x:Name="VersionStatus_URL_TextBlock" Visibility="Visible" HorizontalAlignment="Right" Margin="0,40,0,0" TextWrapping="Wrap"  FontSize="15" VerticalAlignment="Top">
+            <Hyperlink x:Name="Emu68ImagerReleasePageURL" NavigateUri="https://github.com/mja65/Emu68-Imager-Software/releases">
+             Click to go to Download Page
+            </Hyperlink>
+        </TextBlock>
         <Button x:Name="Button_Run" Content="Missing information in order to run tool! Press button to see further details" Background = '#FFFF0000' Foreground = '#FF000000' HorizontalAlignment="Center" Margin="0,910,0,0" VerticalAlignment="Top" Height="40" Width="900" />
     </Grid>
 
