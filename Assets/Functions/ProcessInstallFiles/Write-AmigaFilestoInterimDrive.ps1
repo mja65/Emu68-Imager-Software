@@ -208,6 +208,7 @@ function Write-AmigaFilestoInterimDrive {
             }
        }
         elseif ($IconsPaths.SystemDiskIconInstallMedia -eq 'CD'){
+            if (-not (Copy-CDFiles -HSTImager -InputFile $IconsPaths.InstallMediaPathSystemDiskIcon -FiletoExtract $IconsPaths.SystemDiskIconFilestoInstall -OutputDirectory "$DestinationPath\SystemDiskIcon")){
                 Write-ErrorMessage -Message 'Error extracting file(s) from CD! Quitting'
                 exit      
             }  
