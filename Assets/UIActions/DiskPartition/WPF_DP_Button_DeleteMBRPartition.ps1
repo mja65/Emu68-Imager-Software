@@ -32,6 +32,8 @@ Press OK to continue otherwise cancel
         }
 
 
+        $PartitiontoDelete = $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionName
+
         if ((Remove-MBRGUIPartition -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition) -eq $false){
             Show-WarningorError -Msg_Header 'Cannot Delete Partition' -Msg_Body 'MBR Partition is default partition. Cannot delete.' -BoxTypeError -ButtonType_OK
             return
@@ -39,30 +41,26 @@ Press OK to continue otherwise cancel
     
         if ($DeleteUnderlyingAmigaPartitions -eq $true){
             $Script:GUICurrentStatus.SelectedAmigaPartition = $null
-            $ListofPartitionstoDelete = ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries | Where-Object {$_.PartitionName -match $Script:GUICurrentStatus.SelectedGPTMBRPartition} ).PartitionName
+            $ListofPartitionstoDelete = ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries | Where-Object {$_.PartitionName -match $PartitiontoDelete} ).PartitionName
             if ($ListofPartitionstoDelete){
                 $ListofPartitionstoDelete  | ForEach-Object {
                     Remove-Variable -Scope Script -Name $_
                 }
         
-                Remove-Variable -Scope Script -Name  "$($Script:GUICurrentStatus.SelectedGPTMBRPartition)_AmigaDisk"
+                Remove-Variable -Scope Script -Name  "$($PartitiontoDelete)_AmigaDisk"
             }
+            $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -Amiga)
         }
 
         if ($DeleteDefaultAmigaPartition -eq $true){
             $Script:GUIActions.InstallOSFiles = $false
             $Script:GUIActions.InstallMediaLocation = $null
-            $Script:GUIActions.ROMLocation = $null
-            $Script:GUIActions.KickstartVersiontoUse = $null
-            $Script:GUIActions.KickstartVersiontoUseFriendlyName = $null
             $Script:GUIActions.OSInstallMediaType = $null
-            $Script:GUIActions.FoundInstallMediatoUse = $null
-            $Script:GUIActions.FoundKickstarttoUse = $null
         }
 
         $Script:GUICurrentStatus.SelectedGPTMBRPartition = $null
 
-        Update-UI -DiskPartitionWindow -HighlightSelectedPartitions
+        Update-UI -DiskPartitionWindow -HighlightSelectedPartitions -Emu68Settings -MainWindowButtons
         
     }
     else {
