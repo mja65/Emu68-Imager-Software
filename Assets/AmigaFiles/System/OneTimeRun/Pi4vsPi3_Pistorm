@@ -1,32 +1,27 @@
-IF ${System} EQ "PistormRaspi4"
+IF $System EQ "PistormRaspi4"
 	Echo "Raspberry 4 (or CM4) Found - brcm-emmc.device"
 	rename from Sys:Devs/DOSDrivers/SD0Pi4 to Sys:Devs/DOSDrivers/SD0 QUIET
-	IF ${KickstartVersion} EQ 3.2
+	IF $KickstartVersion EQ 3.2
 		delete Sys:Tools/HDToolbox.info QUIET
 	ENDIF
-	IF ${KickstartVersion} EQ 3.9
-		Skip Cmdline
+	IF $KickstartVersion EQ 3.9
+		Skip End
 	ENDIF
 	rename from Sys:Tools/HDToolboxPi4.info to Sys:Tools/HDToolbox.info QUIET
 	Delete Sys:Devs/DOSDrivers/SD0Pi3 QUIET
 	Delete Sys:Tools/HDToolboxPi3.info QUIET 
 ENDIF
-IF ${System} EQ "PistormRaspi3"
+IF $System EQ "PistormRaspi3"
 	Echo "Raspberry 3 (or Raspberry Zero2) Found - brcm-sdhc.device"
 	rename from Sys:Devs/DOSDrivers/SD0Pi3 to Sys:Devs/DOSDrivers/SD0 QUIET
-	IF ${KickstartVersion} EQ 3.2
+	IF $KickstartVersion EQ 3.2
 		delete Sys:Tools/HDToolbox.info QUIET
 	ENDIF
-	IF ${KickstartVersion} EQ 3.9
-		Skip Cmdline
+	IF $KickstartVersion EQ 3.9
+		Skip End
 	ENDIF
 	rename from Sys:Tools/HDToolboxPi3.info to Sys:Tools/HDToolbox.info QUIET
 	Delete Sys:Devs/DOSDrivers/SD0Pi4 QUIET
 	Delete Sys:Tools/HDToolboxPi4.info QUIET
 ENDIF
-LAB Cmdline
-Mount SD0: >NIL:
-echo "sd.low_speed emmc.low_speed sd.unit0=rw emmc.unit0=rw" >EMU68BOOT:cmdline.txt
-Assign SD0: DISMOUNT >NIL:
-Assign EMU68BOOT: DISMOUNT >NIL:
-
+LAB End

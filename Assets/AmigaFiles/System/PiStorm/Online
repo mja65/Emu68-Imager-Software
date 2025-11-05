@@ -159,7 +159,7 @@ if not warn
     Skip End
 endif
 if exists SYS:Prefs/ENV-ARCHIVE/TZONEOVERRIDE
-    c:setDST ZONE=${TZONEOVERRIDEs}
+    c:setDST ZONE=$TZONEOVERRIDEs
 else
     c:SetDST NOASK NOREQ QUIET >NIL:
 endif

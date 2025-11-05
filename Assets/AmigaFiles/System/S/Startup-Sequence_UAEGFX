@@ -1,4 +1,4 @@
-IF ${System} EQ "WinUAE" 
+IF $System EQ "WinUAE" 
     IF exists Devs:Picasso96Settings   
     RENAME Devs:Picasso96Settings Devs:Picasso96SettingsPiStorm QUIET
     ENDIF
