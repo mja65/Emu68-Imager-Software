@@ -10,7 +10,7 @@ $MessageBody =
 @"
 You have selected the default ID 0x76 Amiga Partition for deletion! If you really want to do this you will not be installing ANY OS files! 
 
-All currently selected Kickstart ROMs, Workbench install files, and user selected packages will be unselected. If you change your mind after deleting and want to create an image with an installed OS you will need to you will need to reset the disk and reperform those steps. 
+All currently selected Workbench install files, and user selected packages will be unselected. If you change your mind after deleting and want to create an image with an installed OS you will need to you will need to reset the disk (i.e. press the "Reset to Start" button) and reperform those steps. 
 
 Press OK to continue otherwise cancel
 "@   
@@ -53,9 +53,20 @@ Press OK to continue otherwise cancel
         }
 
         if ($DeleteDefaultAmigaPartition -eq $true){
-            $Script:GUIActions.InstallOSFiles = $false
-            $Script:GUIActions.InstallMediaLocation = $null
-            $Script:GUIActions.OSInstallMediaType = $null
+
+        $Script:GUIActions.InstallOSFiles = $false
+        $Script:GUIActions.InstallMediaLocation = $null
+        $Script:GUIActions.OSInstallMediaType = $null
+        $Script:GUIActions.FoundInstallMediatoUse = $null
+        $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $true
+        $Script:GUICurrentStatus.InstallMediaRequiredFromUserSelectablePackages = @()
+        $Script:GUICurrentStatus.PackagesChanged = $null
+        $Script:GUIActions.DefaultPackagesSelected = $null 
+        $Script:GUIActions.DefaultIconsetSelected = $null
+        $Script:GUIActions.SelectedIconSet = $null 
+        $Script:GUIActions.AvailablePackages.Clear()
+        $Script:GUIActions.AvailableIconSets.Clear()
+
         }
 
         $Script:GUICurrentStatus.SelectedGPTMBRPartition = $null
@@ -64,7 +75,7 @@ Press OK to continue otherwise cancel
         
     }
     else {
-        Show-WarningorError -Msg_Header 'Cannot Delete Partition' -Msg_Body "No partititon is selected!" -BoxTypeError -ButtonType_OK
+        Show-WarningorError -Msg_Header 'Cannot Delete Partition' -Msg_Body "No partition is selected!" -BoxTypeError -ButtonType_OK
         return
     }
 })

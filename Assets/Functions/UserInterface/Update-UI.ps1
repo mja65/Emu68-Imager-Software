@@ -64,6 +64,10 @@ function Update-UI {
             $WPF_Window_Button_PackageSelection.Visibility = 'Hidden'
 
         }
+        if ($Script:GUIActions.InstallOSFiles -eq $true) {
+            $WPF_Window_Button_PackageSelection.Visibility = 'Visible'
+
+        }
 
     }
 
