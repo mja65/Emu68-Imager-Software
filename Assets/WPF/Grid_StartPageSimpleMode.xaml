@@ -52,11 +52,11 @@
          </GroupBox>
          <GroupBox x:Name="SourceFiles_GroupBox" Header="Source Files" Background="Transparent" Margin="7,120,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="540">
              <Grid Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
-                 <Button x:Name="ADFpath_Button" Content="Click to set Install Media folder" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top"  Width="200" Height="30"/>
+                 <Button x:Name="ADFpath_Button" ToolTip="Click to set custom Install files folder" Content="Click to set Install Media folder" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top"  Width="200" Height="30"/>
                  <Button x:Name="ADFpath_Button_Check" ToolTip="Check availability of Install files" Content="Check" HorizontalAlignment="Left" Margin="215,60,0,0" VerticalAlignment="Top"  Width="40" Height="30" FontSize="10"/>
                  <TextBox x:Name="ADFPath_Label" HorizontalAlignment="Left" Margin="263,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="Using default install media folder" VerticalAlignment="Top" Width="260" Height="30"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
 
-                 <Button x:Name="Rompath_Button" Content="Click to set custom Kickstart folder" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"  Width="200" Height="30"/>
+                 <Button x:Name="Rompath_Button" ToolTip="Click to set custom Kickstart files folder" Content="Click to set Kickstart folder"  HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"  Width="200" Height="30"/>
                  <Button x:Name="Rompath_Button_Check" ToolTip="Check availability of Kickstart file" Content="Check" HorizontalAlignment="Left" Margin="215,10,0,0" VerticalAlignment="Top"  Width="40" Height="30" FontSize="10"/>
                  <TextBox x:Name="ROMPath_Label" HorizontalAlignment="Left" Margin="263,10,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="Using default Kickstart folder" VerticalAlignment="Top" Width="260" Height="30"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
 
