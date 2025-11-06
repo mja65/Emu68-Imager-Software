@@ -510,7 +510,7 @@ function Write-AmigaFilestoInterimDrive {
     
     Write-StartTaskMessage
 
-    $Script:Settings.TotalNumberofSubTasks = 5
+    $Script:Settings.TotalNumberofSubTasks = 6
 
     If (-not ($wifiprefs)){
         $Script:Settings.TotalNumberofSubTasks -- #No wifi
@@ -630,6 +630,15 @@ function Write-AmigaFilestoInterimDrive {
         $null = Copy-Item "$($Script:Settings.TempFolder)\IconFiles\NewFolder.info" "$DestinationFolder.info" 
         
     }
+    
+    $Script:Settings.CurrentSubTaskNumber ++
+    $Script:Settings.CurrentSubTaskName = "Modifying icon positions"
+    Write-StartSubTaskMessage
+
+    $IconstoModifyScript = Get-IconPositionScriptHSTAmiga
+
+    Start-HSTAmigaCommands -HSTScript $IconstoModifyScript
+
 
     Write-TaskCompleteMessage 
    }
