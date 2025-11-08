@@ -4,7 +4,7 @@ $Script:DP_Settings = [PSCustomObject]@{
 $osInfo = Get-WmiObject -Class Win32_OperatingSystem
 
 $Script:Settings = [PSCustomObject]@{
-    Emu68BootCmdline = "sd.unit0=rw emmc.unit0=rw"
+    Emu68BootCmdline = "sd.unit0=rw emmc.unit0=rw unicam.boot unicam.smooth unicam.b=20 unicam.c=0 unicam.phase=60"
     MBRSectorSizeBytes = 512
     MBRPartitionsMaximum = 4
     AmigaPartitionsperDiskMaximum = 10
