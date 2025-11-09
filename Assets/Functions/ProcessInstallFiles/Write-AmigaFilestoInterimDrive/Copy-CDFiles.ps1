@@ -52,9 +52,9 @@ function Copy-CDFiles {
             Start-HSTCommands -HSTScript $Commandtouse -TotalSteps 7609 -ActivityDescription "Running HST Imager to extract OS files"            
         }
     } 
-    else {
-        Write-InformationMessage -Message "$ParentFolder exists. Files already extracted."
-    }
+    # else {
+    #     Write-InformationMessage -Message "$ParentFolder exists. Files already extracted."
+    # }
 
     if (-not (Test-Path -Path $OutputDirectory -PathType Container)){
         $null = New-Item -Path $OutputDirectory -ItemType Directory
