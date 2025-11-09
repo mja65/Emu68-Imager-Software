@@ -22,7 +22,7 @@ function Write-DiskIconsandPositions {
                 $null = new-item (Split-Path -Path $DestinationPath -Parent) -ItemType Directory
             }
             $null = Copy-Item -Path $SourcePath -Destination $DestinationPath -Force
-            $HSTAmigaScript += "icon update $DestinationPath --type 1 --current-x $($_.IconX) --current-y $($_.IconY)"
+           # $HSTAmigaScript += "icon update $DestinationPath --type 1 --current-x $($_.IconX) --current-y $($_.IconY)"
         }
     }
         
@@ -69,10 +69,10 @@ function Write-DiskIconsandPositions {
         #Write-debug "Source is: $SourcePath Destination is: $DestinationPath"  
         $null = Copy-Item -Path $SourcePath -Destination $DestinationPath -Force
     
-        $HSTAmigaScript += "icon update $DestinationPath --type 1 --current-x $($_.IconX) --current-y $($_.IconY)"   
+      #  $HSTAmigaScript += "icon update $DestinationPath --type 1 --current-x $($_.IconX) --current-y $($_.IconY)"   
     }
 
-    Start-HSTAmigaCommands -HSTScript $HSTAmigaScript
+   # Start-HSTAmigaCommands -HSTScript $HSTAmigaScript
 }
 
             
