@@ -504,12 +504,12 @@ function Write-AmigaFilestoInterimDrive {
      
     #   Export-TextFileforAmiga -DatatoExport $PFSOutputScript -AddLineFeeds 'TRUE' -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRun\PFS"
      
-      #$IconPosScript_AmigaDrives = (Get-IconPositionScript -AmigaDrives)
-      #$IconPosScript_Emu68Boot = (Get-IconPositionScript -Emu68Boot)
+      $IconPosScript_AmigaDrives = (Get-IconPositionScript -AmigaDrives)
+      $IconPosScript_Emu68Boot = (Get-IconPositionScript -Emu68Boot)
       
-      #Export-TextFileforAmiga -DatatoExport $IconPosScript_AmigaDrives -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRun\SetIconPositions" -AddLineFeeds 'TRUE'   
+      Export-TextFileforAmiga -DatatoExport $IconPosScript_AmigaDrives -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRun\SetIconPositions" -AddLineFeeds 'TRUE'   
      
-      #Export-TextFileforAmiga -DatatoExport $IconPosScript_Emu68Boot -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRun\SetIconPositionsEmu68Boot_Pistorm" -AddLineFeeds 'TRUE'   
+      Export-TextFileforAmiga -DatatoExport $IconPosScript_Emu68Boot -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRun\SetIconPositionsEmu68Boot_Pistorm" -AddLineFeeds 'TRUE'   
      
       Write-TaskCompleteMessage 
      
