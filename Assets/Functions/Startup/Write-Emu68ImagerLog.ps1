@@ -74,6 +74,19 @@ Log created at: $DateandTime
         else {
             $SSIDtoReturn = "Not Populated"
         }
+
+
+        $DiskDetails = @()
+
+        if ($Script:GUIActions.ListofRemovableMedia){
+            $Script:GUIActions.ListofRemovableMedia | ForEach-Object {
+                $DiskDetails += "DeviceID: [$($_.DeviceID)] Size of Disk(Bytes): [$($_.SizeofDisk)] Disk Name: [$($_.HSTDiskName)]"
+            }
+        }
+        else {
+            $DiskDetails += "No Disks available"
+        } 
+        
        
         $LogEntry =     @"
 
@@ -95,11 +108,14 @@ Kickstart ROM Location (blank is default) [$($Script:GUIActions.ROMLocation)]
 SSID [$SSIDtoReturn)]
 WifiPassword [$WifiPasswordtoReturn)] 
 
+Available Disks for Selection:
+
+$DiskDetails
 
 Activity Commences:
 
 "@
-     
+
         $utf8NoBOM = New-Object System.Text.UTF8Encoding($false)
         $streamWriter = New-Object System.IO.StreamWriter($Script:Settings.LogLocation, $true, $utf8NoBOM)
 

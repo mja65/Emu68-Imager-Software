@@ -150,6 +150,8 @@ function Write-ImageCreation {
         $Script:Settings.CurrentSubTaskNumber ++
         $Script:Settings.CurrentTaskName = 'Processing Commands on Disk'
 
+        Write-InformationMessage -Message "Disk size (Bytes) is: $($WPF_DP_Disk_GPTMBR.DiskSizeBytes)"
+
         Write-StartSubTaskMessage
         $HSTCommandstoRun = $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk
         Start-HSTCommands -HSTScript $HSTCommandstoRun -Section "DiskStructures;WriteFilestoDisk" -ActivityDescription 'Processing commands' -ReportTime
@@ -158,6 +160,9 @@ function Write-ImageCreation {
      Write-TaskCompleteMessage 
      
      if ($OutputTypetoUse -eq 'VHDImage'){
+
+        Write-InformationMessage -Message "Disk size (Bytes) is: $($WPF_DP_Disk_GPTMBR.DiskSizeBytes)"
+        
         $IsMounted = (Get-DiskImage -ImagePath $Script:GUIActions.OutputPath -ErrorAction Ignore).Attached
         if ($IsMounted -eq $true){
            Write-InformationMessage -Message "Dismounting existing image: $($Script:GUIActions.OutputPath)"
