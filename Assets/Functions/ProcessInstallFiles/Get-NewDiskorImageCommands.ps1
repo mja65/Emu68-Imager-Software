@@ -48,7 +48,7 @@ function Get-NewDiskorImageCommands {
             Sequence = 1
         }
         $Script:GUICurrentStatus.HSTCommandstoProcess.NewDiskorImage += [PSCustomObject]@{
-            Command = "write $TempFoldertouse\Clean.vhd $($Script:GUIActions.OutputPath)" 
+            Command = "write $TempFoldertouse\Clean.vhd $($Script:GUIActions.OutputPath) --skip-unused-sectors FALSE" 
             Sequence = 2 
         }
     }
