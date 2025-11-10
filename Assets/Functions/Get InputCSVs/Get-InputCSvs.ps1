@@ -195,6 +195,7 @@ function Get-InputCSVs {
                         PerformHashCheck = $_.PerformHashCheck
                         Hash = $_.Hash
                         FilestoInstall = $_.FilestoInstall
+                        UseUAEFSDB = $_.UseUAEFSDB
                         DrivetoInstall = $_.DrivetoInstall
                         LocationtoInstall = $_.LocationtoInstall
                         UncompressZFiles = $_.UncompressZFiles
@@ -247,6 +248,7 @@ function Get-InputCSVs {
                     PerformHashCheck = $_.PerformHashCheck
                     Hash = $_.Hash
                     FilestoInstall = $_.FilestoInstall
+                    UseUAEFSDB = $_.UseUAEFSDB
                     DrivetoInstall = $_.DrivetoInstall
                     LocationtoInstall = $_.LocationtoInstall
                     UncompressZFiles = $_.UncompressZFiles
