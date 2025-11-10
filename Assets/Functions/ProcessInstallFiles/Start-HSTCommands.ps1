@@ -79,10 +79,12 @@ function Start-HSTCommands {
         }
         if ($line -match '\[.*?ERR\]') {
             Write-ErrorMessage -Message "Error running HST Imager! Error was: $line"
+
             Write-Progress -Activity $ActivityDescription -Completed
             if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
                 $streamWriter.Close()   # Close the StreamWriter so file is saved properly
             }
+            Write-HSTCommandstoLog
             exit            
         }
         if ($line -match '\[.*?INF\]') {
