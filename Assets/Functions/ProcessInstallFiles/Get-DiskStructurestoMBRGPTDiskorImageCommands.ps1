@@ -154,13 +154,13 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
                                    }                                   
                                    Write-InformationMessage -Message "Adding command to import files from $($RDBPartition.Partition.ImportedFilesPath) to RDB Partition $($RDBPartition.Partition.DeviceName)"
                                    $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-                                       Command = "fs copy `"$($RDBPartition.Partition.ImportedFilesPath)\`*`" `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)\ImportedFiles`" --recursive"
+                                       Command = "fs copy `"$($RDBPartition.Partition.ImportedFilesPath)\`*`" `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)\ImportedFiles`" --recursive TRUE"
                                        Sequence = 5      
                                    }  
                                    if ($Script:GUIActions.InstallOSFiles -eq $true){
                                        Write-InformationMessage -Message "Adding command to create .info file for imported files folder"
                                        $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-                                           Command = "fs copy `"$([System.IO.Path]::GetFullPath("$($Script:Settings.TempFolder)\ImportedFiles.info"))`" `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)`" --makedir --recursive"
+                                           Command = "fs copy `"$([System.IO.Path]::GetFullPath("$($Script:Settings.TempFolder)\ImportedFiles.info"))`" `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)`" --makedir --recursive TRUE"
                                            Sequence = 5      
                                        }                                     
                                    }

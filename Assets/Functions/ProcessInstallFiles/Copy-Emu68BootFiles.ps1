@@ -22,13 +22,13 @@ function Copy-EMU68BootFiles {
         $SourcePath = "$([System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\"))*"  
         $DestinationPath = [System.IO.Path]::GetFullPath("$($Script:GUIActions.OutputPath)\MBR\1")
         $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-            Command = "fs copy $SourcePath $DestinationPath --makedir --recursive"
+            Command = "fs copy $SourcePath $DestinationPath --makedir TRUE --recursive TRUE"
             Sequence = 6
         }
         if ($Script:GUIActions.InstallOSFiles -eq $true){
             $SourcePath = "$DiskIconsPath\SD0\disk.info" 
             $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-                Command = "fs copy $SourcePath $DestinationPath --makedir --recursive"
+                Command = "fs copy $SourcePath $DestinationPath --makedir TRUE --recursive TRUE"
                 Sequence = 6
             }
         }
