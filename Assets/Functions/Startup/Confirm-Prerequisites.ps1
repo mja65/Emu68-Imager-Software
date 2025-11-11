@@ -13,6 +13,8 @@ function Confirm-Prerequisites {
     $is64bit = Test-64bit
     $isAdministrator = Test-Administrator
     
+    $null = Confirm-Scaling
+
     $FailedCheck = 0       
 
     if ($is64bit -eq $false){
