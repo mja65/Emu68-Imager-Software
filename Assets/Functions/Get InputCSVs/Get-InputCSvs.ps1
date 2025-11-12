@@ -198,6 +198,7 @@ function Get-InputCSVs {
                         UseUAEFSDB = $_.UseUAEFSDB
                         DrivetoInstall = $_.DrivetoInstall
                         LocationtoInstall = $_.LocationtoInstall
+                        CopytoAmigaDriveDirect = $_.CopytoAmigaDriveDirect
                         UncompressZFiles = $_.UncompressZFiles
                         CreateFolderInfoFile = $_.CreateFolderInfoFile
                         NewFileName = $_.NewFileName
@@ -251,6 +252,7 @@ function Get-InputCSVs {
                     UseUAEFSDB = $_.UseUAEFSDB
                     DrivetoInstall = $_.DrivetoInstall
                     LocationtoInstall = $_.LocationtoInstall
+                    CopytoAmigaDriveDirect = $_.CopytoAmigaDriveDirect
                     UncompressZFiles = $_.UncompressZFiles
                     CreateFolderInfoFile = $_.CreateFolderInfoFile
                     NewFileName = $_.NewFileName

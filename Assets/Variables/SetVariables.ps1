@@ -68,7 +68,7 @@ $Script:Settings = [PSCustomObject]@{
     }
     ListofPackagestoInstallCSV = [PSCustomObject]@{
         Path = '.\InputFiles\ListofPackagestoInstall.CSV'
-        GID = '322661130'
+        GID = '1229567025'
     }
     ScreenModesCSV = [PSCustomObject]@{
         Path = '.\InputFiles\ScreenModes.CSV'
