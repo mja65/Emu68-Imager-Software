@@ -151,7 +151,7 @@ function Write-AmigaFilestoInterimDrive {
                     $DestinationPathFull = "$DestinationPathFolder\$($_.NewFileName)"
                     $Script:GUICurrentStatus.HSTCommandstoProcess.ExtractOSFiles += [PSCustomObject]@{
                         Command = "fs mkdir $DestinationPathFolder"
-                        Sequence = $_.InstallSequence                                                    
+                        Sequence = 0                                                  
                     }
                     
                     $HSTCommandtoUse = 
@@ -244,8 +244,7 @@ function Write-AmigaFilestoInterimDrive {
             $null = Write-AmigaInfoType -IconPath "$DestinationPath\NewFolder\NewFolder.info" -TypetoSet 'Drawer'
         }
         else {
-            $HSTCommandstoProcess = $Script:GUICurrentStatus.HSTCommandstoProcess.ExtractOSFiles + $Script:GUICurrentStatus.HSTCommandstoProcess.CopyIconFiles 
-        
+            $HSTCommandstoProcess = ($Script:GUICurrentStatus.HSTCommandstoProcess.ExtractOSFiles | Sort-Object -property 'Sequence' | select-object 'Command', 'Sequence' -unique)  + $Script:GUICurrentStatus.HSTCommandstoProcess.CopyIconFiles         
             if ($HSTCommandstoProcess){
                 Start-HSTCommands -HSTScript $HSTCommandstoProcess -Section "ExtractOSFiles" -ActivityDescription "Running HST Imager to extract OS files" -ReportTime
             }
