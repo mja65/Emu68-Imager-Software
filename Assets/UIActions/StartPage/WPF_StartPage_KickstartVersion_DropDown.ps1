@@ -11,6 +11,7 @@ foreach ($Kickstart in $Script:GUIActions.AvailableKickstarts) {
                  $Script:GUIActions.KickstartVersiontoUse = $Kickstart.Kickstart_Version 
                  $Script:GUIActions.DefaultPackagesSelected = $true
                  $Script:GUIActions.DefaultIconsetSelected = $true
+                 $Script:GUIActions.SelectedIconSet = $null
                  $Script:GUIActions.KickstartVersiontoUseFriendlyName = $WPF_StartPage_KickstartVersion_Dropdown.SelectedItem
                  $Script:GUIActions.OSInstallMediaType = $Kickstart.InstallMedia
                  $Script:GUIActions.FoundInstallMediatoUse = $null
