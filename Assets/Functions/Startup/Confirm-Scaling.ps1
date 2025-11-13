@@ -43,7 +43,7 @@ function Confirm-Scaling {
     $ScalingRatio = [Math]::Round([DPI]::scaling(), 2) * 100
 
     if ($ScalingRatio -ne 100){
-        Write-Warning "You have the scale and layout of your desktop set to to $($ScalingRatio)%! Setting this to anything other than 100% will result in issues! Use of the GUI will be affected."
+        Write-Warning "You have the scale and layout of your desktop set to $($ScalingRatio)%! Setting this to anything other than 100% will result in issues! Use of the GUI will be affected."
         return $false
     }
     else {
