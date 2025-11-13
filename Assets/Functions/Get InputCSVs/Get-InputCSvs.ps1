@@ -199,6 +199,7 @@ function Get-InputCSVs {
                         DrivetoInstall = $_.DrivetoInstall
                         LocationtoInstall = $_.LocationtoInstall
                         CopytoAmigaDriveDirect = $_.CopytoAmigaDriveDirect
+                        CopyRecursive = $_.CopyRecursive
                         UncompressZFiles = $_.UncompressZFiles
                         CreateFolderInfoFile = $_.CreateFolderInfoFile
                         NewFileName = $_.NewFileName
@@ -253,6 +254,7 @@ function Get-InputCSVs {
                     DrivetoInstall = $_.DrivetoInstall
                     LocationtoInstall = $_.LocationtoInstall
                     CopytoAmigaDriveDirect = $_.CopytoAmigaDriveDirect
+                    CopyRecursive = $_.CopyRecursive
                     UncompressZFiles = $_.UncompressZFiles
                     CreateFolderInfoFile = $_.CreateFolderInfoFile
                     NewFileName = $_.NewFileName
