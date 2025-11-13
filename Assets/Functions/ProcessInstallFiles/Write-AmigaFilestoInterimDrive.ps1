@@ -147,6 +147,19 @@ function Write-AmigaFilestoInterimDrive {
             $ListofPackagestoInstall | Where-Object {$_.Source -eq "ADF"} | ForEach-Object{
                 $SourcePath  = "$($_.InstallMediaPath)\$($_.FilestoInstall)"
                 $DestinationPropertyName = if ($_.CopytoAmigaDriveDirect -eq $false)  { "ExtractOSFiles" } elseif ($_.CopytoAmigaDriveDirect -eq $true) { "WriteDirectFilestoDisk" }                                                
+                if ($_.UseUAEFSDB -eq $true){
+                    $UAEmetadataFlag = "UaeFsDb"
+                }
+                elseif ($_.UseUAEFSDB -eq $false){
+                    $UAEmetadataFlag = "None"
+                }
+                if ($_.CopyRecursive -eq $true){
+                    $RecursiveFlag = "TRUE"
+
+                }
+                elseif ($_.CopyRecursive -eq $false){
+                    $RecursiveFlag = "FALSE"                    
+                }
                 If ($_.NewFileName -ne ""){
                     $DestinationPathFolder = "$($Script:Settings.InterimAmigaDrives)\$($_.DrivetoInstall)\$($_.LocationtoInstall)"
                     $DestinationPathFolder = [System.IO.Path]::GetFullPath($DestinationPathFolder)
@@ -154,46 +167,23 @@ function Write-AmigaFilestoInterimDrive {
                     $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
                         Command = "fs mkdir $DestinationPathFolder"
                         Sequence = 0                                                  
+                    }                                        
+                    $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
+                       Command = "fs extract `"$SourcePath`" `"$DestinationPathFull`" --uaemetadata $UAEmetadataFlag --recursive $RecursiveFlag" 
+                       Sequence = $_.InstallSequence
                     }
-                    
-                    if ($_.UseUAEFSDB -eq $true){
-
-                         $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
-                            Command = "fs extract `"$SourcePath`" `"$DestinationPathFull`" --uaemetadata UaeFsDb --recursive FALSE" 
-                            Sequence = $_.InstallSequence
-                         }
-
-                    }
-                    elseif ($_.UseUAEFSDB -eq $false){
-                        $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
-                            Command = "fs extract `"$SourcePath`" `"$DestinationPathFull`" --uaemetadata None --recursive FALSE"
-                            Sequence = $_.InstallSequence
-                        }
-                    }
-            
                 }
                 else {
                     $DestinationPath = "$($Script:Settings.InterimAmigaDrives)\$($_.DrivetoInstall)\$($_.LocationtoInstall)"
                     $DestinationPath = [System.IO.Path]::GetFullPath($DestinationPath)   
-                    if ($_.UseUAEFSDB -eq $true){
-                         $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
-                            Command = "fs extract `"$SourcePath`" `"$DestinationPath`" --uaemetadata UaeFsDb --recursive TRUE --makedir TRUE"    
-                            Sequence = $_.InstallSequence
-                         }
-
-                    } 
-                    elseif ($_.UseUAEFSDB -eq $false){ 
-                        $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
-                            Command = "fs extract `"$SourcePath`" `"$DestinationPath`" --uaemetadata None --recursive TRUE --makedir TRUE"  
-                            Sequence = $_.InstallSequence
-                         }
-
+                    $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
+                       Command = "fs extract `"$SourcePath`" `"$DestinationPath`" --uaemetadata $UAEmetadataFlag --recursive $RecursiveFlag --makedir TRUE"    
+                       Sequence = $_.InstallSequence
                     }
                 }
            
             }
-
-        }
+            
     
         $Script:Settings.CurrentSubTaskNumber ++
         $Script:Settings.CurrentSubTaskName = 'Preparing extraction commands for files from Install Media for Icons to interim drives and processing copy commands'
@@ -252,9 +242,9 @@ function Write-AmigaFilestoInterimDrive {
                 Write-InformationMessage -Message 'No ADF files to process!'
             }
         }
+    }
     
     }
-
     if ($ProcessDownloadedFiles){
         
         $Script:Settings.CurrentTaskName = "Processing Downloaded Files - Uncompressing .Z Files"
