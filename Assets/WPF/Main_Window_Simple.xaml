@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp27"
         mc:Ignorable="d"
-   Title="Emu68 Imager" Height="1000" Width="1400" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" WindowStartupLocation="CenterOwner">
+   Title="Emu68 Imager" Height="1000" Width="1400" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
     <Window.Resources>
         
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
