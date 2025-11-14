@@ -296,7 +296,7 @@ function Write-AmigaFilestoInterimDrive {
                                                  $_.Source -eq 'Web - SearchforPackageWHDLoadWrapper') `
                                                 #-and ($_.PackageName -eq "Roadshow")                                                
                                                 )} `
-       | Sort-Object {$_.PackageName} | ForEach-Object {      
+       | Sort-Object {$_.InstallSequence, $_.PackageName} | ForEach-Object {      
            
            if ($_.PackageName -ne $PackageNametoUseforReporting){
                $PackageNametoUseforReporting = $_.PackageName 
