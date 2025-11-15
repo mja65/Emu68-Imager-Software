@@ -231,7 +231,7 @@ function Write-AmigaFilestoInterimDrive {
         }
         
         if ($Script:GUIActions.OSInstallMediaType -eq "CD"){
-            $null = Write-AmigaInfoType -IconPath "$DestinationPath\NewFolder\NewFolder.info" -TypetoSet 'Drawer'
+       #     $null = Write-AmigaInfoType -IconPath "$DestinationPath\NewFolder\NewFolder.info" -TypetoSet 'Drawer'
         }
         else {
             $HSTCommandstoProcess = ($Script:GUICurrentStatus.HSTCommandstoProcess.ExtractOSFiles | Sort-Object -property 'Sequence' | select-object 'Command', 'Sequence' -unique)  + $Script:GUICurrentStatus.HSTCommandstoProcess.CopyIconFiles         
@@ -457,7 +457,7 @@ function Write-AmigaFilestoInterimDrive {
       }
       
      
-      $IconPosScript_AmigaDrives = (Get-IconPositionScript -AmigaDrives)
+      $IconPosScript_AmigaDrives = (Get-IconPositionScript -AmigaDrives -AmigaPositioning)
       $IconPosScript_Emu68Boot = (Get-IconPositionScript -Emu68Boot)
       
       Export-TextFileforAmiga -DatatoExport $IconPosScript_AmigaDrives -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRun\SetIconPositions" -AddLineFeeds 'TRUE'   
@@ -594,13 +594,13 @@ function Write-AmigaFilestoInterimDrive {
         
     }
     
-    $Script:Settings.CurrentSubTaskNumber ++
-    $Script:Settings.CurrentSubTaskName = "Modifying icon positions"
-    Write-StartSubTaskMessage
+    # $Script:Settings.CurrentSubTaskNumber ++
+    # $Script:Settings.CurrentSubTaskName = "Modifying icon positions"
+    # Write-StartSubTaskMessage
 
-    $IconstoModifyScript = Get-IconPositionScriptHSTAmiga
+    # $IconstoModifyScript = Get-IconPositionScriptHSTAmiga
 
-    Start-HSTAmigaCommands -HSTScript $IconstoModifyScript
+    # Start-HSTAmigaCommands -HSTScript $IconstoModifyScript
 
 
     Write-TaskCompleteMessage 
