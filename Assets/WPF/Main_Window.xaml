@@ -113,7 +113,7 @@
     <Grid x:Name ="Main" Background="#FFE5E5E5">
          <TextBox x:Name="Screen_Label" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Visible" TextWrapping="Wrap" Text="Tabs for Selection" Width="120" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" Margin="7,100,0,0" Height="40" FontWeight="Bold" FontSize="14"/> 
         <Button x:Name="Button_StartPage" Content="Start" HorizontalAlignment="Left" Margin="10,150,0,0" VerticalAlignment="Top" Height="30" Width="120"/>
-        <Button x:Name="Button_SetupDisk" Content="Setup Disk" HorizontalAlignment="Left" Margin="10,190,0,0" VerticalAlignment="Top" Height="30" Width="120"/>
+        <Button x:Name="Button_SetupDisk" Content="Set up Disk" HorizontalAlignment="Left" Margin="10,190,0,0" VerticalAlignment="Top" Height="30" Width="120"/>
         <Button x:Name="Button_PackageSelection" Content="Select Packages" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Height="30" Width="120"/>
         <TextBox x:Name="LoadandSaveSettings_Label" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Visible" TextWrapping="Wrap" Text="Load and Save Settings" Width="120" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" Margin="7,320,0,0" Height="40" FontWeight="Bold" FontSize="14"/>
          <Button x:Name="Button_LoadSettings" Content="Load Settings" HorizontalAlignment="Left" Margin="10,370,0,0" VerticalAlignment="Top" Height="30" Width="120"/>
