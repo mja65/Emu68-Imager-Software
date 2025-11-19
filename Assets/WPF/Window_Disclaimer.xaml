@@ -14,7 +14,7 @@
         <Button x:Name="Button_Acknowledge_Simple" Content="Start in Simple Mode " HorizontalAlignment="Left" Height="40" VerticalAlignment="Bottom" Width="320" BorderBrush="Black" UseLayoutRounding="False" Background="#FF6688BB" Margin="50,0,0,20"  />
         <Button x:Name="Button_Acknowledge_Advanced" Content="Start in Advanced Mode" HorizontalAlignment="Right" Height="40" VerticalAlignment="Bottom" Width="320" BorderBrush="Black" UseLayoutRounding="False" Background="#FF6688BB" Margin="0,0,50,20" />
 
-        <TextBlock Width="900" TextWrapping="Wrap" VerticalAlignment="Top"  Margin="50,50,50,0" Height="310">
+        <TextBlock Width="880" TextWrapping="Wrap" VerticalAlignment="Top"  Margin="50,50,50,0" Height="310">
             <Run Foreground="Black" FontSize="14" Text="This software is used at your own risk! Efforts were made to test the software but it should be used with caution. Data will be written to physical media devices attached to your computer and all data on that device will be erased. If the incorrect device is chosen, data on that device will also be erased." /><LineBreak/>
             <Run Foreground="Black"/><LineBreak/>
             <Run Foreground="Black" FontSize="14" Text="If you do not accept this risk, then do not use this software! "/><LineBreak/>
