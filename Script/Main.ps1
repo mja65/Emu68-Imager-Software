@@ -63,6 +63,7 @@ $Script:Settings.CurrentTaskName = "Checking Prerequisites for Using Emu68 Image
 Write-StartTaskMessage
 
 Confirm-Prerequisites
+Confirm-NoExtraAmigaFiles
 
 Write-TaskCompleteMessage
 
