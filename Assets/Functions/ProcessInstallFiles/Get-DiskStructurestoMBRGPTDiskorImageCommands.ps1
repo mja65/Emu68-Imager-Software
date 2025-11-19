@@ -150,7 +150,7 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
                                        if (test-path "$($Script:Settings.TempFolder)\ImportedFiles.info"){
                                            $null = Remove-Item "$($Script:Settings.TempFolder)\ImportedFiles.info"                                   
                                        }                                                                  
-                                       $null = Copy-Item "$($Script:Settings.TempFolder)\IconFiles\NewFolder.info" "$($Script:Settings.TempFolder)\ImportedFiles.info"   
+                                       $null = Copy-Item "$($Script:Settings.TempFolder)\IconFiles\NewFolder\NewFolder.info" "$($Script:Settings.TempFolder)\ImportedFiles.info"   
                                    }                                   
                                    Write-InformationMessage -Message "Adding command to import files from $($RDBPartition.Partition.ImportedFilesPath) to RDB Partition $($RDBPartition.Partition.DeviceName)"
                                    $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
