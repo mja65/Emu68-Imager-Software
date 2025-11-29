@@ -26,8 +26,9 @@ $ListofFiles = @"
     \System\OneTimeRun\AUXRename
     \System\OneTimeRun\CopyPalNtsc
     \System\OneTimeRun\Ibrowse
-    \System\OneTimeRun\LocaleSettings
     \System\OneTimeRun\Pi4vsPi3_Pistorm
+    \System\OneTimeRun\CheckScreenModeandChipset_Pistorm
+    \System\OneTimeRunWB\LocaleSettings
     \System\PiStorm\Documentation
     \System\PiStorm\Documentation.info
     \System\PiStorm\Emu68Info.r
@@ -58,6 +59,7 @@ $ListofFiles = @"
     \System\PiStorm\Emu68-Updater\tag.rexx
     \System\PiStorm\Emu68-Updater\Updater
     \System\Prefs\Env-Archive\FIRSTTIMEBOOT
+    \System\Prefs\Env-Archive\FIRSTTIMEBOOTWB
     \System\Prefs\Env-Archive\REBOOT
     \System\Prefs\Env-Archive\ReqTools.prefs
     \System\Prefs\Env-Archive\Picasso96\DisableAmigaBlitter
@@ -66,6 +68,7 @@ $ListofFiles = @"
     \System\Programs\DOpus\DirectoryOpus.info.txt
     \System\Programs\DOpus\C\DOpusEdit
     \System\Programs\IBrowse\IBrowse.prefs
+    \System\S\CheckScreenModeandChipset.rexx
     \System\S\DirectoryOpus.CFG
     \System\S\DST.dat
     \System\S\KickstartRomHashes
@@ -74,6 +77,8 @@ $ListofFiles = @"
     \System\S\Startup-Sequence_OneTimeRun
     \System\S\Startup-Sequence_REXXMAST
     \System\S\Startup-Sequence_UAEGFX
+    \System\S\Startup-Sequence_REXXMASTFAILAT10
+    \System\S\Startup-Sequence_REXXMASTFAILAT21
     \System\S\User-Startup_AmiSSL
     \System\S\User-Startup_MUI38
     \System\S\User-Startup_Picasso96
@@ -85,6 +90,8 @@ $ListofFiles = @"
     \System\Tools\HDToolBoxPi4.info.txt
     \System\WBStartup\Menutools_1
     \System\WBStartup\Menutools_2
+    \System\WBStartup\OneTimeRunWB
+    \System\WBStartup\OneTimeRunWB.info
 "@ -split "`r?`n" | Where-Object { $_ -ne "" } | ForEach-Object { $_.Trim().ToLower() }
     
     # Populated through (Get-ChildItem $Script:Settings.LocationofAmigaFiles -Recurse | Where-Object { $_.PSIsContainer -eq $false }).FullName.Replace([System.IO.Path]::GetFullPath($Script:Settings.LocationofAmigaFiles),"")

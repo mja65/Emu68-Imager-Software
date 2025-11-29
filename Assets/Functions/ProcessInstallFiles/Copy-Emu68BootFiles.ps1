@@ -17,9 +17,9 @@ function Copy-EMU68BootFiles {
     if ($OutputLocationType -eq 'ImgImage'){
         
         $NoBOM_UTF8 = New-Object System.Text.UTF8Encoding($false)
-        [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdline.txt", ("$(Get-Emu68BootCmdline -FirstBoot -SDLowSpeed)`n"), $NoBOM_UTF8)
+        [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdline.txt", ("$(Get-Emu68BootCmdline -FirstBoot -SDLowSpeed -UnicamSettings)`n"), $NoBOM_UTF8)
 
-        [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdlineBAK.txt", ("$(Get-Emu68BootCmdline -SDLowSpeed)`n"), $NoBOM_UTF8)
+        [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdlineBAK.txt", ("$(Get-Emu68BootCmdline -SDLowSpeed -UnicamSettings)`n"), $NoBOM_UTF8)
         
         $SourcePath = "$([System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\"))*"  
         $DestinationPath = [System.IO.Path]::GetFullPath("$($Script:GUIActions.OutputPath)\MBR\1")
@@ -67,9 +67,9 @@ function Copy-EMU68BootFiles {
     
         $NoBOM_UTF8 = New-Object System.Text.UTF8Encoding($false)
 
-        [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdline.txt", ("$(Get-Emu68BootCmdline -FirstBoot -SDLowSpeed)`n"), $NoBOM_UTF8)
+        [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdline.txt", ("$(Get-Emu68BootCmdline -FirstBoot -SDLowSpeed -UnicamSettings)`n"), $NoBOM_UTF8)
        
-        [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdlineBAK.txt", ("$(Get-Emu68BootCmdline -SDLowSpeed)`n"), $NoBOM_UTF8)
+        [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdlineBAK.txt", ("$(Get-Emu68BootCmdline -SDLowSpeed -UnicamSettings)`n"), $NoBOM_UTF8)
        
         $null = Copy-Item "$($Script:Settings.InterimAmigaDrives)\Emu68Boot\*" -Destination $Emu68BootPath -Recurse -force
         

@@ -80,13 +80,20 @@ function Update-UI {
     }
 
     if ($Emu68Settings){
+
+        if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
+            $WPF_StartPage_Unicam_button.Visibility = "Hidden"            
+        }
+
         if ($Script:GUIActions.InstallOSFiles -eq $true){
             $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_SourceFiles_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_ADFpath_Button.Visibility = 'Visible'
             $WPF_StartPage_ADFpath_Button_Check.Visibility = 'Visible'
             $WPF_StartPage_ADFPath_Label.Visibility = 'Visible'
-            $WPF_StartPage_Settings_GroupBox.Visibility = 'Visible'
+            $WPF_StartPage_SettingsScreen_GroupBox.Visibility = 'Visible'
+            $WPF_StartPage_SettingsScreenWB_GroupBox.Visibility = 'Visible'
+            $WPF_StartPage_SettingsWifi_GroupBox.Visibility = 'Visible'
         }
         elseif ($Script:GUIActions.InstallOSFiles -eq $false){
             $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Visible'
@@ -94,7 +101,9 @@ function Update-UI {
             $WPF_StartPage_ADFpath_Button.Visibility = 'Hidden'
             $WPF_StartPage_ADFpath_Button_Check.Visibility = 'Hidden'
             $WPF_StartPage_ADFPath_Label.Visibility = 'Hidden'
-            $WPF_StartPage_Settings_GroupBox.Visibility = 'Visible'
+            $WPF_StartPage_SettingsScreen_GroupBox.Visibility = 'Visible'
+            $WPF_StartPage_SettingsScreenWB_GroupBox.Visibility = 'Hidden'
+            $WPF_StartPage_SettingsWifi_GroupBox.Visibility = 'Hidden'
         }
         if ($Script:GUIActions.ROMLocation){
             $WPF_StartPage_RomPath_Label.Text = Get-FormattedPathforGUI -PathtoTruncate $Script:GUIActions.ROMLocation
@@ -146,6 +155,29 @@ function Update-UI {
         if (($Script:GUIActions.ScreenModetoUseFriendlyName) -and (-not ($WPF_StartPage_ScreenMode_Dropdown.SelectedItem))) {
            $WPF_StartPage_ScreenMode_Dropdown.SelectedItem = $Script:GUIActions.ScreenModetoUseFriendlyName
         }
+
+        if ($Script:GUIActions.ScreenModetoUseWB){
+            if ($Script:GUIActions.ScreenModeType -eq "Native"){
+                $WPF_StartPage_WorkbenchColour_Slider.IsEnabled = 1
+                $WPF_StartPage_WorkbenchColour_Slider.Maximum = 8
+                $WPF_StartPage_Unicam_CheckBox.IsEnabled = 0
+                $WPF_StartPage_Unicam_CheckBox.IsChecked = 0                    
+            }                
+            elseif ($Script:GUIActions.ScreenModeType -eq "RTG"){
+                $WPF_StartPage_Unicam_CheckBox.IsEnabled = 1                                                              
+                $WPF_StartPage_WorkbenchColour_Slider.IsEnabled = 0
+                $WPF_StartPage_WorkbenchColour_Slider.Maximum = 24                
+            }
+        }
+
+        if ($Script:GUIActions.UnicamEnabled -eq $false){
+            $WPF_StartPage_Unicam_button.IsEnabled = 0
+
+        }
+        elseif ($Script:GUIActions.UnicamEnabled -eq $true){
+            $WPF_StartPage_Unicam_button.IsEnabled = 1
+        }
+
     }
 
     #  $WPF_DP_Partition_MBR_2.Children[0].Name

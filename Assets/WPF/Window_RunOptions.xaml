@@ -8,9 +8,10 @@
          Title="Run Options" Height="450" Width="850" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" Topmost="True" WindowStartupLocation="CenterScreen" WindowStyle="None" >
 
     <Grid x:Name ="Main" Background="#FFE5E5E5">
-        <TextBlock x:Name="RunOptions_Label" Text="The imager will be run with the following options. If you do not wish to run press the cancel button." TextWrapping="Wrap" HorizontalAlignment="Center"  VerticalAlignment="Top" Margin="0,20,0,0" Height="35" TextAlignment="Center"/>
-        <DataGrid Name="RunOptions_Datagrid" IsReadOnly="True"  AutoGenerateColumns="False" HorizontalAlignment="Center" Margin="0,50,0,0" VerticalAlignment="Top" HorizontalScrollBarVisibility="Auto" GridLinesVisibility="None" HorizontalGridLinesBrush="#FF505050" VerticalGridLinesBrush="#FF505050" AlternatingRowBackground="LightGray" 
-                  RowBackground="White" >
+     <TextBlock x:Name="ScreenMode_Label" Text="The imager will be run with the following options. If you do not wish to run press the cancel button." TextWrapping="Wrap" HorizontalAlignment="Center"  VerticalAlignment="Top" Margin="0,20,0,0" Height="35" TextAlignment="Center"/>
+    <TextBlock x:Name="RunOptions_Label" Text="The imager will be run with the following options. If you do not wish to run press the cancel button." TextWrapping="Wrap" HorizontalAlignment="Center"  VerticalAlignment="Top" Margin="0,50,0,0" Height="35" TextAlignment="Center"/>
+    <DataGrid Name="RunOptions_Datagrid" IsReadOnly="True"  AutoGenerateColumns="False" HorizontalAlignment="Center" Margin="0,80,0,0" VerticalAlignment="Top" HorizontalScrollBarVisibility="Auto" GridLinesVisibility="None" HorizontalGridLinesBrush="#FF505050" VerticalGridLinesBrush="#FF505050" AlternatingRowBackground="LightGray" 
+                    RowBackground="White" >
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Setting" Binding="{Binding Setting}" Width="210"/>

@@ -1,0 +1,7 @@
+Echo "Choose your regional settings then press the save button"
+Echo ""
+wait 1
+IF $KickstartVersion EQ 3.9
+   C:AddDataTypes REFRESH QUIET
+ENDIF
+SYS:Prefs/Locale

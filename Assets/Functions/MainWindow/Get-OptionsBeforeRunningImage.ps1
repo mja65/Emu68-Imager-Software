@@ -35,6 +35,23 @@ function Get-OptionsBeforeRunningImage {
 
     If ($Script:GUIActions.InstallOSFiles -eq $true){
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("OS to be Installed",$Script:GUIActions.KickstartVersiontoUseFriendlyName)
+        $MinimumScreenMode = Check-WBScreenMode
+        If ($MinimumScreenMode -eq "RTG"){
+            $WPF_RunWindow_ScreenMode_Label.Text = "RTG screenmode chosen. Please ensure you have a monitor connected to the HDMI port on your Raspberry Pi"
+        } 
+        elseIf ($MinimumScreenMode -eq "AGA"){
+            $WPF_RunWindow_ScreenMode_Label.Text = "AGA screenmode chosen. Please ensure you are running on an Amiga 1200"
+
+        } 
+        elseIf ($MinimumScreenMode -eq "ECS"){
+            $WPF_RunWindow_ScreenMode_Label.Text = "ECS screenmode chosen. Please ensure you are running on an Amiga with an ECS Denise (or an Amiga 1200)"             
+        } 
+
+    }
+    else {
+        $WPF_RunWindow_ScreenMode_Label.Visibility = "Hidden"
+
+        $WPF_RunWindow_ScreenMode_Label
     }
     $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Disk or Image",$Script:GUIActions.OutputType)
     $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Location to be installed",$Script:GUIActions.OutputPath)

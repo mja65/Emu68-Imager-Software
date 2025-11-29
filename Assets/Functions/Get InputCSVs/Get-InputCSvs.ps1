@@ -6,6 +6,7 @@ function Get-InputCSVs {
       [switch]$ROMHashes,
       [switch]$InstallMediaHashes,
       [switch]$ScreenModes,
+      [switch]$ScreenModesWB,
       [switch]$PackagestoInstall,
       [switch]$PackagestoInstallEmu68Only,
       [switch]$FileSystems,
@@ -30,6 +31,9 @@ function Get-InputCSVs {
     elseif ($ScreenModes){
         $Pathtouse = $Script:Settings.ScreenModesCSV.Path
     }
+    elseif ($ScreenModesWB){
+        $Pathtouse = $Script:Settings.ScreenModesWBCSV.Path
+    }    
     elseif ($RomHashes){
         $Pathtouse = $Script:Settings.ROMHashesCSV.Path
     }
@@ -150,6 +154,9 @@ function Get-InputCSVs {
     elseif ($ScreenModes){
         $CSVtoReturn = $CSV | Where-Object 'Include' -eq 'TRUE'
     }
+    elseif ($ScreenModesWB){
+        $CSVtoReturn = $CSV | Where-Object 'Include' -eq 'TRUE'
+    }     
     elseif ($RomHashes){
         $CSVtoReturn = $CSV | Select-Object 'IncludeorExclude','ExcludeMessage','Kickstart_Version','Sequence','Hash','FriendlyName','FAT32Name' | Where-Object {$_.Kickstart_Version -eq $Script:GUIActions.KickstartVersiontoUse}
     }

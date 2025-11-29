@@ -96,23 +96,36 @@ function Read-SettingsFile {
    $Script:GUIActions.InstallMediaLocation = $null
    $Script:GUIActions.ROMLocation = $null
    $Script:GUIActions.InstallOSFiles = $true 
+   $Script:GUIActions.ScreenModeType = $null
+   $Script:GUIActions.ScreenModetoUseWB = $null
+   $Script:GUIActions.WorkbenchBackDropEnabled = $null
+   $Script:GUIActions.ScreenModeWBColourDepth = $null
+   $Script:GUIActions.UnicamEnabled = $false    
+   $Script:GUIActions.UnicamStartonBoot = [bool]$null
+   $Script:GUIActions.UnicamScalingType = $null
+   $Script:GUIActions.UnicamBParameter = $null
+   $Script:GUIActions.UnicamCParameter = $null
+   $Script:GUIActions.UnicamSizeXPosition = $null
+   $Script:GUIActions.UnicamSizeYPosition = $null
+   $Script:GUIActions.UnicamOffsetXPosition = $null
+   $Script:GUIActions.UnicamOffsetYPosition = $null
 
    $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSet",([String])))
-$Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDescription",([String])))
-$Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDefaultInstall",([Bool])))
-$Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetUserSelected",([Bool])))
-for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.Columns.Count; $i++) {
-    if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSet'){
-        $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $true
-    }
-    if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSetDescription'){
-        $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $true
-    }
-    if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSetUserSelected'){
-        $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $false
-    }
-}
-
+   $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDescription",([String])))
+   $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDefaultInstall",([Bool])))
+   $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetUserSelected",([Bool])))
+   for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.Columns.Count; $i++) {
+       if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSet'){
+           $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $true
+       }
+       if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSetDescription'){
+           $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $true
+       }
+       if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSetUserSelected'){
+           $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $false
+       }
+   }
+   
 $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameUserSelected",([bool])))
 $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameDefaultInstall",([bool])))
 $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameFriendlyName",([string])))

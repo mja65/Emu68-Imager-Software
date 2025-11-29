@@ -76,7 +76,11 @@ $Script:Settings = [PSCustomObject]@{
     }
     ScreenModesCSV = [PSCustomObject]@{
         Path = '.\InputFiles\ScreenModes.CSV'
-        GID = '860542576'
+        GID = '1007905875'
+    }
+    ScreenModesWBCSV = [PSCustomObject]@{
+        Path = '.\InputFiles\ScreenModesWB.CSV'
+        GID = '491578007'
     }
     FileSystemsCSV = [PSCustomObject]@{
         Path = '.\InputFiles\FileSystems.CSV'
@@ -225,9 +229,23 @@ $Script:GUIActions = [PSCustomObject]@{
     InstallType = 'PiStorm'
     #Not in GUI - End
     ScreenModetoUse = $null
+    ScreenModeType = $null
+    ScreenModetoUseWB = $null
+    WorkbenchBackDropEnabled = $null
+    ScreenModeWBColourDepth = $null
+    UnicamEnabled = $false    
+    UnicamStartonBoot = [bool]$null
+    UnicamScalingType = $null
+    UnicamBParameter = $null
+    UnicamCParameter = $null
+    UnicamSizeXPosition = $null
+    UnicamSizeYPosition = $null
+    UnicamOffsetXPosition = $null
+    UnicamOffsetYPosition = $null
     ScreenModetoUseFriendlyName =$null
     AvailableKickstarts = $null
     AvailableScreenModes = $null
+    AvailableScreenModesWB = $null
     DefaultPackagesSelected = $null 
     DefaultIconsetSelected = $null
     AvailablePackages = New-Object System.Data.DataTable

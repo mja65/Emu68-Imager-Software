@@ -1,0 +1,7 @@
+IF $FIRSTTIMEBOOTWB EQ "TRUE"
+   WAIT 2
+   ECHO "Emu68 Imager - Performing Final Setup"
+   ECHO ""
+   ECHO "DELETE >NIL: SYS:WBStartup/OneTimeRunWB" >> S:OneTimeRun/DeleteOneTimeRunWB
+   ECHO "DELETE >NIL: SYS:WBStartup/OneTimeRunWB.info" >> S:OneTimeRun/DeleteOneTimeRunWB
+ENDIF

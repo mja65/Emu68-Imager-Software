@@ -5,24 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:local="clr-namespace:WpfApp14"
   mc:Ignorable="d">
-          <TextBlock x:Name="StartPage_TextBlock" HorizontalAlignment="Left" Margin="0,410,0,0" TextWrapping="Wrap"  FontSize="13" VerticalAlignment="Top" Width="1000" Height="350">
-         <Run FontWeight="Bold" Text="Mode of Operation - Advanced Mode"/>
-         <LineBreak/>    
-         <Run/><LineBreak/>        
-         <Run Text="In order to use this tool, click the buttons on the left side of the screen."/>
-         <LineBreak/>
-         <Run/><LineBreak/>            
-         <Run FontWeight="Bold" Text="Start "/>
-         <Run Text="- this page. Configure Emu68 options. Where to define the version of Kickstart and Workbench you would like installed as well as configuring Wifi and screen options."/><LineBreak/>
-           <Run FontWeight="Bold" Text="Set up Disk"/>
-         <Run Text=" - Select the disk or image to write to, define the size, as well as partitioning the disk and image according to your requirements"/><LineBreak/>
-         <Run FontWeight="Bold" Text="Select Packages"/>
-         <Run Text=" - Enable and/or disable default packages from installation. This will allow you to select and unselect certain OS install features like the language, as well you can remove or add the additional packages."/><LineBreak/>
-         <Run FontWeight="Bold" Text="Load Settings "/>
-         <Run Text="- Load previously saved settings"/><LineBreak/>
-         <Run FontWeight="Bold" Text="Save Settings"/>
-         <Run Text="- Save current settings"/><LineBreak/>
-         <Run/><LineBreak/>
+          <TextBlock x:Name="StartPage_TextBlock" HorizontalAlignment="Left" Margin="0,600,0,0" TextWrapping="Wrap"  FontSize="13" VerticalAlignment="Top" Width="1000" Height="350">
          <Run Text="Detailed help is available at the following locations:"/><LineBreak/>
          <Run/><LineBreak/>
          <Hyperlink x:Name="ImagerURL" NavigateUri="https://mja65.github.io/Emu68-Imager/">
@@ -42,39 +25,70 @@
          </TextBlock>
 
 
-         <GroupBox x:Name="OSSelection_GroupBox" Header="OS Selection"  Background="Transparent" Margin="7,30,0,128" VerticalAlignment="Top" HorizontalAlignment="Center" Width="540">
-             <Grid Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
-                 <TextBox x:Name="KickstartVersion_Label" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Select OS Version" VerticalAlignment="Top" Width="200" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="14"/>
-                 <ComboBox x:Name="KickstartVersion_DropDown" ToolTip="Select the Kickstart version you wish to use (e.g. 3.1 or 3.2)" HorizontalAlignment="Left" Margin="10,32,10,0" VerticalAlignment="Top" Width="300"/>
+            <GroupBox x:Name="OSSelection_GroupBox" Header="OS Selection"  Background="Transparent" Margin="7,30,0,128" VerticalAlignment="Top" HorizontalAlignment="Center" Width="540">
+                <Grid Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <TextBox x:Name="KickstartVersion_Label" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Select OS Version" VerticalAlignment="Top" Width="200" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                    <ComboBox x:Name="KickstartVersion_DropDown" ToolTip="Select the Kickstart version you wish to use (e.g. 3.1 or 3.2)" HorizontalAlignment="Left" Margin="10,32,10,0" VerticalAlignment="Top" Width="300"/>
 
-             </Grid>
-         </GroupBox>
-         <GroupBox x:Name="SourceFiles_GroupBox" Header="Source Files" Background="Transparent" Margin="7,120,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="540">
-             <Grid Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
-                 <Button x:Name="ADFpath_Button" ToolTip="Click to set custom Install files folder" Content="Click to set Install Media folder" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top"  Width="200" Height="30"/>
-                 <Button x:Name="ADFpath_Button_Check" ToolTip="Check availability of Install files" Content="Check" HorizontalAlignment="Left" Margin="215,60,0,0" VerticalAlignment="Top"  Width="40" Height="30" FontSize="10"/>
-                 <TextBox x:Name="ADFPath_Label" HorizontalAlignment="Left" Margin="263,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="Using default install media folder" VerticalAlignment="Top" Width="260" Height="30"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox x:Name="SourceFiles_GroupBox" Header="Source Files" Background="Transparent" Margin="7,120,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="540">
+                <Grid Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Button x:Name="ADFpath_Button" ToolTip="Click to set custom Install files folder" Content="Click to set Install Media folder" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top"  Width="200" Height="30"/>
+                    <Button x:Name="ADFpath_Button_Check" ToolTip="Check availability of Install files" Content="Check" HorizontalAlignment="Left" Margin="215,60,0,0" VerticalAlignment="Top"  Width="40" Height="30" FontSize="10"/>
+                    <TextBox x:Name="ADFPath_Label" HorizontalAlignment="Left" Margin="263,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="Using default install media folder" VerticalAlignment="Top" Width="260" Height="30"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
 
-                 <Button x:Name="Rompath_Button" ToolTip="Click to set custom Kickstart files folder" Content="Click to set Kickstart folder" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"  Width="200" Height="30"/>
-                 <Button x:Name="Rompath_Button_Check" ToolTip="Check availability of Kickstart file" Content="Check" HorizontalAlignment="Left" Margin="215,10,0,0" VerticalAlignment="Top"  Width="40" Height="30" FontSize="10"/>
-                 <TextBox x:Name="ROMPath_Label" HorizontalAlignment="Left" Margin="263,10,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="Using default Kickstart folder" VerticalAlignment="Top" Width="260" Height="30"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
+                    <Button x:Name="Rompath_Button" ToolTip="Click to set custom Kickstart files folder" Content="Click to set Kickstart folder" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"  Width="200" Height="30"/>
+                    <Button x:Name="Rompath_Button_Check" ToolTip="Check availability of Kickstart file" Content="Check" HorizontalAlignment="Left" Margin="215,10,0,0" VerticalAlignment="Top"  Width="40" Height="30" FontSize="10"/>
+                    <TextBox x:Name="ROMPath_Label" HorizontalAlignment="Left" Margin="263,10,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="Using default Kickstart folder" VerticalAlignment="Top" Width="260" Height="30"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
 
-             </Grid>
-         </GroupBox>
-         <GroupBox x:Name="Settings_GroupBox" Header="Settings" Height="150" Background="Transparent" Margin="7,250,0,0" Width="540" VerticalAlignment="Top" HorizontalAlignment="Center">
-             <Grid>
-                 <ComboBox x:Name="ScreenMode_Dropdown" ToolTip="Select if you wish to use a specific output resolution on your Raspberry Pi" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top" Width="375"/>
-                 <TextBox x:Name="ScreenMode_Label" HorizontalAlignment="Center" Margin="10,0,0,0" TextWrapping="Wrap" Width="320" Text="Select ScreenMode for Raspberry Pi to Output" VerticalAlignment="Top" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox x:Name="SettingsWifi_GroupBox" Header="Wifi Settings" Height="100" Background="Transparent" Margin="154,250,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Right">
+                <Grid>
+                    <TextBox x:Name="SSID_Label" HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="Wrap" Text="Enter your SSID" VerticalAlignment="Top" Width="150" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
+                    <TextBox x:Name="Password_Label" HorizontalAlignment="Left" Margin="10,25,0,0" TextWrapping="Wrap" Text="Enter your Wifi password"  VerticalAlignment="Top" Width="150" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" />
+                    <TextBox x:Name="SSID_Textbox" ToolTip="Set your SSID for wifi on the Amiga (leave empty if you wish to configure on the Amiga)" HorizontalAlignment="Left" Margin="177,5,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="200" />
+                    <TextBox x:Name="Password_Textbox" ToolTip="Set your password for wifi on the Amiga (leave empty if you wish to configure on the Amiga)" HorizontalAlignment="Left" Margin="177,25,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="200" />
+                </Grid>
 
-                 <TextBox x:Name="SSID_Label" HorizontalAlignment="Left" Margin="12,77,0,0" TextWrapping="Wrap" Text="Enter your SSID" VerticalAlignment="Top" Width="150" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
-                 <TextBox x:Name="Password_Label" HorizontalAlignment="Left" Margin="6,100,0,0" TextWrapping="Wrap" Text="Enter your Wifi password"  VerticalAlignment="Top" Width="150" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center"/>
-                 <TextBox x:Name="SSID_Textbox" ToolTip="Set your SSID for wifi on the Amiga (leave empty if you wish to configure on the Amiga)" HorizontalAlignment="Left" Margin="187,77,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="200" />
-                 <TextBox x:Name="Password_Textbox" ToolTip="Set your password for wifi on the Amiga (leave empty if you wish to configure on the Amiga)" HorizontalAlignment="Left" Margin="187,100,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="200" />
-                 <TextBox x:Name="WIfiSettings_Label" HorizontalAlignment="Center" Visibility="Visible" TextWrapping="Wrap" Text="WiFi Settings" VerticalAlignment="Center" Width="120" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" Margin="0,-4,0,0" Height="20" FontWeight="Bold" FontSize="14"/>
+            </GroupBox>
+            <GroupBox x:Name="SettingsScreen_GroupBox" Header="Screen Settings" Height="100" Background="Transparent" Margin="154,250,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <Grid>
+                 
+                    <ComboBox x:Name="ScreenMode_Dropdown" ToolTip="Select if you wish to use a specific resolution on your Raspberry Pi" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top" Width="375"/>
+                    <TextBox x:Name="ScreenMode_Label" HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Width="375" Text="Select ScreenMode for Raspberry Pi" VerticalAlignment="Top" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="14"/>
 
-             </Grid>
+                </Grid>
 
-         </GroupBox>
+            </GroupBox>
+              <GroupBox x:Name="SettingsScreenWB_GroupBox" Header="Screen Settings - Workbench" Height="200" Background="Transparent" Margin="154,350,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Left">
+          <Grid>
+              <TextBox x:Name="WorkbenchOutput_Label" HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="Workbench Output" VerticalAlignment="Top" Width="120" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" TextAlignment="Center"/>
+
+              <RadioButton x:Name="WorkbenchOutput_RadioButtonNative" Content="Native" HorizontalAlignment="Left" Margin="140,10,0,0" VerticalAlignment="Top"/>
+              <RadioButton x:Name="WorkbenchOutput_RadioButtonRTG" Content="RTG" HorizontalAlignment="Left" Margin="140,30,0,0" VerticalAlignment="Top"/>
+
+              <CheckBox x:Name="Backdrop_CheckBox"  HorizontalAlignment="Left" Margin="247,16,0,0" IsEnabled="True" VerticalAlignment="Top"/>
+              <TextBox x:Name="Backdrop_CheckBox_Label" HorizontalAlignment="Left" Margin="264,13,0,0" TextWrapping="Wrap" Text="Workbench Backdrop" VerticalAlignment="Top" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Left"  FontSize="12"/>
+
+              <ComboBox x:Name="ScreenModeWorkbench_Dropdown" ToolTip="Select if you wish to use a specific Workbench resolution" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top" Width="375"/>
+              <TextBox x:Name="ScreenModeWorkbench_Label" HorizontalAlignment="Left" Margin="10,50,0,0" TextWrapping="Wrap" Width="375" Text="Select ScreenMode for Workbench" VerticalAlignment="Top" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="14"/>
+              <GroupBox x:Name="ColourDepth_groupBox" Header="Colour Depth" Margin="0,80,0,0" Width="140" HorizontalAlignment="Left" Height="50" >
+                  <Grid>
+                      <Slider x:Name="WorkbenchColour_Slider" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="120" Maximum="24" Minimum="1" SmallChange="1" AutoToolTipPlacement="BottomRight" Foreground="Black" TickPlacement="BottomRight" IsSnapToTickEnabled="True"/>
+
+                  </Grid>
+      </GroupBox>
+              <TextBox x:Name="WorkbenchColour_Label" HorizontalAlignment="Left" Margin="153,120,0,0" TextWrapping="Wrap" Width="120" Text="Number of Colours:" VerticalAlignment="Top" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontSize="12"/>
+              <TextBox x:Name="WorkbenchColour_Value" HorizontalAlignment="Left" Margin="273,120,0,0" TextWrapping="Wrap" Width="40" Text="16.7M" VerticalAlignment="Top" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontSize="12"/>
+
+
+              <CheckBox x:Name="Unicam_CheckBox" Content="Enable Unicam (Framethrower)" HorizontalAlignment="Left" Margin="10,155,0,0" Height="20" Width="185" IsEnabled="False" VerticalAlignment="Top"/>
+              <Button x:Name="Unicam_button" Content="Click to set Unicam Settings" Width="169" Height="20" Margin="200,154,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="False"/>
+          </Grid>
+
+      </GroupBox>
 
        
     </Grid>

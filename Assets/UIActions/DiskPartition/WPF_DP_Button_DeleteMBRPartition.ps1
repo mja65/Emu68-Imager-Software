@@ -66,6 +66,19 @@ Press OK to continue otherwise cancel
         $Script:GUIActions.SelectedIconSet = $null 
         $Script:GUIActions.AvailablePackages.Clear()
         $Script:GUIActions.AvailableIconSets.Clear()
+        $Script:GUIActions.ScreenModeType = $null
+        $Script:GUIActions.ScreenModetoUseWB = $null
+        $Script:GUIActions.UnicamEnabled = $false    
+        $Script:GUIActions.UnicamStartonBoot = [bool]$null
+        $Script:GUIActions.UnicamScalingType = $null
+        $Script:GUIActions.UnicamBParameter = $null
+        $Script:GUIActions.UnicamCParameter = $null
+        $Script:GUIActions.UnicamSizeXPosition = $null
+        $Script:GUIActions.UnicamSizeYPosition = $null
+        $Script:GUIActions.UnicamOffsetXPosition = $null
+        $Script:GUIActions.UnicamOffsetYPosition = $null        
+        $Script:GUIActions.WorkbenchBackDropEnabled = $null
+        $Script:GUIActions.AvailableScreenModesWB = $null
 
         }
 

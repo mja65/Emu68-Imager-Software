@@ -1,0 +1,50 @@
+<Window x:Name="Window" 
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:local="clr-namespace:WpfApp14"
+            mc:Ignorable="d"
+         Title="Edit Unicam Settings" Height="400" Width="600" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" Topmost="True" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid x:Name ="Main" Background="#FFE5E5E5">
+        <Button x:Name="OK_Button" Content="OK" HorizontalAlignment="Right" Margin="0,0,5,5" VerticalAlignment="Bottom" Width="50" Height="20"/>
+        <Button x:Name="Cancel_Button" Content="Cancel" HorizontalAlignment="Left" Margin="5,0,0,5" VerticalAlignment="Bottom" Width="50" Height="20"/>
+        <TextBox x:Name="ErrorMessage_Label" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="Red" VerticalAlignment="Top" Width="230" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" Text="" Margin="0,10,0,0"/>
+
+        <CheckBox x:Name="Unicam_StartBoot_checkBox" Content="Start on Boot" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top"/>
+
+       
+        <RadioButton x:Name="Unicam_IntegerScaling_radioButton" Content="Integer only Scaling" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top"/>
+        <RadioButton x:Name="Unicam_SmoothScaling_radioButton" Content="Smooth Scaling" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top"/>
+        <GroupBox x:Name="Unicam_B_Parameter_Groupbox" Header="B Parameter" Margin="10,110,0,0" Height="60" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top"  >
+            <Grid>
+                <Slider x:Name="B_Parameter_slider" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="120" Maximum="1000" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True"/>
+                <TextBox x:Name="B_Parameter_Input" HorizontalAlignment="Left" Margin="130,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="Unicam_C_Parameter_Groupbox" Header="C Parameter" Margin="10,180,0,0" Height="60" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top"  >
+            <Grid>
+                <Slider x:Name="C_Parameter_slider" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="120" Maximum="1000" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True"/>
+                <TextBox x:Name="C_Parameter_Input" HorizontalAlignment="Left" Margin="130,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox x:Name="Unicam_Size_Groupbox" Header="Size" Margin="10,250,0,0" Height="70" Width="130" HorizontalAlignment="Left" VerticalAlignment="Top"  >
+            <Grid>
+                <TextBox x:Name="Size_X_Label" HorizontalAlignment="Left" Margin="0,0,0,0" TextWrapping="Wrap" Text="X Position" VerticalAlignment="Top" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" FontWeight="Bold" FontSize="10" Width="55"/>
+                <TextBox x:Name="Size_X_Input" HorizontalAlignment="Left" Margin="0,20,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>
+                <TextBox x:Name="Size_Y_Label" HorizontalAlignment="Left" Margin="60,0,0,0" TextWrapping="Wrap" Text="Y Position" VerticalAlignment="Top" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" FontWeight="Bold" FontSize="10" Width="55"/>
+                <TextBox x:Name="Size_Y_Input" HorizontalAlignment="Left" Margin="60,20,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="Unicam_Offset_Groupbox" Header="Offset" Margin="220,250,0,0" Height="70" Width="130" HorizontalAlignment="Left" VerticalAlignment="Top"  >
+            <Grid>
+                <TextBox x:Name="Offset_X_Label" HorizontalAlignment="Left" Margin="0,0,0,0" TextWrapping="Wrap" Text="X Position" VerticalAlignment="Top" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" FontWeight="Bold" FontSize="10" Width="55"/>
+                <TextBox x:Name="Offset_X_Input" HorizontalAlignment="Left" Margin="0,20,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>
+                <TextBox x:Name="Offset_Y_Label" HorizontalAlignment="Left" Margin="60,0,0,0" TextWrapping="Wrap" Text="Y Position" VerticalAlignment="Top" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" FontWeight="Bold" FontSize="10" Width="55"/>
+                <TextBox x:Name="Offset_Y_Input" HorizontalAlignment="Left" Margin="60,20,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</Window>

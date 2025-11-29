@@ -11,6 +11,7 @@ function Get-InputFiles {
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.InstallMediaHashesCSV.GID -ExistingCSV  $Script:Settings.InstallMediaHashesCSV.Path
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.ListofPackagestoInstallCSV.GID -ExistingCSV $Script:Settings.ListofPackagestoInstallCSV.Path
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.ScreenModesCSV.GID -ExistingCSV $Script:Settings.ScreenModesCSV.Path
+    Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.ScreenModesWBCSV.GID -ExistingCSV $Script:Settings.ScreenModesWBCSV.Path    
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.AminetMirrorsCSV.GID -ExistingCSV $Script:Settings.AminetMirrorsCSV.Path
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.FileSystemsCSV.GID -ExistingCSV $Script:Settings.FileSystemsCSV.Path
     Update-InputCSV -PathtoGoogleDrive $Script:Settings.InputFiles.InputFileSpreadsheetURL -GidValue $Script:Settings.DiskDefaultsCSV.GID -ExistingCSV $Script:Settings.DiskDefaultsCSV.Path

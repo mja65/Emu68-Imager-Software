@@ -1,48 +1,55 @@
-IF $System EQ "WinUAE" 
-    IF exists Devs:Picasso96Settings   
-    RENAME Devs:Picasso96Settings Devs:Picasso96SettingsPiStorm QUIET
-    ENDIF
+FAILAT 21
+IF $System EQ "WinUAE"
+	ECHO "Renaming Picasso96 Settings to Picasso96SettingsPiStorm"
+	IF exists Devs:Picasso96Settings   
+	RENAME Devs:Picasso96Settings Devs:Picasso96SettingsPiStorm QUIET
+	ENDIF
 	IF exists Devs:Monitors/Videocore
-		copy >NIL: Devs:Monitors/Videocore SYS:Storage/Monitors/
+		ECHO "Moving Videocore monitor to SYS:Storage/Monitors/"
+		COPY >NIL: Devs:Monitors/Videocore SYS:Storage/Monitors/
 		DELETE Devs:Monitors/Videocore ALL QUIET FORCE
-	endif
+	ENDIF
 	IF exists Devs:Monitors/Videocore.info
-		copy >NIL: Devs:Monitors/Videocore.info SYS:Storage/Monitors/
+		ECHO "Moving Videocore monitor .info to SYS:Storage/Monitors/"
+		COPY >NIL: Devs:Monitors/Videocore.info SYS:Storage/Monitors/
 		DELETE Devs:Monitors/Videocore.info ALL QUIET FORCE
-	endif	
+	ENDIF	
 	IF exists SYS:storage/Monitors/Uaegfx
+		ECHO "Moving Uaegfx monitor from SYS:Storage/Monitors/"
 		COPY >NIL: SYS:Storage/Monitors/Uaegfx Devs:Monitors/
 		DELETE SYS:Storage/Monitors/Uaegfx ALL QUIET FORCE
 		
 	ENDIF
 	IF exists SYS:storage/Monitors/Uaegfx.info
+		ECHO "Moving Uaegfx monitor .info from SYS:Storage/Monitors/"
 		COPY >NIL: SYS:Storage/Monitors/Uaegfx.info Devs:Monitors/
 		DELETE SYS:Storage/Monitors/Uaegfx.info ALL QUIET FORCE
 	ENDIF
-ENDIF
-
-FAILAT 21
-VERSION brcm-sdhc.device >nil:
-IF NOT FAIL
+ELSE
 	IF exists Devs:Monitors/Uaegfx 
+		ECHO "Moving Uaegfx monitor to SYS:Storage/Monitors/"
 		COPY >NIL: Devs:Monitors/Uaegfx SYS:storage/Monitors/
 		DELETE Devs:Monitors/Uaegfx ALL QUIET FORCE
 	ENDIF
 	IF exists Devs:Monitors/Uaegfx.info 
+		ECHO "Moving Uaegfx monitor .info to SYS:Storage/Monitors/"
 		COPY >NIL: Devs:Monitors/Uaegfx.info SYS:storage/Monitors/
 		DELETE Devs:Monitors/Uaegfx.info ALL QUIET FORCE
 	ENDIF
 	IF exists SYS:Storage/Monitors/Videocore
-		copy >NIL: SYS:Storage/Monitors/Videocore Devs:Monitors/
+		ECHO "Moving Videocore monitor from SYS:Storage/Monitors/"
+		COPY >NIL: SYS:Storage/Monitors/Videocore Devs:Monitors/
 		DELETE SYS:Monitors/Videocore ALL QUIET FORCE
-	endif
+	ENDIF
 	IF exists SYS:Storage/Monitors/Videocore.info
-		copy >NIL: SYS:Storage/Monitors/Videocore.info Devs:Monitors/
+		ECHO "Moving Videocore monitor from SYS:Storage/Monitors/"
+		COPY >NIL: SYS:Storage/Monitors/Videocore.info Devs:Monitors/
 		DELETE SYS:Storage/Monitors/Videocore.info ALL QUIET FORCE
-	endif	
+	ENDIF	
 	
-    IF exists Devs:Picasso96SettingsPiStorm
+	IF exists Devs:Picasso96SettingsPiStorm
+		ECHO "Restoring Picasso96 Settings"
 		RENAME Devs:Picasso96SettingsPiStorm Devs:Picasso96Settings QUIET
-    ENDIF    
+	ENDIF    
 ENDIF
 FAILAT 10

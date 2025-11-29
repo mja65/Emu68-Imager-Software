@@ -473,7 +473,7 @@ function Write-AmigaFilestoInterimDrive {
     
     Write-StartTaskMessage
 
-    $Script:Settings.TotalNumberofSubTasks = 6
+    $Script:Settings.TotalNumberofSubTasks = 7
 
     If (-not ($wifiprefs)){
         $Script:Settings.TotalNumberofSubTasks -- #No wifi
@@ -562,7 +562,42 @@ function Write-AmigaFilestoInterimDrive {
             }     
         }
     }
+    
+    $Script:Settings.CurrentSubTaskNumber ++
+    $Script:Settings.CurrentSubTaskName = "Setting Workbench environment"
 
+    Write-StartSubTaskMessage
+    
+    Write-InformationMessage  "Setting WBConfig.prefs"
+    
+    $WBConfigPrefsFile = "$($Script:Settings.InterimAmigaDrives)\System\Prefs\Env-Archive\Sys\WBConfig.prefs"
+    $WBConfigPrefsFileBackup = "$($Script:Settings.InterimAmigaDrives)\System\Prefs\Env-Archive\Sys\WBConfig.prefs.BAK"
+    $null = Copy-Item -Path $WBConfigPrefsFile -Destination $WBConfigPrefsFileBackup 
+    
+    if ($Script:GUIActions.WorkbenchBackDropEnabled -eq $true) {
+        $WBConfigPrefsToWrite = Get-BackdropPrefs -SourcePath $WBConfigPrefsFileBackup -BackdropTRUE 
+    } 
+    elseif ($Script:GUIActions.WorkbenchBackDropEnabled -eq $false){
+        $WBConfigPrefsToWrite = Get-BackdropPrefs -SourcePath $WBConfigPrefsFileBackup -BackdropFALSE
+    }
+        
+    [System.IO.File]::WriteAllBytes($WBConfigPrefsFile, $WBConfigPrefsToWrite)
+
+    Write-InformationMessage "Setting ScreenMode.prefs"
+    
+    $ScreenModePrefsFile = "$($Script:Settings.InterimAmigaDrives)\System\Prefs\Env-Archive\Sys\ScreenMode.prefs"
+    $ScreenModePrefsFileUser = "$($Script:Settings.InterimAmigaDrives)\System\Prefs\Env-Archive\Sys\ScreenMode.prefs.User"
+
+    $null = Copy-Item -Path $ScreenModePrefsFile -Destination $ScreenModePrefsFileUser
+    
+    $ScreenModePrefsToWrite = Get-ScreenModePrefs -SourcePath $ScreenModePrefsFile -ScreenMode $Script:GUIActions.ScreenModetoUseWB -ColourDepth $Script:GUIActions.ScreenModeWBColourDepth 
+    [System.IO.File]::WriteAllBytes($ScreenModePrefsFileUser, $ScreenModePrefsToWrite)
+   
+    $EnvarcScreenModeChipset = "$($Script:Settings.InterimAmigaDrives)\System\Prefs\Env-Archive\ScreenModeChipset"
+    
+    $ScreenModeChipset = Check-WBScreenMode
+    [System.IO.File]::WriteAllText($EnvarcScreenModeChipset,$ScreenModeChipset,[System.Text.Encoding]::GetEncoding('iso-8859-1'))
+  
     if ($wifiprefs){
         $Script:Settings.CurrentSubTaskNumber ++
         $Script:Settings.CurrentSubTaskName = "Creating Wifi Prefs"
