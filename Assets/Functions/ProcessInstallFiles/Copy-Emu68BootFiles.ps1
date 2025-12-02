@@ -20,17 +20,17 @@ function Copy-EMU68BootFiles {
         [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdline.txt", ("$(Get-Emu68BootCmdline -FirstBoot -SDLowSpeed)`n"), $NoBOM_UTF8)
 
         [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdlineBAK.txt", ("$(Get-Emu68BootCmdline -SDLowSpeed)`n"), $NoBOM_UTF8)
-        
+
         $SourcePath = "$([System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\"))*"  
         $DestinationPath = [System.IO.Path]::GetFullPath("$($Script:GUIActions.OutputPath)\MBR\1")
         $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-            Command = "fs copy $SourcePath $DestinationPath --makedir TRUE --recursive TRUE"
+            Command = "fs copy `"$SourcePath`" `"$DestinationPath`" --makedir TRUE --recursive TRUE"
             Sequence = 6
         }
         if ($Script:GUIActions.InstallOSFiles -eq $true){
             $SourcePath = "$DiskIconsPath\SD0\disk.info" 
             $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-                Command = "fs copy $SourcePath $DestinationPath --makedir TRUE --recursive TRUE"
+                Command = "fs copy `"$SourcePath`" `"$DestinationPath`" --makedir TRUE --recursive TRUE"
                 Sequence = 6
             }
         }
@@ -70,7 +70,7 @@ function Copy-EMU68BootFiles {
         [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdline.txt", ("$(Get-Emu68BootCmdline -FirstBoot -SDLowSpeed)`n"), $NoBOM_UTF8)
        
         [System.IO.File]::WriteAllText("$($Script:Settings.InterimAmigaDrives)\Emu68Boot\cmdlineBAK.txt", ("$(Get-Emu68BootCmdline -SDLowSpeed)`n"), $NoBOM_UTF8)
-       
+
         $null = Copy-Item "$($Script:Settings.InterimAmigaDrives)\Emu68Boot\*" -Destination $Emu68BootPath -Recurse -force
         
         $null = Copy-Item -LiteralPath $Script:GUIActions.FoundKickstarttoUse.KickstartPath -Destination "$Emu68BootPath\$($Script:GUIActions.FoundKickstarttoUse.Fat32Name)"
@@ -85,5 +85,3 @@ function Copy-EMU68BootFiles {
     }
 
 }
-
-

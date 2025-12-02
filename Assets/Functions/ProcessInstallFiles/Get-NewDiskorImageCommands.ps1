@@ -30,7 +30,7 @@ function Get-NewDiskorImageCommands {
         }    
         
         $Script:GUICurrentStatus.HSTCommandstoProcess.NewDiskorImage += [PSCustomObject]@{
-            Command = "blank $($Script:GUIActions.OutputPath) $DiskSizeBytestouse"
+            Command = "blank `"$($Script:GUIActions.OutputPath)`" $DiskSizeBytestouse"
             Sequence = 1           
          }
    
@@ -44,11 +44,11 @@ function Get-NewDiskorImageCommands {
         Write-InformationMessage -Message 'Adding commands to wipe disk'
       
         $Script:GUICurrentStatus.HSTCommandstoProcess.NewDiskorImage += [PSCustomObject]@{
-            Command = "blank $TempFoldertouse\Clean.vhd 5mb"
+            Command = "blank `"$TempFoldertouse\Clean.vhd`" 5mb"
             Sequence = 1
         }
         $Script:GUICurrentStatus.HSTCommandstoProcess.NewDiskorImage += [PSCustomObject]@{
-            Command = "write $TempFoldertouse\Clean.vhd $($Script:GUIActions.OutputPath) --skip-unused-sectors FALSE" 
+            Command = "write `"$TempFoldertouse\Clean.vhd`" `"$($Script:GUIActions.OutputPath)`" --skip-unused-sectors FALSE" 
             Sequence = 2 
         }
     }

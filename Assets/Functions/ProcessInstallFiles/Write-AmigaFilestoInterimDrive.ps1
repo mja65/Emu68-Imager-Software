@@ -165,7 +165,7 @@ function Write-AmigaFilestoInterimDrive {
                     $DestinationPathFolder = [System.IO.Path]::GetFullPath($DestinationPathFolder)
                     $DestinationPathFull = "$DestinationPathFolder\$($_.NewFileName)"
                     $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
-                        Command = "fs mkdir $DestinationPathFolder"
+                        Command = "fs mkdir `"$DestinationPathFolder`""
                         Sequence = 0                                                  
                     }                                        
                     $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
@@ -252,8 +252,9 @@ function Write-AmigaFilestoInterimDrive {
              
         if (($Script:GUIActions.OSInstallMediaType -eq 'Disk') -and ([system.version]$Script:GUIActions.KickstartVersiontoUse -ge [system.version]3.2) -and ([system.version]$Script:GUIActions.KickstartVersiontoUse -lt [system.version]3.3)){
             
-           Expand-AmigaZFiles -LocationofZFiles "$($Script:Settings.InterimAmigaDrives)\System" -MultipleDirectoryFlag
+           Expand-AmigaZFiles -LocationofZFiles "$([System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\System"))" -MultipleDirectoryFlag
         }
+       
     
         Write-TaskCompleteMessage 
      

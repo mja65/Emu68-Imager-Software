@@ -15,10 +15,10 @@ function Expand-AmigaZFiles {
     $SevenzipPathtouse  = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.SevenZipFilePath)
     $LogLocation = [System.IO.Path]::GetFullPath($Script:Settings.LogLocation)
 
-    $LocationofZFilestouse = [System.IO.Path]::GetFullPath($LocationofZFiles)
+    #Write-debug "Location of Z Files [$LocationofZFiles]"
 
     if ($MultipleDirectoryFlag){
-        $DirectoriestoDecompress = ((Get-ChildItem  -path $LocationofZFilestouse -Recurse -Filter '*.Z').Directory).FullName 
+        $DirectoriestoDecompress = ((Get-ChildItem -LiteralPath $LocationofZFiles -Recurse -Filter '*.Z').Directory).FullName 
         $UniqueDirectoriestoDecompress = $DirectoriestoDecompress | Select-Object -Unique 
         $TotalFolders = $UniqueDirectoriestoDecompress.Count
         $FoldersDone = 0
@@ -37,8 +37,8 @@ function Expand-AmigaZFiles {
         Write-Progress -Activity "Extracting .Z files" -Completed -Status "Done"
     }
     else {
-        $ListofFilestoDecompress = Get-ChildItem -Path $LocationofZFilestouse -Recurse -Filter '*.Z'
-        Write-InformationMessage -Message "Decompressing .Z files in location: $LocationofZFilestouse" 
+        $ListofFilestoDecompress = Get-ChildItem -Path $LocationofZFiles -Recurse -Filter '*.Z'
+        Write-InformationMessage -Message "Decompressing .Z files in location: $LocationofZFiles" 
         foreach ($FiletoDecompress in $ListofFilestoDecompress){
             $InputFile = $FiletoDecompress.FullName
             set-location $FiletoDecompress.DirectoryName
@@ -49,10 +49,10 @@ function Expand-AmigaZFiles {
 
     Set-Location $CurrentLocation
     
-    Write-InformationMessage -Message "Deleting .Z files in location: $LocationofZFilestouse"
+    Write-InformationMessage -Message "Deleting .Z files in location: $LocationofZFiles"
 
     Show-SpinnerWhileDeleting -ScriptBlock {
-        Get-ChildItem -Path $using:LocationofZFilestouse -Filter "*.Z" -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
+        Get-ChildItem -Path $using:LocationofZFiles -Filter "*.Z" -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
     }
     
 }
