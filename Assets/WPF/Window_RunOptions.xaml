@@ -5,7 +5,7 @@
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:local="clr-namespace:WpfApp14"
             mc:Ignorable="d"
-         Title="Run Options" Height="450" Width="850" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" Topmost="True" WindowStartupLocation="CenterScreen" WindowStyle="None" >
+         Title="Run Options" Height="600" Width="1000" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" Topmost="True" WindowStartupLocation="CenterScreen" WindowStyle="None" >
 
     <Grid x:Name ="Main" Background="#FFE5E5E5">
      <TextBlock x:Name="ScreenMode_Label" Text="The imager will be run with the following options. If you do not wish to run press the cancel button." TextWrapping="Wrap" HorizontalAlignment="Center"  VerticalAlignment="Top" Margin="0,20,0,0" Height="35" TextAlignment="Center"/>
@@ -14,8 +14,8 @@
                     RowBackground="White" >
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Setting" Binding="{Binding Setting}" Width="210"/>
-                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="595">
+                <DataGridTextColumn Header="Setting" Binding="{Binding Setting}" Width="300"/>
+                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="600">
                     <DataGridTextColumn.ElementStyle>
                         <Style>
                             <Setter Property="TextBlock.TextWrapping" Value="Wrap" />

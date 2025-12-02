@@ -46,6 +46,9 @@ function Get-OptionsBeforeRunningImage {
         elseIf ($MinimumScreenMode -eq "ECS"){
             $WPF_RunWindow_ScreenMode_Label.Text = "ECS screenmode chosen. Please ensure you are running on an Amiga with an ECS Denise (or an Amiga 1200)"             
         } 
+        elseif ($MinimumScreenMode -eq "OCS"){
+            $WPF_RunWindow_ScreenMode_Label.Text = ""
+        }
 
     }
     else {
@@ -58,9 +61,15 @@ function Get-OptionsBeforeRunningImage {
     $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("ScreenMode to Use",$Script:GUIActions.ScreenModetoUseFriendlyName)
     $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Disk Size","$($DiskSizetoReport.Size) $($DiskSizetoReport.Scale) `($($WPF_DP_Disk_GPTMBR.DiskSizeBytes) bytes`)")
     $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Number of MBR Partitions to Write",$NumberofMBRPartitions)
+    $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Workbench Screen Mode selected (Raspberry Pi):",$Script:GUIActions.ScreenModetoUse)
     If ($Script:GUIActions.InstallOSFiles -eq $true){
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("SSID to configure:",$SSID)
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Wifi Password to set:",$WifiPassword)
+        $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Screen Mode selected (Workbench):",$Script:GUIActions.ScreenModetoUseWB)
+        $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Workbench Backdrop Enabled:",$Script:GUIActions.WorkbenchBackDropEnabled)
+        $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Workbench Screen Mode Colour Depth (bits):",$Script:GUIActions.ScreenModeWBColourDepth)
+        $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Workbench Screen Mode Type:",$Script:GUIActions.ScreenModeType)
+        $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Unicam Enabled (Framethrower):",$Script:GUIActions.UnicamEnabled)
     }
     
 
