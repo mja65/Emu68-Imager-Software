@@ -6,7 +6,7 @@ $WPF_StartPage_Unicam_CheckBox.add_Checked({
     }
     $WPF_StartPage_Unicam_CheckBox.IsEnabled = 1
     $Script:GUIActions.UnicamEnabled = $true
-    $Script:GUIActions.UnicamStartonBoot = [bool]$null
+    $Script:GUIActions.UnicamStartonBoot = $true
     $Script:GUIActions.UnicamScalingType = "Smooth"
     $Script:GUIActions.UnicamBParameter = 20
     $Script:GUIActions.UnicamCParameter = 0
