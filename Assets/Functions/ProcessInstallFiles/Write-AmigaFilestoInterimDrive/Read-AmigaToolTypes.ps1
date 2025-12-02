@@ -7,8 +7,8 @@ function Read-AmigaTooltypes {
     $Logoutput = "$($Script:Settings.TempFolder)\LogOutputTemp.txt"
 
     Write-InformationMessage -Message "Extracting Tooltypes for info file(s): $IconPath to $ToolTypesPath" 
-    
-    & $Script:ExternalProgramSettings.HSTAmigaPath icon tooltypes export $IconPath $ToolTypesPath | Tee-Object -variable Logoutput
+      
+    & $([System.IO.Path]::GetFullPath("$($Script:ExternalProgramSettings.HSTAmigaPath)")) icon tooltypes export $IconPath $ToolTypesPath | Tee-Object -variable Logoutput
     $ErrorCount  =0
     foreach ($ErrorLine in $Logoutput){
         if ($ErrorLine -match " ERR]"){

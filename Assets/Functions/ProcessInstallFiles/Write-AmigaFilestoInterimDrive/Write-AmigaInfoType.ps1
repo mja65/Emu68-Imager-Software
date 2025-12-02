@@ -36,7 +36,7 @@ function Write-AmigaInfoType {
 
     $Logoutput = "$($Script:Settings.TempFolder)\LogOutputTemp.txt"
 
-    &  $Script:ExternalProgramSettings.HSTAmigaPath icon update $IconPath -t  $HSTParameter >$Logoutput
+    &  $([System.IO.Path]::GetFullPath("$($Script:ExternalProgramSettings.HSTAmigaPath)")) icon update $IconPath -t  $HSTParameter >$Logoutput
     $CheckforError = Get-Content ($Logoutput)
     $ErrorCount = 0
     foreach ($ErrorLine in $CheckforError){

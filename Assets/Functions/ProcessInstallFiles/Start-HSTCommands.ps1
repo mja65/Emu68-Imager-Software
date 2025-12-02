@@ -48,7 +48,8 @@ function Start-HSTCommands {
     Write-InformationMessage -Message "Running HST Imager for the following arguments: [$Arguments]"
     
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $startInfo.FileName = $Script:ExternalProgramSettings.HSTImagerPath
+    
+    $startInfo.FileName = $([System.IO.Path]::GetFullPath("$($Script:ExternalProgramSettings.HSTImagerPath)"))
     $startInfo.Arguments = $Arguments
     $startInfo.RedirectStandardOutput = $true
     $startInfo.UseShellExecute = $false

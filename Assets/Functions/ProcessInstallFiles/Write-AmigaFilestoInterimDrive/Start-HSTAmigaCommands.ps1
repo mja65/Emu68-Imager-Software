@@ -19,7 +19,7 @@ function Start-HSTAmigaCommands {
     Write-InformationMessage -Message "Running HST Amiga"
     
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $startInfo.FileName = $Script:ExternalProgramSettings.HSTAmigaPath
+    $startInfo.FileName = $([System.IO.Path]::GetFullPath("$($Script:ExternalProgramSettings.HSTAmigaPath)"))
     $startInfo.Arguments = $Arguments
     $startInfo.RedirectStandardOutput = $true
     $startInfo.UseShellExecute = $false

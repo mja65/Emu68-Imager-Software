@@ -47,13 +47,13 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
         $MBRPartitionStartSector = $MBRPartition.Partition.StartingPositionSector + $StartingSector
      
         $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-            Command = "mbr part add $($Script:GUIActions.OutputPath) $PartitionTypetoUse $([int64]($MBRPartition.Partition.partitionsizebytes)) --start-sector $([int64]$MBRPartitionStartSector)"
+            Command = "mbr part add `"$($Script:GUIActions.OutputPath)`" $PartitionTypetoUse $([int64]($MBRPartition.Partition.partitionsizebytes)) --start-sector $([int64]$MBRPartitionStartSector)"
             Sequence = 1      
         }  
         if ($MBRPartition.Partition.PartitionSubType -eq 'FAT32'){
             Write-InformationMessage -Message "Adding command to format FAT32 partition for partition #$MBRPartitionCounter"
             $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-                Command = "mbr part format $($Script:GUIActions.OutputPath) $MBRPartitionCounter $($MBRPartition.Partition.VolumeName)"
+                Command = "mbr part format `"$($Script:GUIActions.OutputPath)`" $MBRPartitionCounter $($MBRPartition.Partition.VolumeName)"
                 Sequence = 1      
             }  
         }
@@ -106,7 +106,7 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
            Write-InformationMessage -Message "Preparing commands to set up Amiga Disk for $($MBRPartition.PartitionName) - MBR Partition Number: $MBRPartitionCounter"
            if ($MBRPartition.Partition.ImportedPartition -ne $true){
                $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-                   Command = "rdb init $($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter"
+                   Command = "rdb init `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`""
                    Sequence = 3    
                }  
                foreach ($FileSystem in $FileSystemstoAdd){
@@ -114,7 +114,7 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
                     $DosTypetoUse = $FileSystem.DosType.Replace("\","")
                     Write-InformationMessage -Message "Adding filesystem `"$($FileSystem.FileSystemName)`" to Disk"
                        $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-                           Command = "rdb filesystem add `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`" $($FileSystem.FileSystemPath) $DosTypetoUse"    
+                           Command = "rdb filesystem add `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`" `"$($FileSystem.FileSystemPath)`" $DosTypetoUse"    
                            Sequence = 3      
                        }            
                    }               
