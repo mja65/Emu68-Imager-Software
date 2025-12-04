@@ -6,7 +6,8 @@ function Write-AmigaFilestoInterimDrive {
        [switch]$AdjustingScriptsandInfoFiles,
        [switch]$ProcessDownloadedFiles,
        [switch]$CopyRemainingFiles,
-       [switch]$wifiprefs
+       [switch]$wifiprefs,
+       [switch]$AdjustWBStartup
     )
     
 
@@ -642,4 +643,27 @@ function Write-AmigaFilestoInterimDrive {
     Write-TaskCompleteMessage 
    }
 
+   if ($AdjustWBStartup){
+
+        $Script:Settings.CurrentTaskName = "Moving WBStartup files for first boot"
+        
+        Write-StartTaskMessage
+        $WBStartupPath = "$($Script:Settings.InterimAmigaDrives)\System\WBStartup"
+        $FilestoMove = (Get-ChildItem -Path $WBStartupPath)
+        
+        if (-not (test-path  "$WBStartupPath\Disabled" -PathType Container)){
+            $null = New-Item -path "$WBStartupPath\Disabled" -ItemType Directory 
+        } 
+        
+        
+        $FilestoMove |  Where-Object {$_.Name -ne 'Disabled' -and $_.Name -ne 'OnetimeRunWB.info' -and $_.Name -ne 'OnetimeRunWB'}  |  ForEach-Object {
+            $null = move-item -Path $_.FullName -Destination "$WBStartupPath\Disabled\" -Force 
+        }
+        
+        Write-TaskCompleteMessage
+
+    }
 }
+
+
+   

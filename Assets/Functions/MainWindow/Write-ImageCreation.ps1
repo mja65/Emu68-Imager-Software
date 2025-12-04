@@ -41,7 +41,7 @@ function Write-ImageCreation {
         Write-AmigaFilestoInterimDrive -DownloadFilesFromInternet -CopyRemainingFiles  # 15 tasks
      }
      elseif ($Script:GUIActions.InstallOSFiles -eq $true){
-        Write-AmigaFilestoInterimDrive -DownloadFilesFromInternet -DownloadLocalFiles -ExtractADFFilesandIconFiles -AdjustingScriptsandInfoFiles -ProcessDownloadedFiles -CopyRemainingFiles -wifiprefs
+        Write-AmigaFilestoInterimDrive -DownloadFilesFromInternet -DownloadLocalFiles -ExtractADFFilesandIconFiles -AdjustingScriptsandInfoFiles -ProcessDownloadedFiles -CopyRemainingFiles -wifiprefs -AdjustWBStartup
      }
 
      if ($Script:GUIActions.InstallOSFiles -eq $true){

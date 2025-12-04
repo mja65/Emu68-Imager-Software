@@ -93,7 +93,7 @@ if (-not (Get-StartupFiles)){
 
 Write-TaskCompleteMessage
 
-$Script:Settings.TotalNumberofTasks = 10
+$Script:Settings.TotalNumberofTasks = 11
 
 if ($Script:GUICurrentStatus.RunMode -eq 'CommandLine'){
     get-process -id $Pid | set-windowstate -State MINIMIZE -SuppressErrors

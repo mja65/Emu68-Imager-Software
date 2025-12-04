@@ -5,3 +5,9 @@ IF $KickstartVersion EQ 3.9
    C:AddDataTypes REFRESH QUIET
 ENDIF
 SYS:Prefs/Locale
+Echo "Finalising set up and rebooting your system to finalise set up"
+wait 3
+copy >NIL: sys:WBStartup/Disabled/#? sys:WBStartup/ FORCE ALL CLONE
+delete >NIL: sys:WBStartup/Disabled FORCE ALL
+Sys:diskchange SDH0:
+Sys:c/reboot
