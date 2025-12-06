@@ -25,9 +25,14 @@ IF $System EQ "WinUAE"
 		COPY >NIL: SYS:Storage/Monitors/Uaegfx.info Devs:Monitors/
 		DELETE SYS:Storage/Monitors/Uaegfx.info ALL QUIET FORCE
 	ENDIF
-	If exists Sys:Prefs/Env-Archive/sys/screenmode.prefs.user 
-		Echo "Using User Defined ScreenMode"
-		Sys:Prefs/ScreenMode FROM Sys:Prefs/Env-Archive/sys/screenmode.prefs.User USE >NIL:
+	If exists Sys:Prefs/Env-Archive/sys/screenmode.prefs.user
+		If $ScreenModeChipset EQ "RTG"
+			Echo "Videocore Mode selected. Using Native screenmode."
+			Sys:Prefs/ScreenMode FROM Sys:Prefs/Env-Archive/sys/screenmode.prefs.Native USE >NIL:
+		ELSE
+			Echo "Using User Defined ScreenMode"
+			Sys:Prefs/ScreenMode FROM Sys:Prefs/Env-Archive/sys/screenmode.prefs.User USE >NIL:
+		ENDIF
 	ENDIF
 ELSE
 	IF exists Devs:Monitors/Uaegfx 

@@ -595,6 +595,10 @@ function Write-AmigaFilestoInterimDrive {
     $ScreenModeChipset = Check-WBScreenMode
     [System.IO.File]::WriteAllText($EnvarcScreenModeChipset,$ScreenModeChipset,[System.Text.Encoding]::GetEncoding('iso-8859-1'))
   
+    if ($ScreenModeChipset -eq "RTG"){
+        $null = Copy-Item -Path $ScreenModePrefsFile "$ScreenModePrefsFile.Native"
+    }
+
     if ($wifiprefs){
         $Script:Settings.CurrentSubTaskNumber ++
         $Script:Settings.CurrentSubTaskName = "Creating Wifi Prefs"
