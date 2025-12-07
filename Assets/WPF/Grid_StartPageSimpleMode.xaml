@@ -58,7 +58,8 @@
                  
                     <ComboBox x:Name="ScreenMode_Dropdown" ToolTip="Select if you wish to use a specific resolution on your Raspberry Pi" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top" Width="375"/>
                     <TextBox x:Name="ScreenMode_Label" HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Width="375" Text="Select ScreenMode for Raspberry Pi" VerticalAlignment="Top" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="14"/>
-
+                <Button x:Name="CustomScreenMode_button" Content="Click to set Custom Resolution" Width="375" Height="20" Margin="10,52,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden" IsEnabled="False"/>
+   
                 </Grid>
 
             </GroupBox>
