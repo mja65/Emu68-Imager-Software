@@ -5,7 +5,7 @@ IF $RpiType EQ "Pi4"
 		delete Sys:Tools/HDToolbox.info QUIET
 	ENDIF
 	IF $KickstartVersion EQ 3.9
-		Skip Cmdline
+		Skip END
 	ENDIF
 	rename from Sys:Tools/HDToolboxPi4.info to Sys:Tools/HDToolbox.info QUIET
 	Delete Sys:Devs/DOSDrivers/SD0Pi3 QUIET
@@ -18,15 +18,10 @@ IF $RpiType EQ "Pi3"
 		delete Sys:Tools/HDToolbox.info QUIET
 	ENDIF
 	IF $KickstartVersion EQ 3.9
-		Skip Cmdline
+		Skip END
 	ENDIF
 	rename from Sys:Tools/HDToolboxPi3.info to Sys:Tools/HDToolbox.info QUIET
 	Delete Sys:Devs/DOSDrivers/SD0Pi4 QUIET
 	Delete Sys:Tools/HDToolboxPi4.info QUIET
 ENDIF
-LAB Cmdline
-Mount SD0: >NIL:
-Delete EMU68BOOT:cmdline.txt QUIET
-rename from EMU68BOOT:cmdlineBAK.txt to EMU68BOOT:cmdline.txt
-Assign SD0: DISMOUNT >NIL:
-Assign EMU68BOOT: DISMOUNT >NIL:
+LAB END

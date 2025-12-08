@@ -89,22 +89,28 @@ function Get-IconPositionScript {
         
             }
             $IconPosScript += "iconpos >NIL: $($Disk.Partition.DeviceName):disk.info type=DISK"
-            $IconPosScript += "iconpos >NIL: $($Disk.Partition.DeviceName):disk.info type=DISK XPOS=$IconX YPOS=$IconY DXPOS=$DrawerX DYPOS=$DrawerY DWIDTH=$DWidth DHEIGHT=$DHeight"
+            $IconPosScript += "iconpos >NIL: $($Disk.Partition.DeviceName):disk.info XPOS=$IconX YPOS=$IconY DXPOS=$DrawerX DYPOS=$DrawerY DWIDTH=$DWidth DHEIGHT=$DHeight"
             
             $LastIconY = $IconY
         }
     }
      
     if ($Emu68Boot) {
+    #    $IconPosScript += "Mount SD0: >NIL:"
+    $IconPosScript += "IF NOT `$System EQ `"WinUAE`""
+        # $IconPosScript += "   Delete EMU68BOOT:cmdline.txt QUIET"
+        # $IconPosScript += "   rename from EMU68BOOT:cmdlineBAK.txt to EMU68BOOT:cmdline.txt"
         foreach ($Disk in $DefaultDisks) {
             if ($Disk.Disk -eq 'EMU68BOOT'){
-                $IconPosScript += "Mount SD0: >NIL:"
-                $IconPosScript += "iconpos >NIL: $($Disk.DeviceName):disk.info type=DISK"
-                $IconPosScript += "iconpos >NIL: $($Disk.DeviceName):disk.info type=DISK XPOS=$($Disk.IconX) YPOS=$($Disk.IconY) DRAWERX=$($Disk.DrawerX) DRAWERY=$($DIsk.DrawerY) DWIDTH=$($Disk.DWidth) DHEIGHT=$($Disk.DHeight)"
-                $IconPosScript += "Assign SD0: DISMOUNT >NIL:"
-                $IconPosScript += "Assign EMU68BOOT: DISMOUNT >NIL:"
+                $IconPosScript += "   iconpos >NIL: $($Disk.DeviceName):disk.info type=DISK"
+                $IconPosScript += "   iconpos >NIL: $($Disk.DeviceName):disk.info XPOS=$($Disk.IconX) YPOS=$($Disk.IconY) DXPOS=$($Disk.DrawerX) DYPOS=$($DIsk.DrawerY) DWIDTH=$($Disk.DWidth) DHEIGHT=$($Disk.DHeight)"
+
             }
-        }         
+        }  
+        $IconPosScript += "ENDIF"    
+    #    $IconPosScript += "WAIT 1"                               
+    #    $IconPosScript += "Assign SD0: DISMOUNT >NIL:"
+    #    $IconPosScript += "Assign EMU68BOOT: DISMOUNT >NIL:"
     }
      
     return $IconPosScript

@@ -458,8 +458,8 @@ function Write-AmigaFilestoInterimDrive {
           $null = remove-item "$($Script:Settings.InterimAmigaDrives)\System\libs\68040.libary" -Force 
       }
        
-      $IconPosScript_Emu68Boot = (Get-IconPositionScript -Emu68Boot)
-      Export-TextFileforAmiga -DatatoExport $IconPosScript_Emu68Boot -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRun\SetIconPositionsEmu68Boot_Pistorm" -AddLineFeeds 'TRUE'   
+     # $IconPosScript_Emu68Boot = (Get-IconPositionScript -Emu68Boot)
+   #   Export-TextFileforAmiga -DatatoExport $IconPosScript_Emu68Boot -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRun\SetIconPositionsEmu68Boot_Pistorm" -AddLineFeeds 'TRUE'   
      
       Write-TaskCompleteMessage 
      
@@ -648,7 +648,7 @@ function Write-AmigaFilestoInterimDrive {
         
         Write-StartTaskMessage
         
-        $IconPosScript_AmigaDrives = (Get-IconPositionScript -AmigaDrives -AmigaPositioning)
+        $IconPosScript_AmigaDrives = (Get-IconPositionScript -AmigaDrives -AmigaPositioning -Emu68Boot)
         Export-TextFileforAmiga -DatatoExport $IconPosScript_AmigaDrives -ExportFile "$($Script:Settings.InterimAmigaDrives)\System\S\OneTimeRunWB\SetIconPositions" -AddLineFeeds 'TRUE'   
         
         $WBStartupPath = "$($Script:Settings.InterimAmigaDrives)\System\WBStartup"

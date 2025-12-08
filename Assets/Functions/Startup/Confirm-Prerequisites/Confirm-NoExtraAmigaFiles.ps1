@@ -30,6 +30,7 @@ $ListofFiles = @"
     \System\OneTimeRun\CheckScreenModeandChipset_Pistorm
     \System\OneTimeRun\CheckScreenModeandChipset
     \System\OneTimeRunWB\LocaleSettings
+    \System\OneTimeRunWB\Cmdline
     \System\PiStorm\CheckHashes
     \System\PiStorm\CheckIconPositions
     \System\PiStorm\Documentation

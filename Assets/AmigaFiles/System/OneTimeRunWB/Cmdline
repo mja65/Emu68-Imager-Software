@@ -1,0 +1,4 @@
+IF NOT $System EQ "WinUAE"
+   Delete EMU68BOOT:cmdline.txt QUIET"
+   rename from EMU68BOOT:cmdlineBAK.txt to EMU68BOOT:cmdline.txt"
+Endif
