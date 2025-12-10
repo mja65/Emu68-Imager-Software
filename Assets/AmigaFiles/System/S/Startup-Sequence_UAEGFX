@@ -1,5 +1,5 @@
 FAILAT 21
-IF $System EQ "WinUAE"
+IF $System EQ "UAE"
 	ECHO "Renaming Picasso96 Settings to Picasso96SettingsPiStorm"
 	IF exists Devs:Picasso96Settings   
 	RENAME Devs:Picasso96Settings Devs:Picasso96SettingsPiStorm QUIET

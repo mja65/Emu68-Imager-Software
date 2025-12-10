@@ -6,7 +6,7 @@ IF $FIRSTTIMEBOOTWB EQ "TRUE"
    IF WARN 
       ECHO "Running One Time Scripts" 
       ECHO >T:RunTimeScript "FAILAT 21" 
-      IF $System EQ "WinUAE" 
+      IF $System EQ "UAE" 
          LIST >>T:RunTimeScriptWB S:OneTimeRunWB PAT=~(#?.info|#?_pistorm) LFORMAT="ECHO *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES
       ELSE
          LIST >>T:RunTimeScriptWB S:OneTimeRunWB PAT=~(#?.info|) LFORMAT="ECHO *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES
@@ -20,7 +20,7 @@ IF $FIRSTTIMEBOOTWB EQ "TRUE"
    ECHO "Rebooting the Amiga in 3 seconds!"
    Wait 3
    Sys:c/diskchange SDH0:
-   IF $System EQ "WinUAE"
+   IF $System EQ "UAE"
       Sys:c/reboot
    ELSE
       c:EMU68INFO HARDRESET
