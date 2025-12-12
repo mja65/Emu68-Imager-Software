@@ -14,13 +14,27 @@ function Expand-Packages {
     if ($Web) {
 
         $ArchivestoExtract = [System.Collections.Generic.List[PSCustomObject]]::New()
+        $LastFile = $null 
         $ListofPackages | ForEach-Object {
-            $FileExtension = $_.FileDownloadName.Substring($_.FileDownloadName.Length -4,4)
-            $ArchivestoExtract += [PSCustomObject]@{
-                SourceLocation = [System.IO.Path]::GetFullPath("$($Script:Settings.WebPackagesDownloadLocation)\$($_.FileDownloadName)")
-                FoldertoExtract = [System.IO.Path]::GetFullPath("$($Script:Settings.WebPackagesDownloadLocation)\$($_.FileDownloadName.Substring(0,$_.FileDownloadName.Length -4))")
-                FileExtension = $FileExtension
+            $FoldertoExtractMainFile = [System.IO.Path]::GetFullPath("$($Script:Settings.WebPackagesDownloadLocation)\$($_.FileDownloadName.Substring(0,$_.FileDownloadName.Length -4))")
+            if ($LastFile -ne $_.FileDownloadName){
+                $FileExtension = $_.FileDownloadName.Substring($_.FileDownloadName.Length -4,4)
+                $ArchivestoExtract += [PSCustomObject]@{
+                    SourceLocation = [System.IO.Path]::GetFullPath("$($Script:Settings.WebPackagesDownloadLocation)\$($_.FileDownloadName)")
+                    FoldertoExtract = $FoldertoExtractMainFile
+                    FileExtension = $FileExtension
+                }
             }
+            if ($_.ArchiveinArchiveName){
+                $FoldertoExtractArchiveinArchive = "$FoldertoExtractMainFile\$($_.ArchiveinArchiveName.Substring(0,$_.ArchiveinArchiveName.Length -4))"
+                $FileExtension = $_.ArchiveinArchiveName.Substring($_.ArchiveinArchiveName.Length -4,4)
+                $ArchivestoExtract += [PSCustomObject]@{
+                    SourceLocation = "$FoldertoExtractMainFile\$($_.ArchiveinArchiveName)"
+                    FoldertoExtract = $FoldertoExtractArchiveinArchive
+                    FileExtension = $FileExtension
+                }                
+            }
+            $LastFile = $_.FileDownloadName            
         }
     }
     elseif ($Local) {

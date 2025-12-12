@@ -73,8 +73,10 @@ function Write-AmigaFilestoInterimDrive {
         
         Write-StartTaskMessage
         
-        $ListofPackagestoDownloadfromInternet = $ListofPackagestoInstall | Where-Object {(($_.Source -eq "Github") -or  ($_.Source -eq "Web") -or ($_.Source -eq "Web - SearchforPackageAminet") -or ($_.Source -eq "Web - SearchforPackageWHDLoadWrapper"))} | Select-Object 'Source','GithubName','GithubRelease','GithubReleaseType','SourceLocation','BackupSourceLocation','FileDownloadName','PerformHashCheck','Hash','UpdatePackageSearchTerm','UpdatePackageSearchResultLimit', 'UpdatePackageSearchExclusionTerm','UpdatePackageSearchMinimumDate' -Unique 
+        $ListofPackagestoDownloadfromInternetandExpand = $ListofPackagestoInstall | Where-Object {(($_.Source -eq "Github") -or  ($_.Source -eq "Web") -or ($_.Source -eq "Web - SearchforPackageAminet") -or ($_.Source -eq "Web - SearchforPackageWHDLoadWrapper"))} | Sort-Object 'FileDownloadName' | Select-Object 'Source','GithubName','GithubRelease','GithubReleaseType','SourceLocation','ArchiveinArchiveName','BackupSourceLocation','FileDownloadName','PerformHashCheck','Hash','UpdatePackageSearchTerm','UpdatePackageSearchResultLimit', 'UpdatePackageSearchExclusionTerm','UpdatePackageSearchMinimumDate' -Unique 
         
+        $ListofPackagestoDownloadfromInternet = $ListofPackagestoDownloadfromInternetandExpand |  Select-Object 'Source','GithubName','GithubRelease','GithubReleaseType','SourceLocation','BackupSourceLocation','FileDownloadName','PerformHashCheck','Hash','UpdatePackageSearchTerm','UpdatePackageSearchResultLimit', 'UpdatePackageSearchExclusionTerm','UpdatePackageSearchMinimumDate' -Unique 
+
         Get-PackagesfromInternet -ListofPackagestoDownload $ListofPackagestoDownloadfromInternet
         
         Write-TaskCompleteMessage 
@@ -83,7 +85,7 @@ function Write-AmigaFilestoInterimDrive {
         
         Write-StartTaskMessage
         
-        Expand-Packages -Web -ListofPackages $ListofPackagestoDownloadfromInternet
+        Expand-Packages -Web -ListofPackages $ListofPackagestoDownloadfromInternetandExpand
         
         Write-TaskCompleteMessage 
     
@@ -342,6 +344,12 @@ function Write-AmigaFilestoInterimDrive {
                       $ArchiveNameExtractedFilePath = $ArchiveNameExtractedFilePath.Substring(0,$ArchiveNameExtractedFilePath.Length-4)
                   }
                   $SourcePath = "$($Script:Settings.WebPackagesDownloadLocation)\$ArchiveNameExtractedFilePath\$($_.FilestoInstall)"   
+                  if ($_.ArchiveinArchiveName){
+                    #$AdditionalPathtoAdd="Contrib\Emu68Info_0.1.7.lha"
+                    $AdditionalPathtoAdd = $_.ArchiveinArchiveName
+                    $AdditionalPathtoAdd = $AdditionalPathtoAdd.Substring(0,$AdditionalPathtoAdd.Length-4) 
+                    $SourcePath = "$($Script:Settings.WebPackagesDownloadLocation)\$ArchiveNameExtractedFilePath\$AdditionalPathtoAdd\$($_.FilestoInstall)"
+                  } 
               }          
               $DestinationFolder = "$($Script:Settings.InterimAmigaDrives)\$($_.DrivetoInstall)\$($_.LocationtoInstall)"
               $DestinationFolder = $DestinationFolder.TrimEnd('\')     
