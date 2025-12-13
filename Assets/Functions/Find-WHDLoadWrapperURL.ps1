@@ -1,4 +1,4 @@
-function Find-WHDLoadWrapperURL{
+function Find-WHDLoadWrapperURL {
     param (
         $SearchCriteria,
         $ResultLimit
@@ -11,7 +11,7 @@ function Find-WHDLoadWrapperURL{
         
         do {
             try {
-                $SearchResults=Invoke-WebRequest "http://ftp2.grandis.nu/turransearch/search.php?_search_=1&search=$SearchCriteria&category_id=Misc&exclude=&limit=$ResultLimit&httplinks=on&username=ftp%2Cany&filesonly=on"
+                $SearchResults=Invoke-WebRequest "http://ftp2.grandis.nu/turransearch/search.php?_search_=1&search=$SearchCriteria&category_id=Misc&exclude=&limit=$ResultLimit&httplinks=on&username=ftp%2Cany&filesonly=on" -UseBasicParsing 
                                                
 
                 $IsSuccess = $true  
