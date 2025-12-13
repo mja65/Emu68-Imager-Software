@@ -29,7 +29,7 @@ Select
         end
     end
     when vChipset = "ECS" then do
-        if vScreenModeChipset~="OCS" & vScreenModeChipset~="OCS" & vScreenModeChipset~="RTG" then do
+        if vScreenModeChipset~="OCS" & vScreenModeChipset~="ECS" & vScreenModeChipset~="RTG" then do
             say "You are running on an ECS machine and selected a non-ECS screenmode! Reverting to default screenmode!"
             vDefaultScreenMode = 1        
         end
