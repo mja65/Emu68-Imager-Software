@@ -197,16 +197,16 @@ ECHO ""
 SET OldVC4Version `Version LIBS:Picasso96/VideoCore.card`
 SET NewCV4Version `Version RAM:Emu68tools_temp/VideoCore/VideoCore.card`
 
-IF "$OldVC4Version" EQ "$NewCV4Version"
-  ECHO "Your version of VideoCore is already up to date."
-  SKIP END
-ENDIF
+;IF "$OldVC4Version" EQ "$NewCV4Version"
+;  ECHO "Your version of VideoCore is already up to date."
+;  SKIP END
+;ENDIF
 
-;RX Emu68-Updater:VersionChecker.rexx "$OldVC4Version" "$NewCV4Version" >NIL:
+RX Emu68-Updater:VersionChecker.rexx "$OldVC4Version" "$NewCV4Version" >NIL:
 
-;IF NOT WARN
-  ;ASK "New $NewVC4Version version found, do you want to update your current $OldVC4Version version? Y/N"
-  ASK "Do you want to update to the latest version of VideoCore? Y/N"
+IF NOT WARN
+  ASK "New $NewVC4Version version found, do you want to update your current $OldVC4Version version? Y/N"
+  ;ASK "Do you want to update to the latest version of VideoCore? Y/N"
     IF WARN
 	  IF EXISTS "LIBS:Picasso96/Backup_Videocore/VideoCore.card_old"
 	    DELETE "LIBS:Picasso96/Backup_Videocore/VideoCore.card_old" FORCE QUIET >NIL:
@@ -224,10 +224,10 @@ ENDIF
 	ELSE
 	  SKIP END
 	ENDIF
-;ELSE
-;  ECHO "Your version of VideoCore is already up to date."
-;  SKIP END
-;ENDIF
+ELSE
+  ECHO "Your version of VideoCore is already up to date."
+  SKIP END
+ENDIF
 
 LAB END
 
