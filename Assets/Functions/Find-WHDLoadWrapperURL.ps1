@@ -3,17 +3,19 @@ function Find-WHDLoadWrapperURL {
         $SearchCriteria,
         $ResultLimit
         )        
-        $SiteLink='http://ftp2.grandis.nu'
+        $SiteLink = 'http://ftp2.grandis.nu'
         $ListofURLs = New-Object System.Collections.Generic.List[System.Object]
         
         $Counter = 0
         $IsSuccess = $null
         
+        # $SearchCriteria = "WHDLoadWrapper"
+        # $ResultLimit =  "10" 
+
         do {
             try {
-                $SearchResults=Invoke-WebRequest "http://ftp2.grandis.nu/turransearch/search.php?_search_=1&search=$SearchCriteria&category_id=Misc&exclude=&limit=$ResultLimit&httplinks=on&username=ftp%2Cany&filesonly=on" -UseBasicParsing 
-                                               
-
+                #$SearchResults = Invoke-WebRequest "http://ftp2.grandis.nu/turransearch/search.php?_search_=1&search=$SearchCriteria&category_id=Misc&exclude=&limit=$ResultLimit&httplinks=on&username=ftp%2Cany&filesonly=on" -UseBasicParsing                     
+                $SearchResults = Invoke-WebRequest "http://ftp2.grandis.nu/turransearch/search.php?_search_=1&search=$SearchCriteria&category_id=&exclude=&limit=$ResultLimit&httplinks=on&username=ftp%2Cany&filesonly=on" -UseBasicParsing 
                 $IsSuccess = $true  
             }
             catch {
@@ -41,7 +43,7 @@ function Find-WHDLoadWrapperURL {
                 }
             }
             $DownloadLink = $SiteLink+($ListofURLs | Sort-Object -Descending | Select-Object -First 1)
-            if ($DownloadLink){
+            if (($DownloadLink) -and ($DownloadLink -ne $SiteLink)){
                 return $DownloadLink
             }
             else {
