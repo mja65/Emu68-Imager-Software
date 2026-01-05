@@ -67,6 +67,28 @@ function Write-AmigaFilestoInterimDrive {
     
     Write-TaskCompleteMessage 
 
+    # Check for Custom Roadshow
+    $RoadshowPackages = $ListofPackagestoInstall | Where-Object {$_.PackageName -eq "Roadshow"}
+    $CustomRoadshowPath = "$($Script:Settings.LocationofAmigaFiles)\LocalAmigaPackages\Roadshow-1.15.lha"
+    
+    if ($RoadshowPackages -and (Test-Path $CustomRoadshowPath)) {
+        Write-InformationMessage -Message "Custom Roadshow archive found. Using 'Roadshow-1.15.lha' instead of bundled Demo."
+        
+        foreach ($Package in $RoadshowPackages) {
+             $Package.Source = "Local - LHA File"
+             $Package.SourceLocation = "LocalAmigaPackages\Roadshow-1.15.lha"
+             # Reset other potential flags that might interfere
+             $Package.FileDownloadName = $null 
+             $Package.GithubRelease = $null
+
+             # Update FilestoInstall to point to the non-demo folder structure
+             # Replaces "Roadshow-Demo-*" or "Roadshow-Demo-1.15" with "Roadshow-1.15"
+             if ($Package.FilestoInstall -match "Roadshow-Demo") {
+                 $Package.FilestoInstall = $Package.FilestoInstall -replace "Roadshow-Demo-[^\\]*", "Roadshow-1.15"
+             }
+        }
+    } 
+
     if ($DownloadFilesFromInternet){
     
         $Script:Settings.CurrentTaskName = "Getting Packages from Internet"

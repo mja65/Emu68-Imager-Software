@@ -7,6 +7,7 @@ $ListofFiles = @"
     \EMU68Boot\config.txt
     \EMU68Boot\ps32lite-stealth-firmware.gz
     \LocalAmigaPackages\Roadshow-Demo-1.15.lha
+    \LocalAmigaPackages\Roadshow-1.15.lha
     \System\C\AreWeOnline
     \System\C\AreWePAL
     \System\C\CE
