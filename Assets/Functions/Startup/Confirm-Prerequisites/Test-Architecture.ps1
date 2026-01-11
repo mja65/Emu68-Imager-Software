@@ -3,7 +3,7 @@ function Test-Architecture {
         
     )
 
-    if (($Script:Settings.Architecture -eq '64-bit') -or ($Script:Settings.Architecture -eq '64 bit')){
+    if (($Script:Settings.Architecture -eq '64-bit') -or ($Script:Settings.Architecture -eq '64 bit') -or ($Script:Settings.Architecture -eq '64 Bits')){
         $Valuetoreturn = "64bit"
     }
     elseif ($Script:Settings.Architecture -match 'ARM 64-bit'){
