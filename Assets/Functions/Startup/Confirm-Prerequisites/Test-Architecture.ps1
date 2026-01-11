@@ -1,19 +1,21 @@
 function Test-Architecture {
     param (
-        
+        $Architecture
     )
 
-    if (($Script:Settings.Architecture -eq '64-bit') -or ($Script:Settings.Architecture -eq '64 bit')){
-        $Valuetoreturn = "64bit"
-    }
-    elseif ($Script:Settings.Architecture -match 'ARM 64-bit'){
-        $Valuetoreturn = "ARM"
-        Write-WarningMessage -Message "You are running ARM! While some users report this work, this is unsupported!"
+    if ($Architecture -match '64[- ]?bits?') {
+        if ($Architecture -match 'ARM') {
+            $Valuetoreturn = "ARM"
+            Write-WarningMessage -Message "You are running ARM! While some users report this work, this is unsupported!"
+        }
+        else {
+            $Valuetoreturn = "64bit"
+        }
     }
     else {
         $Valuetoreturn = "Other"
     }
-    
+       
     return $Valuetoreturn
 
 }

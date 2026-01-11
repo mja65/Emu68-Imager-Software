@@ -10,7 +10,7 @@ function Confirm-Prerequisites {
     Write-StartSubTaskMessage 
     
     
-    $ArchitectureFound = Test-Architecture
+    $ArchitectureFound = Test-Architecture -Architecture ($Script:Settings.Architecture)
     $isAdministrator = Test-Administrator
     
     $null = Confirm-Scaling
