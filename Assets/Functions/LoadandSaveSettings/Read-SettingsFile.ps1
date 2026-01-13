@@ -105,7 +105,7 @@ function Read-SettingsFile {
    $Script:GUIActions.UnicamEnabled = $false    
    $Script:GUIActions.UnicamStartonBoot = [bool]$null
    $Script:GUIActions.UnicamScalingType = $null
-   $Script:GUIActions.UnicamPhase = $null
+   #$Script:GUIActions.UnicamPhase = $null
    $Script:GUIActions.UnicamBParameter = $null
    $Script:GUIActions.UnicamCParameter = $null
    $Script:GUIActions.UnicamSizeXPosition = $null

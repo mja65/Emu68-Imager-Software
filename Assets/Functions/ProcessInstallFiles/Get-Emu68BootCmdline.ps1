@@ -25,11 +25,11 @@ function Get-Emu68BootCmdline {
                 $CmdlineToReturn = "$CmdLinetoReturn unicam.boot"
             }
             if ($Script:GUIActions.UnicamScalingType -eq "Smooth"){
-                $CmdlineToReturn = "$CmdLinetoReturn unicam.smooth unicam.phase=$($Script:GUIActions.UnicamPhase) unicam.b=$($Script:GUIActions.UnicamBParameter) unicam.c=$($Script:GUIActions.UnicamCParameter)"
+                $CmdlineToReturn = "$CmdLinetoReturn unicam.smooth unicam.b=$($Script:GUIActions.UnicamBParameter) unicam.c=$($Script:GUIActions.UnicamCParameter)"
 
             }
             elseif ($Script:GUIActions.UnicamScalingType -eq "Integer"){
-                $CmdlineToReturn = "$CmdLinetoReturn unicam.integer unicam.phase=$($Script:GUIActions.UnicamPhase)"
+                $CmdlineToReturn = "$CmdLinetoReturn unicam.integer"
 
             }
         }

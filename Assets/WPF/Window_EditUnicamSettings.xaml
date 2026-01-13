@@ -17,13 +17,6 @@
         <RadioButton x:Name="Unicam_IntegerScaling_radioButton" Content="Integer only Scaling" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top"/>
         <RadioButton x:Name="Unicam_SmoothScaling_radioButton" Content="Smooth Scaling" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top"/>
 
-        <GroupBox x:Name="Unicam_Phase_Groupbox" Header="Phase" Margin="10,110,0,0" Height="60" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top"  >
-            <Grid>
-                <Slider x:Name="Phase_slider" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="120" Maximum="255" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True"/>
-                <TextBox x:Name="Phase_Input" HorizontalAlignment="Left" Margin="130,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>
-            </Grid>
-        </GroupBox>
-
         <GroupBox x:Name="Unicam_B_Parameter_Groupbox" Header="B Parameter" Margin="10,180,0,0" Height="60" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top"  >
             <Grid>
                 <Slider x:Name="B_Parameter_slider" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="120" Maximum="1000" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True"/>

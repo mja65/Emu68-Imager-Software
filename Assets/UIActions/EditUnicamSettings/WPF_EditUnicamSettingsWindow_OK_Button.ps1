@@ -32,7 +32,7 @@ $WPF_EditUnicamSettingsWindow_OK_Button.Add_Click({
         $Script:GUIActions.UnicamScalingType = "Smooth"
     }
        
-    $Script:GUIActions.UnicamPhase = $WPF_EditUnicamSettingsWindow_Phase_Input.Text
+    #$Script:GUIActions.UnicamPhase = $WPF_EditUnicamSettingsWindow_Phase_Input.Text
     $Script:GUIActions.UnicamBParameter = $WPF_EditUnicamSettingsWindow_B_Parameter_Input.Text
     $Script:GUIActions.UnicamCParameter = $WPF_EditUnicamSettingsWindow_C_Parameter_Input.Text
     $Script:GUIActions.UnicamSizeXPosition = $WPF_EditUnicamSettingsWindow_Size_X_Input.Text
