@@ -1,6 +1,6 @@
 delete t:offline.run QUIET FORCE >NIL:
 delete T:OnlineGENet.run QUIET FORCE >NIL:
 delete t:OnlineWireless.run QUIET FORCE >NIL:
-echo "execute sys:Pistorm/Online ConnectionType=wifipi Action=Connect" >T:OnlineWireless.run 
+echo "rx sys:Pistorm/Network/Network.rexx Action=Connect device=wifipi ipstack=Roadshow Waitatend " >T:OnlineWireless.run 
 echo "endcli" >>T:OnlineWireless.run 
 Newcli WINDOW=CON:100/100/600/300/Online/AUTO from T:OnlineWireless.run
