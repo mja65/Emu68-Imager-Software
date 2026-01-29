@@ -106,6 +106,12 @@ ELSE DO
    SwitchNoReStartMiami = "FALSE"
 END
 
+IF POS('NORESTARTWIRELESSMANAGER', input) > 0 THEN DO
+   SwitchNoReStartWirelessManager = "TRUE"
+END
+ELSE DO
+   SwitchNoReStartWirelessManager = "FALSE"
+END
 
 IF device ~= "" & ~POS(".", device) > 0 THEN DO
    device = device || ".DEVICE"
@@ -156,6 +162,7 @@ IF DEBUG = "TRUE" then DO
    SAY "Device: "device
    SAY "DevicebaseName: "DevicebaseName
    SAY "SwitchNoRestartMiami: "SwitchNoRestartMiami 
+   SAY "SwitchNoReStartWirelessManager: "SwitchNoReStartWirelessManager
    SAY "SwitchNoCloseMiami: "SwitchNoCloseMiami 
    SAY "SwitchNoSyncTime: "SwitchNoSyncTime 
    SAY "SwitchNoCloseWirelessManager: "SwitchNoCloseWirelessManager
@@ -179,32 +186,53 @@ IF action = "CONNECT" then DO
          CALL CloseWindowMessage()
          EXIT 10
       END
-      If ~KillWirelessManager() then DO
-          CALL CloseWindowMessage()
-         EXIT 10
-      END
-      SAY ""
-      SAY "Connecting to Wireless. This may take a few moments......."
-      SAY ""
-      'setenv InProgressBar 1'
-      'run >T:Progressbar.txt S:ProgressBar'
-      'Run >NIL: C:wirelessmanager device='WifiPiDevicePath' CONFIG='WirelessprefsPath' VERBOSE >'WirelesslogFilePath
-      'C:WaitUntilConnected device='WifiPiDevicePath' Unit=0 delay=100'
-      If RC = 0 then DO
-         SAY ""
-         'unsetenv InProgressBar'
-         'delete T:Progressbar.txt >NIL: QUIET'
-      END
-      ELSE DO
-         SAY ""
-         SAY "Could not connect to Wifi!"
-         'unsetenv InProgressBar'
-         'delete T:Progressbar.txt >NIL: QUIET'
+      IF SwitchNoReStartWirelessManager = "FALSE" then DO
          If ~KillWirelessManager() then DO
             CALL CloseWindowMessage()
             EXIT 10
-         END         
-         EXIT 10
+         END      
+      END
+      ELSE DO  
+        'Status COM=c:wirelessmanager >T:WirelessManagerStatus'
+         IF EXISTS('T:WirelessManagerStatus') THEN DO
+            IF OPEN('f','T:WirelessManagerStatus','R') then DO
+               IF ~EOF('f') then DO
+                  WirelessManagerPID = STRIP(READLN('f'))
+                  CALL CLOSE ('f')
+                  IF DATATYPE(WirelessManagerPID,'W') then DO
+                     WirelessManagerActive = "TRUE"
+                  END
+                  ELSE DO
+                     WirelessManagerActive = "FALSE"
+                  END
+               END
+            END
+         END
+      END
+      IF WirelessManagerActive ~="TRUE" | SwitchNoReStartWirelessManager = "FALSE" then DO
+         SAY ""
+         SAY "Connecting to Wireless. This may take a few moments......."
+         SAY ""
+         'setenv InProgressBar 1'
+         'run >T:Progressbar.txt S:ProgressBar'
+         'Run >NIL: C:wirelessmanager device='WifiPiDevicePath' CONFIG='WirelessprefsPath' VERBOSE >'WirelesslogFilePath
+         'C:WaitUntilConnected device='WifiPiDevicePath' Unit=0 delay=100'
+         If RC = 0 then DO
+            SAY ""
+            'unsetenv InProgressBar'
+            'delete T:Progressbar.txt >NIL: QUIET'
+         END
+         ELSE DO
+            SAY ""
+            SAY "Could not connect to Wifi!"
+            'unsetenv InProgressBar'
+            'delete T:Progressbar.txt >NIL: QUIET'
+            If ~KillWirelessManager() then DO
+               CALL CloseWindowMessage()
+               EXIT 10
+            END         
+            EXIT 10
+         END
       END
    END
    IF device = "GENET.DEVICE" THEN DO
@@ -489,7 +517,7 @@ IsMiamiInstalled:
       END
       RETURN 1
    END
-   
+
 KillWirelessManager:
    'Status COM=c:wirelessmanager >T:WirelessManagerStatus'
    IF EXISTS('T:WirelessManagerStatus') THEN DO
