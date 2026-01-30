@@ -18,13 +18,13 @@ ENDIF
 ASSIGN Emu68-Updater: ""
 
 IF NOT EXISTS ENV:PistormVariant
-	SYS:C/EMU68INFO variant >NIL:
-	IF WARN
-		ECHO "It seems you're not running Emu68, this window will close in 3 seconds"
-		SKIP Cleanup
-	ELSE
-		SYS:C/EMU68INFO variant >ENV:PistormVariant
-	ENDIF
+  SYS:C/EMU68INFO variant >NIL:
+  IF WARN
+    ECHO "It seems you're not running Emu68, this window will close in 3 seconds"
+    SKIP Cleanup
+  ELSE
+    SYS:C/EMU68INFO variant >ENV:PistormVariant
+  ENDIF
 ENDIF
 
 ECHO "Welcome to Emu68 & VideoCore Updater!"
@@ -40,7 +40,7 @@ IF WARN
       ECHO "Please check your EMU68DEVICE value by opening the Emu68-Updater file with an editor."
       ECHO ""
       SKIP VC4_Update
-	ENDIF
+  ENDIF
 ENDIF
 
 IF EXISTS "{EMU68DEVICE}{EMU68PATH}Emu68-$PistormVariant"
@@ -78,9 +78,9 @@ IF WARN
    c:aget https://api.github.com/repos/michalsc/Emu68/releases TO RAM:releases.json >NIL:
    IF WARN
      ECHO "It seems the system is currently unable to connect to Github, please try again later."
-	 ECHO ""
-	 ECHO "This window will close in 3 seconds."
-	 SKIP Cleanup
+   ECHO ""
+   ECHO "This window will close in 3 seconds."
+   SKIP Cleanup
    ENDIF
 ENDIF
 
@@ -99,9 +99,9 @@ IF WARN
    c:aget https://github.com/michalsc/Emu68/releases/download/$TagENV/Emu68-$PistormVariant.zip TO RAM:Emu68-$PistormVariant.zip >NIL:
    IF WARN
      ECHO "It seems the system is currently unable to connect to Github, please try again later."
-	 ECHO ""
-	 ECHO "This window will close in 3 seconds."
-	 SKIP Cleanup
+   ECHO ""
+   ECHO "This window will close in 3 seconds."
+   SKIP Cleanup
    ENDIF
 ENDIF
 
@@ -123,17 +123,17 @@ RX Emu68-Updater:VersionChecker.rexx "$OldEmu68Version" "$NewEmu68Version" >NIL:
 IF NOT WARN
   ASK "New $NewEmu68Version version found, do you want to update your current $OldEmu68Version version? Y/N"
     IF WARN
-	  IF EXISTS "{EMU68DEVICE}{EMU68PATH}Backup_Emu68/Emu68-$PistormVariant_old"
-	    DELETE "{EMU68DEVICE}{EMU68PATH}Backup_Emu68/Emu68-$PistormVariant_old" FORCE QUIET >NIL:
-	  ENDIF
-	  COPY "{EMU68DEVICE}{EMU68PATH}Emu68-$PistormVariant" TO "{EMU68DEVICE}{EMU68PATH}Backup_Emu68/Emu68-$PistormVariant_old" FORCE CLONE QUIET >NIL:
-	  COPY "RAM:Emu68upd_temp/Emu68-$PistormVariant" TO "{EMU68DEVICE}{EMU68PATH}Emu68-$PistormVariant" FORCE CLONE QUIET >NIL:
-	  Set EMU68UPD 1
-	  ECHO ""
-	ELSE
-	  ECHO ""
-	  SKIP VC4_Update
-	ENDIF
+    IF EXISTS "{EMU68DEVICE}{EMU68PATH}Backup_Emu68/Emu68-$PistormVariant_old"
+      DELETE "{EMU68DEVICE}{EMU68PATH}Backup_Emu68/Emu68-$PistormVariant_old" FORCE QUIET >NIL:
+    ENDIF
+    COPY "{EMU68DEVICE}{EMU68PATH}Emu68-$PistormVariant" TO "{EMU68DEVICE}{EMU68PATH}Backup_Emu68/Emu68-$PistormVariant_old" FORCE CLONE QUIET >NIL:
+    COPY "RAM:Emu68upd_temp/Emu68-$PistormVariant" TO "{EMU68DEVICE}{EMU68PATH}Emu68-$PistormVariant" FORCE CLONE QUIET >NIL:
+    Set EMU68UPD 1
+    ECHO ""
+  ELSE
+    ECHO ""
+    SKIP VC4_Update
+  ENDIF
 ELSE
   ECHO "Your version of Emu68 is already up to date."
   ECHO ""
@@ -165,7 +165,7 @@ IF WARN
    c:aget https://api.github.com/repos/michalsc/Emu68-tools/releases TO RAM:releases.json >NIL:
    IF WARN
      ECHO "It seems the system is currently unable to connect to Github, please try again later."
-	 SKIP END
+   SKIP END
    ENDIF
 ENDIF
 
@@ -184,7 +184,7 @@ IF WARN
    c:aget https://github.com/michalsc/Emu68-tools/releases/download/$TagENV/Emu68-tools.zip TO RAM:Emu68-tools.zip >NIL:
    IF WARN
      ECHO "It seems the system is currently unable to connect to Github, please try again later."
-	 SKIP END
+   SKIP END
    ENDIF
 ENDIF
 
@@ -212,22 +212,22 @@ IF NOT WARN
   ASK "New $NewVC4Version version found, do you want to update your current $OldVC4Version version? Y/N"
   ;ASK "Do you want to update to the latest version of VideoCore? Y/N"
     IF WARN
-	  IF EXISTS "LIBS:Picasso96/Backup_Videocore/VideoCore.card_old"
-	    DELETE "LIBS:Picasso96/Backup_Videocore/VideoCore.card_old" FORCE QUIET >NIL:
-	  ENDIF
-	  COPY "LIBS:Picasso96/VideoCore.card" TO "LIBS:Picasso96/Backup_Videocore/VideoCore.card_old" FORCE CLONE QUIET >NIL:
-	  COPY "RAM:Emu68tools_temp/VideoCore/VideoCore.card" TO "LIBS:Picasso96/VideoCore.card" FORCE CLONE QUIET >NIL:
-	  Emu68-Updater:TTToFile SYS:Devs/Monitors/VideoCore.info TO RAM:T/VC4TT
-	  Search RAM:VC4TT "VC4_LEGACY_ID" >NIL:
-	  IF WARN
-	     ECHO "VC4_LEGACY_ID" >> RAM:T/VC4TT
-		 Emu68-Updater:FileToTT RAM:T/VC4TT TO SYS:Devs/Monitors/VideoCore.info
-	  ENDIF
-	  DELETE RAM:T/VC4TT FORCE QUIET >NIL:
-	  Set VC4UPD 1
-	ELSE
-	  SKIP END
-	ENDIF
+    IF EXISTS "LIBS:Picasso96/Backup_Videocore/VideoCore.card_old"
+      DELETE "LIBS:Picasso96/Backup_Videocore/VideoCore.card_old" FORCE QUIET >NIL:
+    ENDIF
+    COPY "LIBS:Picasso96/VideoCore.card" TO "LIBS:Picasso96/Backup_Videocore/VideoCore.card_old" FORCE CLONE QUIET >NIL:
+    COPY "RAM:Emu68tools_temp/VideoCore/VideoCore.card" TO "LIBS:Picasso96/VideoCore.card" FORCE CLONE QUIET >NIL:
+    Emu68-Updater:TTToFile SYS:Devs/Monitors/VideoCore.info TO RAM:T/VC4TT
+    Search RAM:VC4TT "VC4_LEGACY_ID" >NIL:
+    IF WARN
+       ECHO "VC4_LEGACY_ID" >> RAM:T/VC4TT
+     Emu68-Updater:FileToTT RAM:T/VC4TT TO SYS:Devs/Monitors/VideoCore.info
+    ENDIF
+    DELETE RAM:T/VC4TT FORCE QUIET >NIL:
+    Set VC4UPD 1
+  ELSE
+    SKIP END
+  ENDIF
 ELSE
   ECHO "Your version of VideoCore is already up to date."
   SKIP END
@@ -239,33 +239,33 @@ IF $VC4UPD EQ 1
   ECHO ""
   ASK "Update completed successfully! A Hard Reset is needed for the changes to take effect, do you want to do it now? Y/N"
     IF WARN
-	  ECHO ""
-	  ECHO "Rebooting..."
-	  WAIT 3
+    ECHO ""
+    ECHO "Rebooting..."
+    WAIT 3
       c:EMU68INFO HARDRESET
     ELSE
       ECHO ""
       ECHO "This window will close in 3 seconds."
-	  SKIP Cleanup
+    SKIP Cleanup
     ENDIF
 ELSE
   IF $EMU68UPD EQ 1
     ECHO ""
     ASK "Update completed successfully! A Hard Reset is needed for the changes to take effect, do you want to do it now? Y/N"
       IF WARN
-	    ECHO ""
-	    ECHO "Rebooting..."
-	    WAIT 3
+      ECHO ""
+      ECHO "Rebooting..."
+      WAIT 3
         c:EMU68INFO HARDRESET
       ELSE
         ECHO ""
         ECHO "This window will close in 3 seconds."
-	    SKIP Cleanup
+      SKIP Cleanup
       ENDIF
   ELSE
     ECHO ""
     ECHO "This window will close in 3 seconds."
-	SKIP Cleanup
+  SKIP Cleanup
   ENDIF
 ENDIF
 
