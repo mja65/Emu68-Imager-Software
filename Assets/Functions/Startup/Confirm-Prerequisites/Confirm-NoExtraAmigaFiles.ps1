@@ -11,6 +11,7 @@ $ListofFiles = @"
     \System\C\AreWePAL
     \System\C\CE
     \System\C\Emu68Info
+    \System\C\ListDevices
     \System\C\TomCopy
     \System\C\TomDelete
     \System\C\WaitForTask

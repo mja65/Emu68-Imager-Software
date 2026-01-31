@@ -42,8 +42,18 @@ function Write-ImageCreation {
      }
      elseif ($Script:GUIActions.InstallOSFiles -eq $true){
         Write-AmigaFilestoInterimDrive -DownloadFilesFromInternet -DownloadLocalFiles -ExtractADFFilesandIconFiles -AdjustingScriptsandInfoFiles -ProcessDownloadedFiles -CopyRemainingFiles -wifiprefs -AdjustWBStartup
-     }
-
+        If ($Script:GUIActions.NetworkStack -eq "Miami"){
+           $CommandstoAddNetworkStack = (Get-MiamiUserFiles -MiamiFilesPath $Script:Settings.MiamiFilesLocation -DestinationPath $([System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\System"))) 
+         }
+         elseif ($Script:GUIActions.NetworkStack -eq "Roadshow"){
+            $CommandstoAddNetworkStack = (Get-RoadshowUserFiles -RoadshowFilesPath $Script:Settings.RoadshowFilesLocation -DestinationPath $([System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\System")))          
+         }
+         if ($CommandstoAddNetworkStack){
+            Write-InformationMessage "Copying files from $($Script:GUIActions.NetworkStack) UserFiles folder"
+            $Script:GUICurrentStatus.HSTCommandstoProcess.WriteDirectFilestoDisk += $CommandstoAddNetworkStack      
+         }
+      }
+      
      if ($Script:GUIActions.InstallOSFiles -eq $true){
         
         $Script:Settings.CurrentTaskName = "Downloading and copying Emu68 Documentation to Amiga Disk"
@@ -132,9 +142,9 @@ function Write-ImageCreation {
            }
        }
 
-        $HSTCommandstoRun = $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteDirectFilestoDisk + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk
+        $HSTCommandstoRun = $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteDirectFilestoDisk 
 
-        Start-HSTCommands -HSTScript $HSTCommandstoRun -Section "DiskStructures;WriteFilestoDisk" -ActivityDescription "Processing commands (this may take a few minutes depending on the size of your disk)" -ReportTime
+        Start-HSTCommands -HSTScript $HSTCommandstoRun -Section "DiskStructures;WriteFilestoDisk;WriteDirectFilestoDisk" -ActivityDescription "Processing commands (this may take a few minutes depending on the size of your disk)" -ReportTime
         #"Processing commands (this may take a few minutes depending on the size of your disk)"
      }
 
@@ -155,8 +165,8 @@ function Write-ImageCreation {
         Write-InformationMessage -Message "Disk size (Bytes) is: $($WPF_DP_Disk_GPTMBR.DiskSizeBytes)"
 
         Write-StartSubTaskMessage
-        $HSTCommandstoRun = $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteDirectFilestoDisk + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk
-        Start-HSTCommands -HSTScript $HSTCommandstoRun -Section "DiskStructures;WriteFilestoDisk" -ActivityDescription 'Processing commands' -ReportTime
+        $HSTCommandstoRun = $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk + $Script:GUICurrentStatus.HSTCommandstoProcess.WriteDirectFilestoDisk 
+        Start-HSTCommands -HSTScript $HSTCommandstoRun -Section "DiskStructures;WriteFilestoDisk;WriteDirectFilestoDisk" -ActivityDescription 'Processing commands' -ReportTime
      }
      
      Write-TaskCompleteMessage 
