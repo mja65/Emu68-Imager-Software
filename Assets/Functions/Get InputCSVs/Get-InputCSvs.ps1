@@ -52,6 +52,9 @@ function Get-InputCSVs {
 
     $CSV = @()
     
+    #$caller = (Get-PSCallStack)[1]
+    #Write-debug "I was called by: $($caller.FunctionName) at line $($caller.ScriptLineNumber)"
+        
     import-csv -path $Pathtouse -Delimiter ";" | ForEach-Object {
         if ($_.MinimumInstallerVersion -ne "" -and $_.InstallerVersionLessThan -ne ""){
             if (($Script:Settings.Version -ge [system.version]$_.MinimumInstallerVersion) -and ($Script:Settings.Version -lt [system.version]$_.InstallerVersionLessThan)){
