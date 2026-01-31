@@ -31,6 +31,7 @@ function Get-CopyFilestoAmigaDiskCommands {
             $ReplacementString = [System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\System")
             $Script:GUICurrentStatus.HSTCommandstoProcess.WriteDirectFilestoDisk | ForEach-Object {
                 $_.Command = $($_.Command.Replace($ReplacementString,$DestinationPath)) 
+                $_.Sequence = 7
             }
         }
         if ($CopyFilestoDevice -eq $true){

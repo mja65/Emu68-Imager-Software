@@ -7,6 +7,8 @@ function Confirm-DefaultPaths {
 
     $LocationstoCheck += $Script:Settings.DefaultSettingsLocation 
     $LocationstoCheck += $Script:Settings.DefaultOutputImageLocation 
+    $LocationstoCheck += $Script:Settings.RoadshowFilesLocation
+    $LocationstoCheck += $Script:Settings.MiamiFilesLocation 
     $LocationstoCheck += $Script:Settings.DefaultInstallMediaLocation
     $LocationstoCheck += $Script:Settings.DefaultImportLocation 
     $LocationstoCheck += $Script:Settings.DefaultROMLocation
