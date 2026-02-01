@@ -7,6 +7,7 @@
  * REQUIREMENTS:                                                              *
  * - IP Stack:            Miami or Roadshow                                   *
  * - Devices:             genet.device or wifipi.device or                    *
+ * - Libraries:           rexxtricks.library                                  *
  *                        uaenet.device(for UAE, built-in)                    *
  * - Tools (in C:):       SetDST, WirelessManager, WaitUntilConnected, sntp,  *
  *                        mecho,KillDev,ListDevices                           *
@@ -16,7 +17,7 @@
 
 OPTIONS RESULTS
 
-/* if ~SHOW('L','rexxtricks.library') then addlib('rexxtricks.library',0,-30,0) */
+if ~SHOW('L','rexxtricks.library') then addlib('rexxtricks.library',0,-30,0) 
 
 PARSE ARG input 
 input = upper(TRANSLATE(input, ' ', '='))
@@ -269,7 +270,7 @@ IF action = "CONNECT" then DO
    IF device = "GENET.DEVICE" THEN DO
       SAY ""
       SAY "Connecting to Ethernet"
-      If RPIVersion() ~= "Pi4" then DO
+      If RPIVersion() ~= "RPi4" then DO
          SAY ""
          Say "Genet.device only works on Pistorm with Raspberry Pi4 or CM4! Aborting!"
          CALL CloseWindowMessage()
@@ -290,18 +291,7 @@ IF action = "CONNECT" then DO
    END
 
    IF ipstack = "ROADSHOW" THEN DO
-      if LoadRoadshowParams(DevicebaseName) THEN DO
-         'roadshowcontrol tcp.recvspace='TCPReceive' >NIL:'
-         'roadshowcontrol udp.recvspace='UDPReceive' >NIL:'
-         'roadshowcontrol tcp.sendspace='TCPSend' >NIL:'
-         'roadshowcontrol udp.sendspace='UDPSend' >NIL:'
-      END
-      ELSE DO
-         IF DEBUG="TRUE" then DO
-            SAY ""
-            SAY "No Roadshow Parameters found"
-         END
-      END
+      CALL LoadRoadshowParams(DevicebaseName)
       'setenv InProgressBar 1'
       'run >T:Progressbar.txt S:ProgressBar'
       'AddNetInterface 'DevicebaseName' TIMEOUT=50 >T:AddInterface.txt'
@@ -425,7 +415,7 @@ IF action = "CONNECT" then DO
          'C:SetDST ZONE='vTimeZoneOverride
       END
       ELSE DO
-         'wait sec=2'
+         /*'wait sec=2'*/
          'C:SetDST NOASK NOREQ QUIET >NIL:'
       END
       SAY "Time set and DST applied if applicable"
@@ -448,46 +438,39 @@ IF action = "DISCONNECT" then DO
       CALL KillRoadshow()
    END
    IF ipstack = "MIAMI" THEN DO
-      IF ~IsMiamiInstalled() THEN DO
+      IF ~SHOW('P', 'MIAMI.1') THEN DO
          SAY ""
-         Say "Miami not installed! Cannot take it offline!"
+         SAY "Miami is already closed and offline!"
       END
       ELSE DO
-         IF ~SHOW('P', 'MIAMI.1') THEN DO
+         ADDRESS 'MIAMI.1'
+         'ISONLINE'
+         IF RC = 0 THEN DO
+            ADDRESS COMMAND
             SAY ""
-            SAY "Miami is already closed and offline!"
+            SAY "Miami is already offline!"
          END
          ELSE DO
-            ADDRESS 'MIAMI.1'
+            'OFFLINE'
             'ISONLINE'
-            IF RC = 0 THEN DO
+            IF RC = 1 THEN DO
                ADDRESS COMMAND
                SAY ""
-               SAY "Miami is already offline!"
+               SAY "Couldn't get Miami offline!"
             END
             ELSE DO
-               'OFFLINE'
-               'ISONLINE'
-               IF RC = 1 THEN DO
-                  ADDRESS COMMAND
+               If DEBUG = "TRUE" then DO
                   SAY ""
-                  SAY "Couldn't get Miami offline!"
+                  SAY "Miami is now offline"
                END
-               ELSE DO
+               If SwitchNoCloseMiami = "FALSE" then DO                  
+                  CALL KillMiami()
                   If DEBUG = "TRUE" then DO
                      SAY ""
-                     SAY "Miami is now offline"
+                     SAY "Miami is now closed"
                   END
-                  If SwitchNoCloseMiami = "FALSE" then DO                  
-                     CALL KillMiami()
-                     If DEBUG = "TRUE" then DO
-                        SAY ""
-                        SAY "Miami is now closed"
-                     END
-                  END
-                  ADDRESS COMMAND
-                  
                END
+               ADDRESS COMMAND               
             END
          END
       END
@@ -561,17 +544,24 @@ KillMiami:
       ADDRESS COMMAND
    END
    Return
+   
 KillNetworkShares:
-   'c:ListDevices device_name=L:smb-handler,L:smb2-handler NOFORMATTABLE >T:NetworkShares.txt' 
-   IF OPEN('f','T:WirelessManagerStatus','R') then DO
-      DO UNTIL EOF('f')
-         parse var STRIP(READLN('f')) vDevice';'vRawDosType';'vDosType';'vDeviceName';'vUnit';'vVolume
-         vDevice = TRANSLATE(vDevice, , ";")
-         'killdev DOSDEV='vDevice' >NIL:'
+   'c:ListDevices device_name=L:smb-handler,L:smb2-handler NOFORMATTABLE >T:NetworkShares.txt'
+   IF OPEN('f','T:NetworkShares.txt','R') then DO
+      DO while ~EOF('f')  
+      Line = STRIP(READLN('f'))
+      If line = "" then iterate
+      parse var Line vDevice';'vRawDosType';'vDosType';'vDeviceName';'vUnit';'vVolume
+      vCmd = 'c:killdev 'vDevice
+      IF DEBUG="TRUE" then DO
+         say "Running command: "vCmd
+      END 
+      vCmd
       END
    END
+   call close('f')
    'delete T:NetworkShares.txt QUIET >NIL:'
-   RETURN
+   RETURN   
 KillWirelessManager:
    'Status COM=c:wirelessmanager >T:WirelessManagerStatus'
    IF EXISTS('T:WirelessManagerStatus') THEN DO
@@ -609,40 +599,31 @@ KillWirelessManager:
    END
 
 RpiVersion:
+   RpiType = GETENV(rpitype)
+   if RpiType~="" THEN RETURN RpiType
    'VERSION brcm-emmc.device >nil:'
-   if RC=0 then DO
-      Return "Pi4"
-   END
+   if RC=0 then RETURN 'RPi4'
    'version brcm-sdhc.device >NIL:'
-   If RC=0 then DO
-      Return "Pi3"
-   END
-   ELSE DO 
-      SAY ""
-      say "You are not running a PiStorm!"
-      Return "Unknown"
-   END
+   if RC=0 then RETURN 'RPi3'
+   Return "Unknown"
 LoadRoadshowParams:
    PARSE ARG targetDevice
-   IF ~EXISTS(RoadshowParametersFile) THEN DO
-      RETURN 0
-   END
-   IF OPEN('pf', RoadshowParametersFile, 'READ') THEN DO
-      DO UNTIL EOF('pf')
-         line = READLN('pf')
-         IF line ~= "" & LEFT(line, 1) ~= ";" THEN DO
-            PARSE VAR line vType ';' vName ';' vVal
-            /* Match and assign to the caller's scope */
-            IF UPPER(vType) = UPPER(targetDevice) THEN DO
-               INTERPRET vName '= vVal'
-            END
-         END
-      END
-      CALL CLOSE('pf')
-      RETURN 1
-   END
-   RETURN 0
-
+   if ~READFILE(RoadshowParametersFile,ReadLines) then RETURN
+   do i=1 to Readlines.0
+   IF Readlines.i = "" | LEFT(Readlines.i, 1) = ";" THEN iterate
+     parse var Readlines.i vType';'vParameter';'vValue
+     if upper(vType) ~= targetDevice then iterate
+     SELECT
+        WHEN upper(vParameter) = "TCPRECEIVE" THEN vCmd = 'roadshowcontrol tcp.recvspace='vValue' >NIL:'
+        WHEN upper(vParameter)= "UDPRECEIVE" THEN vCmd = 'roadshowcontrol udp.recvspace='vValue' >NIL:'
+        WHEN upper(vParameter) = "TCPSEND" THEN vCmd = 'roadshowcontrol tcp.sendspace='vValue' >NIL:'
+        WHEN upper(vParameter) = "UDPSEND" THEN vCmd = 'roadshowcontrol udp.sendspace='vValue' >NIL:'
+        OTHERWISE nop
+     end
+     if DEBUG="TRUE" then SAY vCmd
+     vCmd
+   end
+   RETURN
 CloseWindowMessage:
    If SwitchWaitatEnd="TRUE" then DO
       SAY ""

@@ -1,7 +1,6 @@
 ;This file contains TCP and UDP send and receive sizes which can improve the speed of your connection.
 ;Only change these if you know what you are doing!
-;
-ConnectionType;Parameter;Value
+;ConnectionType;Parameter;Value
 genet;TCPReceive;200000
 genet;UDPReceive;200000
 genet;TCPSend;16384
