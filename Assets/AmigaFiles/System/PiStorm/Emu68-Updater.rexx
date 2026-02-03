@@ -13,15 +13,14 @@
  ******************************************************************************/
 
 
-ADDRESS COMMAND
-
 if ~SHOW('L','rexxtricks.library') then addlib('rexxtricks.library',0,-30,0) 
+
+ADDRESS COMMAND
  
 DeviceListPath = 'C:ListDevices'
 Drivername1 = 'brcm-emmc.device'
 Drivername2 = 'brcm-sdhc.device'
 TargetDostype = '0x46415401'
-VideocoreFilePath = 'SYS:Devs/Monitors/VideoCore'
 Emu68BackupFolderName = 'Backup_Emu68'
 VideoCoreBackupFolderName = 'Backup_Videocore'
 
@@ -56,60 +55,65 @@ If ~READFILE(PiStormVariantPath,PiStormVariantLine) then Call CloseProgram("Erro
 PistormVariant = PiStormVariantLine.1
 say 'Running 'PistormVariant
 
+Emu68FileName = 'Emu68-'||PistormVariant
+Emu68FileNameLength = Length(Emu68FileName)
+
 'c:AreWeOnline'
-if RC>0 then CallCloseProgram("System is currently offline, please enable your internet connection then try again.",10,3)
+if RC>0 then Call CloseProgram("System is currently offline, please enable your internet connection then try again.",10,3)
 
 'ASSIGN >NIL: AmiSSL: EXISTS'
-if RC>0 then CallCloseProgram("AmiSSL not found!",10,3)
+if RC>0 then Call CloseProgram("AmiSSL not found!",10,3)
 
 DeviceListPath 'raw_dostype='TargetDostype' NOFORMATTABLE >'ListofEmu68DisksFile 
 
 if ~READFILE(ListofEmu68DisksFile,ListofDisks) then Call CloseProgram("Error accessing list of drives!",10,3)
 
 found_count = 0
-first_device = ""
+FAT32Device = ""
 
 DO i=1 to ListofDisks.0
     parse var ListofDisks.i vDevice';'vRawDosType';'vDosType';'vDeviceName';'vUnit';'vVolume
     found_count = found_count + 1
-    if found_count = 1 then first_device = vDevice':'
+    if found_count = 1 then FAT32Device = vDevice':'
 END
 
 'delete 'ListofEmu68DisksFile' QUIET >NIL:' 
 
 If found_count = 0 then Call CloseProgram("Error finding FAT32 drive!",10,3)
+SAY ''
+Say 'Found FAT32 partition at device: 'FAT32Device 
 
-/*Say 'Found FAT32 partition at device: 'first_device */
+if ~Readfile(FAT32Device||'config.txt',ConfigtxtLines) then Call CloseProgram("Error accessing Config.txt!",10,3)
 
-'list all files 'first_device' Pat=(Emu68-pistorm#?) Lformat="%p" >'Emu68FilesLocation
+PathsFound=0
+Emu68FilePath=""
 
-if ~READFILE(Emu68FilesLocation,ListofEmu68FolderLocations) then Call CloseProgram("Error accessing list of folders!",10)
-
-captured_line = ""
-MultipleFolders = "FALSE"
-
-do i=1 to ListofEmu68FolderLocations.0
-   IF POS(Emu68BackupFolderName, ListofEmu68FolderLocations.i) > 0 then iterate
-   if captured_line ~= ListofEmu68FolderLocations.i & captured_line ~="" then Do
-      MultipleFolders = "TRUE"
-      leave
-   end
-   captured_line = ListofEmu68FolderLocations.i
+do i=1 to ConfigtxtLines.0
+   line = strip(ConfigtxtLines.i)
+   if left(upper(line),7)='KERNEL=' & right(upper(line),Emu68FileNameLength) = upper(Emu68FileName) then DO
+      /*Emu68FilePath = substr(line,8,(length(line)-7-Emu68FileNameLength))*/
+      PathsFound = PathsFound + 1
+      If Emu68FilePath ~= "" & upper(Emu68FilePath) ~= upper(substr(line,8)) then Call CloseProgram("Multiple different entries for 'Kernel=' lline in config.txt file!",10,3)
+      else do
+         if Emu68FilePath = "" then do
+            Emu68FilePath = substr(line,8)
+            if left(Emu68FilePath,1)='/' then Emu68FilePath =  substr(EMU68FilePath,2)
+         end
+      end
+   END
 end
 
-'delete 'Emu68FilesLocation' QUIET >NIL:' 
+if Emu68FilePath="" then exit
+Emu68FilePath = FAT32Device||Emu68FilePath
 
-if MultipleFolders = "TRUE" then Call CloseProgram("Multiple Emu68 file locations found! Cannot automatically update!",10)
-if captured_line = "" then CALL CloseProgram("No Emu68 files found! Cannot update!",10,3)
+Emu68FolderLocation = left(Emu68FilePath,(Length(Emu68FilePath)-Emu68FileNameLength))
 
-Emu68FilePath = captured_line  
+if right(Emu68FolderLocation,1)~=':' & right(Emu68FolderLocation,1)~='/' then Emu68FolderLocation = Emu68FolderLocation||'/' 
 
 Say 'Found Emu68 files at:'Emu68FilePath
 
-if ~EXISTS(Emu68FilePath||Emu68BackupFolderName) then DO
-   SAY 'Creating backup folder'
-   'MAKEDIR 'Emu68FilePath||Emu68BackupFolderName' >NIL:'
-END
+BackupFolderPath = Emu68FolderLocation||Emu68BackupFolderName
+
 
 Call DownloadFile('Trying download from Github for Emu68 file details.',Emu68GithubPathJSONURL,Emu68json_path,3)
 
@@ -123,15 +127,18 @@ Destination = 'T:Emu68-'||PistormVariant'.zip'
 
 Call DownloadFile('Trying download from Github for Emu68 files',Emu68FilesDownloadURL,Destination,3)
 
+SAY "Download Complete"
+
 call Unzip(Destination,Emu68TempFilesFolder) 
+
+SAY "Files unzipped"
 
 SAY "Starting Emu68 update process..."
 SAY ""
 
-FilePathOldversion = Emu68FilePath||'Emu68-'PistormVariant 
 FilePathNewversion = Emu68TempFilesFolder||'/Emu68-'PistormVariant
 
-'version 'FilePathOldversion' >T:Emu68OldVersion.txt'
+'version 'Emu68FilePath' >T:Emu68OldVersion.txt'
 'version 'FilePathNewversion' >T:Emu68NewVersion.txt'
 
 if ~READFILE('T:Emu68OldVersion.txt',OldVersionEmu68Line) then Call CloseProgram("Error accessing version of Emu68!",10)
@@ -153,10 +160,21 @@ ELSE DO
    'echo "New 'NewEmu68Version' version found, do you want to update your current 'OldEmu68Version' version? Y/N" NOLINE'
    Pull Response
    if upper(Response)='Y' | upper(Response)='YES' then do
-      BackupFilePath = Emu68FilePath||Emu68BackupFolderName'/Emu68-'PistormVariant'_old'
-      If Exists (BackupFilePath) then 'delete 'BackupFilePath' FORCE QUIET >NIL:'  
-      'copy "'Emu68FilePath'Emu68-'PiStormVariant'" TO "'Emu68FilePath||Emu68BackupFolderName'/Emu68-'PistormVariant'_old" FORCE CLONE QUIET >NIL:'
-      'copy "'Emu68TempFilesFolder'/Emu68-'PistormVariant'" TO "'Emu68FilePath'Emu68-'PiStormVariant'" FORCE CLONE QUIET >NIL:'  
+      if ~EXISTS(Emu68FolderLocation||Emu68BackupFolderName) then DO
+         SAY 'Creating backup folder at 'BackupFolderPath
+         'MAKEDIR 'BackupFolderPath' >NIL:'
+      END
+      
+      BackupFilePath = BackupFolderPath'/Emu68-'PistormVariant'_old'
+    
+      If Exists (BackupFilePath) then DO
+         SAY "Deleting previous backup file"
+         'delete 'BackupFilePath' FORCE QUIET >NIL:'
+      end  
+      say 'Copying file from: 'Emu68FilePath' to: 'BackupFilePath  
+      'copy "'Emu68FilePath'" TO "'BackupFilePath'" FORCE CLONE QUIET >NIL:'
+      say 'Copying file from: 'FilePathNewversion' to: 'Emu68FilePath
+      'copy "'FilePathNewversion'" TO "'Emu68FilePath'" FORCE CLONE QUIET >NIL:'  
    end
 END
 
@@ -164,7 +182,7 @@ END
 'delete 'destination' QUIET >NIL:'
 'delete 'Emu68TempFilesFolder' ALL QUIET >NIL:'
 
-If ~EXISTS('LIBS:Picasso96/'VideoCoreBackupFolderName) THEN 'MAKEDIR LIBS:Picasso96/'VideoCoreBackupFolderName' >NIL:'
+Say "Starting update processs for Videocore"
 
 Call DownloadFile('Trying download from Github for Emu68-Tools file details.',Emu68ToolsGithubPathJSONURL,Emu68Toolsjson_path,3)
 
@@ -179,7 +197,11 @@ Destination = 'T:Emu68-Tools.zip'
 
 Call DownloadFile('Trying download from Github for Emu68 files',Emu68ToolsDownloadURL,Destination,3)
 
+SAY "Download Complete"
+
 call Unzip(Destination,Emu68ToolsTempFilesFolder) 
+
+SAY "Files unzipped"
 
 SAY "Starting VideoCore update process..."
 SAY ""
@@ -209,28 +231,71 @@ else do
    'echo "New 'NewVideocoreVersion' version found, do you want to update your current 'OldVideocoreVersion' version? Y/N " NOLINE'
    Pull Response
    if upper(Response)='Y' | upper(Response)='YES' then do
+      If ~EXISTS('LIBS:Picasso96/'VideoCoreBackupFolderName) THEN DO
+         say 'Creating backup folder at 'VideoCoreBackupFolderName
+         'MAKEDIR LIBS:Picasso96/'VideoCoreBackupFolderName' >NIL:'
+      END
       BackupFilePath = 'LIBS:Picasso96/'||VideoCoreBackupFolderName'/Videocore.card_old'
-      Say BackupFilePath
-      If Exists (BackupFilePath) then 'delete 'BackupFilePath' FORCE QUIET >NIL:'
-      'copy "'FilePathVideocoreOldversion'" TO "LIBS:Picasso96/'||VideocoreBackupFolderName'/Videocore.card_old" FORCE CLONE QUIET >NIL:'
+      If Exists (BackupFilePath) then do
+         say "Deleting previous backup file"
+         'delete 'BackupFilePath' FORCE QUIET >NIL:'
+      end
+      say 'Copying file from: 'FilePathVideocoreOldversion' to: 'BackupFilePath  
+      'copy "'FilePathVideocoreOldversion'" TO "'BackupFilePath'" FORCE CLONE QUIET >NIL:'
+      say 'Copying file from: 'FilePathVideocoreNewversion' to: 'FilePathVideocoreOldversion 
       'copy "'FilePathVideocoreNewversion'" TO "'FilePathVideocoreOldversion'" FORCE CLONE QUIET >NIL:'  
    end
-   If ~GetToolTypes(VideocoreFilePath,VideocoreToolTypeLines) then Call CloseProgram('Could not open Videocore.card',10,3)
-   LegacyIDFound="FALSE"
-   do i=1 to VideocoreToolTypeLines.0
-      if POS('VC4_LEGACY_ID',VideocoreToolTypeLines.i)>0 then Do
-         LegacyIDFound="TRUE"
-         Leave
+   
+
+   SAY "Identifying Monitor file for Videcore"
+   
+   if ~GETDIR('SYS:Devs/Monitors','~(#?.info)',ListofFiles,'FILES','PATH',) then Call CloseProgram("Error identifying monitor files",10)
+
+   FoundCount = 0
+   do i = 1 to ListofFiles.0
+      If GetToolTypes(ListofFiles.i,VideocoreToolTypeLines) then DO
+         Do j =1 to VideocoreToolTypeLines.0
+            TooltipLine = upper(strip(VideocoreToolTypeLines.j))
+            if TooltipLine="BOARDTYPE=VIDEOCORE" then DO
+               FoundCount = FoundCount + 1
+               say "Videocore found in: "ListofFiles.i
+            END   
+         END
+      END
+   end 
+
+   Select
+      WHEN FoundCount = 0 then exit
+      WHEN FoundCount >1 THEN DO
+         Say "More than one monitor file found for Videocore! Cannot check tooltypes!"
+         UpdateToolType = "FALSE"
+      END
+      WHEN FoudCount = 1 then DO
+         UpdateToolType = "TRUE"
+         VideocoreFilePath = ListofFiles.i
+      END
+      OTHERWISE nop
+   END
+
+   If UpdateToolType = "TRUE" then do
+      If ~GetToolTypes(VideocoreFilePath,VideocoreToolTypeLines) then Call CloseProgram('Could not open Videocore.card',10,3)
+      LegacyIDFound="FALSE"
+      do i=1 to VideocoreToolTypeLines.0
+         if POS('VC4_LEGACY_ID',VideocoreToolTypeLines.i)>0 then Do
+            LegacyIDFound="TRUE"
+            Leave
+         end
       end
-   end
-   if LegacyIDFound="FALSE" then do
-      'echo "VC4_LEGACY_ID tooltype not found! If you are using the sharware version of P96 (version 2.x) you will need to add this. Do you want to update the Tooltype Y/N " NOLINE'
-      Pull Response
-      if upper(Response)='Y' | upper(Response)='YES' then do
-         SAY "Adding VC4_LEGACY_ID tooltype to Videocore.card"
-         If ~SETTOOLTYPEVALUE(VideocoreFilePath,'VC4_LEGACY_ID','') then Call CloseProgram('Could not open Videocore.card',10,3)
+      if LegacyIDFound="FALSE" then do
+         'echo "VC4_LEGACY_ID tooltype not found! If you are using the sharware version of P96 (version 2.x) you will need to add this. Do you want to update the Tooltype Y/N " NOLINE'
+         Pull Response
+         if upper(Response)='Y' | upper(Response)='YES' then do
+            SAY "Adding VC4_LEGACY_ID tooltype to Videocore.card"
+            If ~SETTOOLTYPEVALUE(VideocoreFilePath,'VC4_LEGACY_ID','') then Call CloseProgram('Could not open Videocore.card',10,3)
+         END
       END
    END
+
 END
 
 'delete 'Emu68Toolsjson_path' QUIET >NIL:'
@@ -252,6 +317,7 @@ CloseProgram:
    Return
 DownloadFile:
    Parse ARG Message,URL,DLLocation,NumberAttempts
+   SAY ""
    Attempt = 1
    Do until IsDLed="TRUE"
       Say Message' Attempt number: 'Attempt 
@@ -297,7 +363,7 @@ ProcessJsonFile:
       END
    END
    CALL CLOSE(inputfile)
-   IF tag_value = "" THEN CALL CloseProgram('Could not find a valid release (draft:false, prerelease:false) in the file.',3,20)
+   IF tag_value = "" THEN CALL CloseProgram('Could not find a valid release (draft:false, prerelease:false) in the file.',3,10)
    ELSE Return tag_value  
 CheckUpdateNeeded:
    parse arg OldVersion,NewVersion
