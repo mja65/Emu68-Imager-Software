@@ -21,6 +21,7 @@ DeviceListPath = 'C:ListDevices'
 Drivername1 = 'brcm-emmc.device'
 Drivername2 = 'brcm-sdhc.device'
 TargetDostype = '0x46415401'
+VideocoreFilePath = 'SYS:Devs/Monitors/VideoCore'
 Emu68BackupFolderName = 'Backup_Emu68'
 VideoCoreBackupFolderName = 'Backup_Videocore'
 
@@ -55,9 +56,6 @@ If ~READFILE(PiStormVariantPath,PiStormVariantLine) then Call CloseProgram("Erro
 PistormVariant = PiStormVariantLine.1
 say 'Running 'PistormVariant
 
-Emu68FileName = 'Emu68-'||PistormVariant
-Emu68FileNameLength = Length(Emu68FileName)
-
 'c:AreWeOnline'
 if RC>0 then CallCloseProgram("System is currently offline, please enable your internet connection then try again.",10,3)
 
@@ -69,43 +67,42 @@ DeviceListPath 'raw_dostype='TargetDostype' NOFORMATTABLE >'ListofEmu68DisksFile
 if ~READFILE(ListofEmu68DisksFile,ListofDisks) then Call CloseProgram("Error accessing list of drives!",10,3)
 
 found_count = 0
-FAT32Device = ""
+first_device = ""
 
 DO i=1 to ListofDisks.0
     parse var ListofDisks.i vDevice';'vRawDosType';'vDosType';'vDeviceName';'vUnit';'vVolume
     found_count = found_count + 1
-    if found_count = 1 then FAT32Device = vDevice':'
+    if found_count = 1 then first_device = vDevice':'
 END
 
 'delete 'ListofEmu68DisksFile' QUIET >NIL:' 
 
 If found_count = 0 then Call CloseProgram("Error finding FAT32 drive!",10,3)
 
-Say 'Found FAT32 partition at device: 'FAT32Device 
+/*Say 'Found FAT32 partition at device: 'first_device */
 
-if ~Readfile(FAT32Device||'config.txt',ConfigtxtLines) then Call CloseProgram("Error accessing Config.txt!",10,3)
+'list all files 'first_device' Pat=(Emu68-pistorm#?) Lformat="%p" >'Emu68FilesLocation
 
-PathsFound=0
-Emu68FilePath=""
+if ~READFILE(Emu68FilesLocation,ListofEmu68FolderLocations) then Call CloseProgram("Error accessing list of folders!",10)
 
-do i=1 to ConfigtxtLines.0
-   line = strip(ConfigtxtLines.i)
-   if left(upper(line),7)='KERNEL=' & right(upper(line),Emu68FileNameLength) = upper(Emu68FileName) then DO
-      /*Emu68FilePath = substr(line,8,(length(line)-7-Emu68FileNameLength))*/
-      PathsFound = PathsFound + 1
-      If Emu68FilePath ~= "" & upper(Emu68FilePath) ~= upper(substr(line,8)) then Call CloseProgram("Multiple different entries for 'Kernel=' lline in config.txt file!",10,3)
-      else do
-         if Emu68FilePath = "" then do
-            Emu68FilePath = substr(line,8)
-            if left(Emu68FilePath,1)='/' then Emu68FilePath =  substr(EMU68FilePath,2)
-            say Emu68FilePath
-         end
-      end
-   END
+captured_line = ""
+MultipleFolders = "FALSE"
+
+do i=1 to ListofEmu68FolderLocations.0
+   IF POS(Emu68BackupFolderName, ListofEmu68FolderLocations.i) > 0 then iterate
+   if captured_line ~= ListofEmu68FolderLocations.i & captured_line ~="" then Do
+      MultipleFolders = "TRUE"
+      leave
+   end
+   captured_line = ListofEmu68FolderLocations.i
 end
 
-if Emu68FilePath="" then exit
-Emu68FilePath = FAT32Device||Emu68FilePath
+'delete 'Emu68FilesLocation' QUIET >NIL:' 
+
+if MultipleFolders = "TRUE" then Call CloseProgram("Multiple Emu68 file locations found! Cannot automatically update!",10)
+if captured_line = "" then CALL CloseProgram("No Emu68 files found! Cannot update!",10,3)
+
+Emu68FilePath = captured_line  
 
 Say 'Found Emu68 files at:'Emu68FilePath
 
@@ -218,39 +215,6 @@ else do
       'copy "'FilePathVideocoreOldversion'" TO "LIBS:Picasso96/'||VideocoreBackupFolderName'/Videocore.card_old" FORCE CLONE QUIET >NIL:'
       'copy "'FilePathVideocoreNewversion'" TO "'FilePathVideocoreOldversion'" FORCE CLONE QUIET >NIL:'  
    end
-   
-
-SAY "Identifying Monitor file for Videcore"
-   
-if ~GETDIR('SYS:Devs/Monitors','~(#?.info)',ListofFiles,'FILES','PATH',) then Call CloseProgram("Error identifying monitor files",10)
-
-FoundCount = 0
-do i = 1 to ListofFiles.0
-   If GetToolTypes(ListofFiles.i,VideocoreToolTypeLines) then DO
-      Do j =1 to VideocoreToolTypeLines.0
-         TooltipLine = upper(strip(VideocoreToolTypeLines.j))
-         if TooltipLine="BOARDTYPE=VIDEOCORE" then DO
-            FoundCount = FoundCount + 1
-            say "Videocore found in: "ListofFiles.i
-         END   
-      END
-   END
-end 
-
-Select
-   WHEN FoundCount = 0 then exit
-   WHEN FoundCount >1 THEN DO
-      Say "More than one monitor file found for Videocore! Cannot check tooltypes!"
-      UpdateToolType = "FALSE"
-   END
-   WHEN FoudCount = 1 then DO
-      UpdateToolType = "TRUE"
-      VideocoreFilePath = ListofFiles.i
-   END
-   OTHERWISE nop
-END
-
-If UpdateToolType = "TRUE" then do
    If ~GetToolTypes(VideocoreFilePath,VideocoreToolTypeLines) then Call CloseProgram('Could not open Videocore.card',10,3)
    LegacyIDFound="FALSE"
    do i=1 to VideocoreToolTypeLines.0
@@ -267,8 +231,6 @@ If UpdateToolType = "TRUE" then do
          If ~SETTOOLTYPEVALUE(VideocoreFilePath,'VC4_LEGACY_ID','') then Call CloseProgram('Could not open Videocore.card',10,3)
       END
    END
-END
-
 END
 
 'delete 'Emu68Toolsjson_path' QUIET >NIL:'
