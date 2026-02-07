@@ -19,7 +19,7 @@ function Get-MiamiUserFiles {
     $ListofFilestoFind | ForEach-Object {
         $File = Get-Item -Path (Join-Path $MiamiFilesPath $_.Name) -ErrorAction SilentlyContinue
         if (-not ($null -ne $File -and $File.Length -eq $_.SizeBytes)) {
-           break
+           return
         }
         else {
             $HSTCommands += [PSCustomObject]@{
