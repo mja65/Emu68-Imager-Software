@@ -5,7 +5,9 @@ function Get-GithubRelease {
         $Tag_Name,
         $Name,
         $LocationforDownload,
-        $FileNameforDownload
+        $FileNameforDownload,
+        [switch]$SortUpdatedBy,
+        [switch]$SortTagName
     )
   
     #Write-host "GithubRepository: $GithubRepository GithubReleaseType: $GithubReleaseType Tag_Name: $Tag_Name Name:$Name LocationforDownload: $LocationforDownload FileNameforDownload: $FileNameforDownload"
@@ -72,20 +74,25 @@ function Get-GithubRelease {
         exit
     }  
 
-    If (($GithubReleaseType -eq "Release") -or ($GithubReleaseType -eq "Release-NoArchive")){
-        if ($Tag_Name){
-            $GithubDetails_ForDownload = $GithubDetails | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name }             
+    If ($GithubReleaseType -eq "Release" -or $GithubReleaseType -eq "Release-NoArchive" -or $GithubReleaseType -eq "Prerelease" -or $GithubReleaseType -eq "nightly"){
+        If (GithubReleaseType -ne "Prerelease"){
+            $GithubDetails_Filtered = $GithubDetails | Where-Object  {$_.tag_name -notmatch '-rc' -and  $_.tag_name -notmatch '-beta' -and  $_.tag_name -notmatch '-alpha' -and ($_.draft).tostring() -eq 'False' -and ($_.prerelease).tostring() -eq 'False' -and ($_.name).tostring() -notmatch 'Release Candidate'}
+        } 
+        else {
+            $GithubDetails_Filtered = $GithubDetails | Where-Object  {($_.draft).tostring() -eq 'False' -and ($_.prerelease).tostring() -eq 'True'}
+        }
+        if (GithubReleaseType -eq "nightly"){
+            $GithubDetails_Sorted = $GithubDetails_Filtered | Where-Object { $_.tag_name -eq 'nightly'}  | Select-Object -ExpandProperty assets | Sort-Object -Property "updated_at" -Descending 
+            $GithubDetails_ForDownload = $GithubDetails_Sorted  | Where-Object { $_.name -match $Name } | Select-Object -First 1       
+        }
+        elseif ($Tag_Name){
+            $GithubDetails_ForDownload = $GithubDetails_Filtered | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name }           
         }
         else {
-            $GithubDetails_Sorted = $GithubDetails | Where-Object { $_.tag_name -ne 'nightly' -and ($_.draft).tostring() -eq 'False' -and ($_.prerelease).tostring() -eq 'False' -and ($_.name).tostring() -notmatch 'Release Candidate'} | Sort-Object -Property 'tag_name' -Descending | Select-Object -ExpandProperty assets 
-            $NametoCheck = $Name
-            $GithubDetails_ForDownload = $GithubDetails_Sorted  | Where-Object { $_.name -match $NametoCheck } | Select-Object -First 1
+            $GithubDetails_Sorted = $GithubDetails_Filtered | Where-Object { $_.tag_name -ne 'nightly'} | Sort-Object -Property 'tag_name' -Descending | Select-Object -ExpandProperty assets 
+            $GithubDetails_ForDownload = $GithubDetails_Sorted  | Where-Object { $_.name -match $Name } | Select-Object -First 1
         }
     }
-    elseif ($GithubReleaseType -eq "nightly"){
-        $GithubDetails_Sorted = $GithubDetails | Where-Object { $_.tag_name -eq 'nightly'}  | Select-Object -ExpandProperty assets | Sort-Object -Property "updated_at" -Descending 
-        $GithubDetails_ForDownload = $GithubDetails_Sorted  | Where-Object { $_.name -match $Name } | Select-Object -First 1
-    } 
     else {
         Write-ErrorMessage -Message "Error with input! Exiting!"
         exit
