@@ -5,13 +5,12 @@ arm_boost=1
 [all]
 disable_splash=1
 arm_64bit=1
-bootcode_delay=1
-
-# Limit total memory size to 2GB for now. Necessary for CM4/Pi4
-total_mem=2048
 
 # Default boot delay is one second. Uncomment this line if you want zero second delay
-boot_delay=0
+#boot_delay=0
+bootcode_delay=1
+
+[DTOVERLAY]
 
 # This is important so that GPU firmware does not add its overlay icons on the screen
 # If you also want to disable speed throttling in case of undervoltage, set this value to 2
@@ -55,11 +54,6 @@ gpu_mem=32
 #-Pistorm detection-#
 gpio=0-27=ip
 gpio=0-27=pu
-
-##If keyboard reset is kept hold, then put pistorm32 into stealth mode, boots stock A1200
-[gpio4=0]
-kernel=Emu68-pistorm32lite
-initramfs ps32lite-stealth-firmware.gz
 
 [all]
 ##PiStorm32lite Boot
