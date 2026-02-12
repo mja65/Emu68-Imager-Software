@@ -23,6 +23,10 @@ function Update-ConfigTXT {
         if ($line -eq '[ROMPATH]'){
             $RevisedConfigTxt += "initramfs $($Script:GUIActions.FoundKickstarttoUse.Fat32Name)"
         }
+        elseif ($line -eq '[DTOVERLAY]'){
+            $RevisedConfigTxt += Get-UnicamConfigTxt
+
+        }
         elseif ($line -eq '[VIDEOMODES]'){
             $RevisedConfigTxt +="# The following section defines the screenmode for your monitor for output from the Raspberry Pi. If you wish to "
             $RevisedConfigTxt +="# select a different screenmode you can comment out the existing mode and remove the comment marks from the new one."        
