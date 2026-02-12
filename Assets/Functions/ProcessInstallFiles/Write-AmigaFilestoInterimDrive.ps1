@@ -99,7 +99,9 @@ function Write-AmigaFilestoInterimDrive {
        
        $ListofLocalPackages = $ListofPackagestoInstall | Where-Object {$_.KickstartVersion -eq $Script:GUIActions.KickstartVersiontoUse -and $_.Source -eq 'Local - LHA File'} | Select-Object 'SourceLocation' -Unique
        
-       Expand-Packages -Local -ListofPackages $ListofLocalPackages
+       If ($ListofLocalPackages){
+           Expand-Packages -Local -ListofPackages $ListofLocalPackages
+       }
        
        Write-TaskCompleteMessage 
     
