@@ -48,6 +48,20 @@ SAY "Running Network script for action: "action
 SAY ""
 SAY "**********************************************"
 
+IF action = "CONNECT" then DO
+   TZONE = GETENV(TZONE) 
+   if TZONE="" THEN DO
+      TimeZoneOverride = GETENV(TZONEOVERRIDE)
+      if TimeZoneOverride~="" then DO
+         say TimeZoneOverride 
+         say "Using Timezone override"
+         'C:SetDST ZONE='vTimeZoneOverride' NOASK NOREQ QUIET >NIL:'
+      END
+      ELSE 'C:SetDST NOASK NOREQ QUIET >NIL:'
+   END    
+
+END
+
 /* Check IPStack */
 IF action = "CONNECT" then DO
    IF FIND("ROADSHOW MIAMI",ipstack) = 0 THEN DO
@@ -76,12 +90,15 @@ SwitchNoSyncTime = "FALSE"
 SwitchNoCloseMiami = "FALSE"
 SwitchNoReStartMiami = "FALSE"
 SwitchNoReStartWirelessManager = "FALSE"
+SwitchNoShutDownRoadshow = "FALSE"
 
 IF POS('NOCLOSEWIRELESSMANAGER', input) > 0 THEN SwitchNoCloseWirelessManager = "TRUE"
 IF POS('NOSYNCTIME', input) > 0 THEN SwitchNoSyncTime = "TRUE"
 IF POS('NOCLOSEMIAMI', input) > 0 THEN SwitchNoCloseMiami = "TRUE"
 IF POS('NORESTARTMIAMI', input) > 0 THEN SwitchNoReStartMiami = "TRUE"
 IF POS('NORESTARTWIRELESSMANAGER', input) > 0 THEN SwitchNoReStartWirelessManager = "TRUE"
+IF POS('NOSHUTDOWNROADSHOW', input) > 0 THEN SwitchNoShutDownRoadshow = "TRUE"
+
 
 IF device ~= "" & ~POS(".", device) > 0 THEN device = device || ".DEVICE"
 
@@ -129,7 +146,8 @@ IF DEBUG = "TRUE" then DO
    SAY "SwitchNoCloseMiami: "SwitchNoCloseMiami 
    SAY "SwitchNoSyncTime: "SwitchNoSyncTime 
    SAY "SwitchNoCloseWirelessManager: "SwitchNoCloseWirelessManager
-   SAY "SwitchWaitatEnd: "SwitchWaitatEnd   
+   SAY "SwitchWaitatEnd: "SwitchWaitatEnd
+   SAY "SwitchNoShutDownRoadshow "SwitchNoShutDownRoadshow
    SAY "WirelessprefsPath: "WirelessprefsPath
    SAY "WifiPiDevicePath: "WifiPiDevicePath
    SAY "WirelesslogFilePath: "WirelesslogFilePath
@@ -143,9 +161,18 @@ IF action = "CONNECT" then DO
       CALL KillNetworkShares()
       CALL KillMiami()
    END
-   If IPStack = "ROADSHOW" then DO
-      CALL KillNetworkShares()
-      CALL KillRoadshow()
+   If IPStack = "ROADSHOW" then DO  
+      IF SwitchNoShutDownRoadshow = "FALSE" then DO 
+         CALL KillNetworkShares()
+         CALL KillRoadshow()
+      END
+      ELSE DO
+         'areweonline'
+         If RC = 0 then DO
+            CALL KillNetworkShares()
+            CALL KillRoadshow()
+         END
+      END
    END
    IF device = "WIFIPI.DEVICE" THEN DO
       SAY ""
@@ -237,7 +264,7 @@ IF action = "CONNECT" then DO
          EXIT 10
       END   
    END
-   IF device = "USENET.DEVICE" THEN DO
+   IF device = "UAENET.DEVICE" THEN DO
       SAY ""
       SAY "Connecting to Network in UAE (uaenet.device)"
       if ~IsUAE() THEN DO
@@ -341,16 +368,6 @@ IF action = "CONNECT" then DO
    if SwitchNoSyncTime = "FALSE" then DO
       SAY ""
       SAY "Updating system time"
-      TZONE = GETENV(TZONE) 
-      if TZONE="" THEN DO
-         TimeZoneOverride = GETENV(TZONEOVERRIDE)
-         if TimeZoneOverride~="" then DO
-            say TimeZoneOverride 
-            say "should not be here"
-            'C:SetDST ZONE='vTimeZoneOverride
-         END
-         ELSE 'C:SetDST NOASK NOREQ QUIET >NIL:'
-      END    
       'c:sntp pool.ntp.org >'sntpLog
       'Search' sntpLog '"Unknown host" >NIL:'
       IF RC = 0 THEN DO
@@ -582,7 +599,7 @@ ShowUsage:
    SAY "<Action Type>: Connect, Disconnect"
    SAY "<Selected Device>: WifiPi, Genet, Uaenet (applicable for Connect action type)"
    SAY "<IP Stack>: Miami, Roadshow"
-   SAY "<Options>: NoSyncTime, NoRestartMiami, NoRestartWirelessManager (applicable for connect action type)"
+   SAY "<Options>: NoSyncTime, NoRestartMiami, NoRestartWirelessManager, NoShutdownRoadshow (applicable for connect action type)"
    SAY "<Options>: NoCloseWirelessManager, NoCloseMiami (applicable for disconnect action type)"
    SAY "<Options>: Debug, WaitatEnd"
    SAY ""
