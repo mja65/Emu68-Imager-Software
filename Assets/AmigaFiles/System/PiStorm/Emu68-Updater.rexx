@@ -310,6 +310,7 @@ EXIT
 
 CloseProgram:
    Parse ARG Message, ExitNumber, TimetoClose
+   Say ""
    Say Message
    Say 'This window will close in 'TimetoClose' seconds'
    'wait sec='TimetoClose 
