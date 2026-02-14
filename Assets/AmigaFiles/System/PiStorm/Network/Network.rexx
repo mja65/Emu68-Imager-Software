@@ -1,4 +1,4 @@
-/* $VER: Network.rexx 1.0 (2026-01-28)                                        */
+/* $VER: Network.rexx 1.0 (2026-02-14)                                        */
 /* Script to take Amiga online and offline including sync of clock            */
 /*                                                                            */
 
@@ -7,10 +7,12 @@
  * REQUIREMENTS:                                                              *
  * - IP Stack:            Miami or Roadshow                                   *
  * - Devices:             genet.device or wifipi.device or                    *
- * - Libraries:           rexxtricks.library                                  *
  *                        uaenet.device(for UAE, built-in)                    *
+ *                        or v2expeth.device (Apollo V2)                      *
+ * - Libraries:           rexxtricks.library                                  *
  * - Tools (in C:):       SetDST, WirelessManager, WaitUntilConnected, sntp,  *
- *                        mecho,KillDev,ListDevices                           *
+ *                        mecho,KillDev,ListDevices, areweonline,             *
+ *                        ApolloControl (Apollo only)                         *
  * - Script (in S:):      ProgressBar                                         *
  *                                                                            *
  *****************************************************************************/
@@ -49,6 +51,7 @@ SAY ""
 SAY "**********************************************"
 
 IF action = "CONNECT" then DO
+   ADDRESS COMMAND
    TZONE = GETENV(TZONE) 
    if TZONE="" THEN DO
       TimeZoneOverride = GETENV(TZONEOVERRIDE)
@@ -104,8 +107,8 @@ IF device ~= "" & ~POS(".", device) > 0 THEN device = device || ".DEVICE"
 
 IF action = "CONNECT" then DO
    DevicebaseName = left(device,(LENGTH(device) - 7))
-   IF FIND("WIFIPI GENET UAENET",DevicebaseName) = 0 THEN DO
-      SAY "Error: Unsupported DEVICE '"DevicebaseName"'. Supported: wifipi.device, genet.device, uaenet.device"
+   IF FIND("WIFIPI GENET UAENET V2EXPETH",DevicebaseName) = 0 THEN DO
+      SAY "Error: Unsupported DEVICE '"DevicebaseName"'. Supported: wifipi.device, genet.device, uaenet.device, v2expeth.device"
       CALL CloseWindowMessage()
       EXIT 10
    END
@@ -177,7 +180,12 @@ IF action = "CONNECT" then DO
    IF device = "WIFIPI.DEVICE" THEN DO
       SAY ""
       SAY "Connecting to Wifi Network"
-      
+      If upper(RPIVersion()) = "UNKNOWN" then DO
+         SAY ""
+         Say "Wifipi.device only works on Pistorm! Aborting!"
+         CALL CloseWindowMessage()
+         EXIT 10
+      END
       IF ~EXISTS(WirelessprefsPath) THEN DO
          SAY ""
          SAY "Cannot connect to Wifi! No Wireless.prefs file found!"
@@ -228,20 +236,20 @@ IF action = "CONNECT" then DO
          SAY ""
          SAY "Connecting to Wireless. This may take a few moments......."
          SAY ""
-         'setenv InProgressBar 1'
-         'run >T:Progressbar.txt S:ProgressBar'
+         'setenv InProgressBar Connecting to Wireless'
+         'run >T:Progressbar.txt rx S:ProgressBar.rexx'
          'Run >NIL: C:wirelessmanager device='WifiPiDevicePath' CONFIG='WirelessprefsPath' VERBOSE >'WirelesslogFilePath
          'C:WaitUntilConnected device='WifiPiDevicePath' Unit=0 delay=100'
          If RC = 0 then DO
-            SAY ""
-            'unsetenv InProgressBar'
+            'setenv InProgressBar COMPLETE'
             'delete T:Progressbar.txt >NIL: QUIET'
+            'wait 1'
          END
          ELSE DO
+            'setenv InProgressBar ERROR'
+            'delete T:Progressbar.txt >NIL: QUIET'
             SAY ""
             SAY "Could not connect to Wifi!"
-            'unsetenv InProgressBar'
-            'delete T:Progressbar.txt >NIL: QUIET'
             If ~KillWirelessManager() then DO
                CALL CloseWindowMessage()
                EXIT 10
@@ -272,18 +280,26 @@ IF action = "CONNECT" then DO
          EXIT 10
       END
    END
-
+   IF device = "V2EXPETH.DEVICE" THEN DO
+      SAY ""
+      SAY "Connecting to Ethernet (v2expeth.device)"
+      if ~IsV2() THEN DO
+         CALL CloseWindowMessage()
+         EXIT 10
+      END
+   END
    IF ipstack = "ROADSHOW" THEN DO
       CALL LoadRoadshowParams(DevicebaseName)
-      'setenv InProgressBar 1'
-      'run >T:Progressbar.txt S:ProgressBar'
+      'setenv InProgressBar Connecting to Network'
+      'run >T:Progressbar.txt rx S:ProgressBar.rexx'
       'AddNetInterface 'DevicebaseName' TIMEOUT=50 >T:AddInterface.txt'
       'Search T:AddInterface.txt "Could not add" >NIL:'
       IF RC = 0 THEN DO
+         'setenv InProgressBar ERROR'
+         'delete T:Progressbar.txt >NIL: QUIET'
          SAY ""
          SAY "Error connecting to Roadshow"
-         'unsetenv InProgressBar'
-         'delete T:Progressbar.txt >NIL: QUIET'
+
          If ~KillWirelessManager() then DO
             CALL CloseWindowMessage()
             EXIT 10
@@ -291,9 +307,9 @@ IF action = "CONNECT" then DO
          EXIT 10
       END
       ELSE DO
-         SAY ""
-         'unsetenv InProgressBar'
+         'setenv InProgressBar COMPLETE'
          'delete T:Progressbar.txt >NIL: QUIET'
+         'wait 1'
       END
    END
 
@@ -366,7 +382,6 @@ IF action = "CONNECT" then DO
       ADDRESS COMMAND 
    END
    if SwitchNoSyncTime = "FALSE" then DO
-      SAY ""
       SAY "Updating system time"
       'c:sntp pool.ntp.org >'sntpLog
       'Search' sntpLog '"Unknown host" >NIL:'
@@ -464,19 +479,33 @@ IsMiamiInstalled:
       END
       RETURN 1
    END
-IsUAE:
-   'VERSION uaehf.device'
+IsV2:
+   'apollocontrol de'
    If RC >0 THEN DO
-      If debug = "TRUE" THEN DO
-         SAY "UAE not detected"
-      END   
+      If debug = "TRUE" THEN SAY "Apollo Accelerator not detected"
       RETURN 1
    END
    ELSE DO
-      If debug = "TRUE" THEN DO
-         SAY "UAE detected"
+      'apollocontrol se'
+      ApolloType = GETENV(vBoardName)
+      if left(ApolloType,2) = "V2" then do
+         If debug = "TRUE" THEN SAY "Apollo V2 Card detected"
+         RETURN 1   
       END
+      ELSE DO
+         If debug = "TRUE" THEN SAY "Apollo Accelerator is not V2"
+         RETURN 0
+      END  
+   END    
+IsUAE:
+   'VERSION uaehf.device'
+   If RC >0 THEN DO
+      If debug = "TRUE" THEN SAY "UAE not detected"
       RETURN 0
+   END
+   ELSE DO
+      If debug = "TRUE" THEN SAY "UAE detected"
+      RETURN 1
    END
 IsRoadshowInstalled:
    IF EXISTS('Libs:bsdsocket.library') THEN DO
@@ -489,8 +518,6 @@ IsRoadshowInstalled:
       END
       RETURN 0
    END
-   
-
 KillRoadshow:
    'c:Netshutdown >NIL:'
    Return
@@ -597,7 +624,7 @@ ShowUsage:
    SAY ""
    SAY "Usage: Rx Network.rexx ACTION=<Action Type> DEVICE=<Selected Device> IPSTACK=<IP Stack> <Options>"
    SAY "<Action Type>: Connect, Disconnect"
-   SAY "<Selected Device>: WifiPi, Genet, Uaenet (applicable for Connect action type)"
+   SAY "<Selected Device>: WifiPi, Genet, Uaenet, V2expeth (applicable for Connect action type)"
    SAY "<IP Stack>: Miami, Roadshow"
    SAY "<Options>: NoSyncTime, NoRestartMiami, NoRestartWirelessManager, NoShutdownRoadshow (applicable for connect action type)"
    SAY "<Options>: NoCloseWirelessManager, NoCloseMiami (applicable for disconnect action type)"

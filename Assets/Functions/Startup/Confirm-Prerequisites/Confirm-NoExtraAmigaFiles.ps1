@@ -47,11 +47,13 @@ $ListofFiles = @"
     \System\PiStorm\Install Packages.info
     \System\PiStorm\Network\Network.rexx
     \System\PiStorm\Network\OfflineScriptMenutools_Roadshow
-    \System\PiStorm\Network\OnlineGENetScriptMenutools_Roadshow
-    \System\PiStorm\Network\OnlineWifiScriptMenuTools_Roadshow
     \System\PiStorm\Network\OfflineScriptMenutools_Miami
+    \System\PiStorm\Network\OnlineGENetScriptMenutools_Roadshow
     \System\PiStorm\Network\OnlineGENetScriptMenutools_Miami
+    \System\PiStorm\Network\OnlineWifiScriptMenuTools_Roadshow
     \System\PiStorm\Network\OnlineWifiScriptMenuTools_Miami
+    \System\PiStorm\Network\Onlinev2expethScriptMenutools_Roadshow
+    \System\PiStorm\Network\Onlinev2expethScriptMenutools_Miami
     \System\PiStorm\Network\_UAEFSDB.___
     \System\PiStorm\Offline_Miami.info
     \System\PiStorm\OnlineGENet_Miami.info
@@ -89,7 +91,7 @@ $ListofFiles = @"
     \System\S\DirectoryOpus.CFG
     \System\S\DST.dat
     \System\S\KickstartRomHashes
-    \System\S\ProgressBar
+    \System\S\ProgressBar.rexx
     \System\S\Startup-Sequence_Iconlib
     \System\S\Startup-Sequence_OneTimeRun
     \System\S\Startup-Sequence_REXXMAST
