@@ -1,4 +1,4 @@
-/* $VER: Network.rexx 1.0 (2026-01-28)                                        */
+/* $VER: Network.rexx 1.0 (2026-02-14)                                        */
 /* Script to take Amiga online and offline including sync of clock            */
 /*                                                                            */
 
@@ -10,7 +10,7 @@
  * - Libraries:           rexxtricks.library                                  *
  *                        uaenet.device(for UAE, built-in)                    *
  * - Tools (in C:):       SetDST, WirelessManager, WaitUntilConnected, sntp,  *
- *                        mecho,KillDev,ListDevices                           *
+ *                        mecho,KillDev,ListDevices, areweonline              *
  * - Script (in S:):      ProgressBar                                         *
  *                                                                            *
  *****************************************************************************/
@@ -228,20 +228,20 @@ IF action = "CONNECT" then DO
          SAY ""
          SAY "Connecting to Wireless. This may take a few moments......."
          SAY ""
-         'setenv InProgressBar 1'
-         'run >T:Progressbar.txt S:ProgressBar'
+         'setenv InProgressBar Connecting to Wireless'
+         'run >T:Progressbar.txt rx S:ProgressBar.rexx'
          'Run >NIL: C:wirelessmanager device='WifiPiDevicePath' CONFIG='WirelessprefsPath' VERBOSE >'WirelesslogFilePath
          'C:WaitUntilConnected device='WifiPiDevicePath' Unit=0 delay=100'
          If RC = 0 then DO
-            SAY ""
-            'unsetenv InProgressBar'
+            'setenv InProgressBar COMPLETE'
             'delete T:Progressbar.txt >NIL: QUIET'
+            'wait 1'
          END
          ELSE DO
+            'setenv InProgressBar ERROR'
+            'delete T:Progressbar.txt >NIL: QUIET'
             SAY ""
             SAY "Could not connect to Wifi!"
-            'unsetenv InProgressBar'
-            'delete T:Progressbar.txt >NIL: QUIET'
             If ~KillWirelessManager() then DO
                CALL CloseWindowMessage()
                EXIT 10
@@ -275,15 +275,16 @@ IF action = "CONNECT" then DO
 
    IF ipstack = "ROADSHOW" THEN DO
       CALL LoadRoadshowParams(DevicebaseName)
-      'setenv InProgressBar 1'
-      'run >T:Progressbar.txt S:ProgressBar'
+      'setenv InProgressBar Connecting to Network'
+      'run >T:Progressbar.txt rx S:ProgressBar.rexx'
       'AddNetInterface 'DevicebaseName' TIMEOUT=50 >T:AddInterface.txt'
       'Search T:AddInterface.txt "Could not add" >NIL:'
       IF RC = 0 THEN DO
+         'setenv InProgressBar ERROR'
+         'delete T:Progressbar.txt >NIL: QUIET'
          SAY ""
          SAY "Error connecting to Roadshow"
-         'unsetenv InProgressBar'
-         'delete T:Progressbar.txt >NIL: QUIET'
+
          If ~KillWirelessManager() then DO
             CALL CloseWindowMessage()
             EXIT 10
@@ -291,9 +292,9 @@ IF action = "CONNECT" then DO
          EXIT 10
       END
       ELSE DO
-         SAY ""
-         'unsetenv InProgressBar'
+         'setenv InProgressBar COMPLETE'
          'delete T:Progressbar.txt >NIL: QUIET'
+         'wait 1'
       END
    END
 
@@ -366,7 +367,6 @@ IF action = "CONNECT" then DO
       ADDRESS COMMAND 
    END
    if SwitchNoSyncTime = "FALSE" then DO
-      SAY ""
       SAY "Updating system time"
       'c:sntp pool.ntp.org >'sntpLog
       'Search' sntpLog '"Unknown host" >NIL:'
