@@ -50,21 +50,6 @@ SAY "Running Network script for action: "action
 SAY ""
 SAY "**********************************************"
 
-IF action = "CONNECT" then DO
-   ADDRESS COMMAND
-   TZONE = GETENV(TZONE) 
-   if TZONE="" THEN DO
-      TimeZoneOverride = GETENV(TZONEOVERRIDE)
-      if TimeZoneOverride~="" then DO
-         say TimeZoneOverride 
-         say "Using Timezone override"
-         'C:SetDST ZONE='vTimeZoneOverride' NOASK NOREQ QUIET >NIL:'
-      END
-      ELSE 'C:SetDST NOASK NOREQ QUIET >NIL:'
-   END    
-
-END
-
 /* Check IPStack */
 IF action = "CONNECT" then DO
    IF FIND("ROADSHOW MIAMI",ipstack) = 0 THEN DO
@@ -383,16 +368,25 @@ IF action = "CONNECT" then DO
    END
    if SwitchNoSyncTime = "FALSE" then DO
       SAY "Updating system time"
-      'c:sntp pool.ntp.org >'sntpLog
-      'Search' sntpLog '"Unknown host" >NIL:'
-      IF RC = 0 THEN DO
-         SAY "Unable to synchronise time"
-         'Delete' sntpLog 'QUIET'
+      If ~SyncTime() THEN DO
          CALL CloseWindowMessage()
          EXIT 5
-      END
+      End
       ELSE DO
-         'Delete' sntpLog 'QUIET'
+         TZONE = GETENV(TZONE) 
+         if TZONE="" THEN DO
+            TimeZoneOverride = GETENV(TZONEOVERRIDE)
+            if TimeZoneOverride~="" then DO
+               say TimeZoneOverride 
+               say "Using Timezone override"
+               'C:SetDST ZONE='vTimeZoneOverride' NOASK NOREQ QUIET >NIL:'
+            END
+            ELSE 'C:SetDST NOASK NOREQ QUIET >NIL:'
+            If ~SyncTime() THEN DO
+               CALL CloseWindowMessage()
+               EXIT 5
+            End
+         END         
       END 
       SAY "Time set and DST applied if applicable"
    END
@@ -464,6 +458,15 @@ EXIT 0
 
 /* ================= FUNCTIONS ================= */
 
+SyncTime:
+ 'c:sntp pool.ntp.org >'sntpLog
+ 'Search' sntpLog '"Unknown host" >NIL:'
+ IF RC = 0 THEN DO
+    SAY "Unable to synchronise time"
+    'Delete' sntpLog 'QUIET'
+    RETURN 0
+ END
+ ELSE RETURN 1
 IsMiamiInstalled:
    'assign exists Miami: >NIL:'
    IF RC >= 5 then DO
