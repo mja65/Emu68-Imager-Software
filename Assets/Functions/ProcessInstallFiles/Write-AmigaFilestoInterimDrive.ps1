@@ -168,7 +168,7 @@ function Write-AmigaFilestoInterimDrive {
                 }
                 If ($_.NewFileName -ne ""){
                     $DestinationPathFolder = "$($Script:Settings.InterimAmigaDrives)\$($_.DrivetoInstall)\$($_.LocationtoInstall)"
-                    $DestinationPathFolder = [System.IO.Path]::GetFullPath($DestinationPathFolder)
+                    $DestinationPathFolder = ([System.IO.Path]::GetFullPath($DestinationPathFolder)).TrimEnd('\')
                     $DestinationPathFull = "$DestinationPathFolder\$($_.NewFileName)"
                     $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
                         Command = "fs mkdir `"$DestinationPathFolder`""
@@ -181,7 +181,7 @@ function Write-AmigaFilestoInterimDrive {
                 }
                 else {
                     $DestinationPath = "$($Script:Settings.InterimAmigaDrives)\$($_.DrivetoInstall)\$($_.LocationtoInstall)"
-                    $DestinationPath = [System.IO.Path]::GetFullPath($DestinationPath)   
+                    $DestinationPath = ([System.IO.Path]::GetFullPath($DestinationPath)).TrimEnd('\')   
                     $Script:GUICurrentStatus.HSTCommandstoProcess.$DestinationPropertyName += [PSCustomObject]@{
                        Command = "fs extract `"$SourcePath`" `"$DestinationPath`" --uaemetadata $UAEmetadataFlag --recursive $RecursiveFlag --makedir TRUE --force TRUE"    
                        Sequence = $_.InstallSequence
