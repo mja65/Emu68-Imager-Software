@@ -182,6 +182,7 @@ function Get-InputCSVs {
                         KickstartVersion = [system.version](($_.KickstartVersion -split ',')[$Counter]) 
                         IconSetName = $_.IconSetName
                         NetworkStack = $_.NetworkStack
+                        AmigaUpdate = $_.AmigaUpdate
                         PackageType = $_.PackageType
                         PackageName = $_.PackageName
                         PackageNameDefaultInstall = $_.PackageNameDefaultInstall 
@@ -238,6 +239,7 @@ function Get-InputCSVs {
                     KickstartVersion = [system.version]$_.KickstartVersion
                     IconSetName = $_.IconSetName
                     NetworkStack = $_.NetworkStack
+                    AmigaUpdate = $_.AmigaUpdate
                     PackageType = $_.PackageType
                     PackageName = $_.PackageName
                     PackageNameDefaultInstall = $_.PackageNameDefaultInstall 

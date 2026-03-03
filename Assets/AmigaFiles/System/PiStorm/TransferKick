@@ -1,7 +1,17 @@
-/* TransferKick.rexx
-Program to calculate the hashes for Kickstart files on FAT32 drive and transfer matching files to 
-DEVS:Kickstarts for use in WHDLoad.
-*/
+/* $VER: TransferKick 1.1 (26.02.26)                                          */
+/* Program to calculate the hashes for Kickstart files on FAT32 drive and     */
+/* transfer matching files to DEVS:Kickstarts for use in WHDLoad.             */
+/*                                                                            */
+
+/******************************************************************************
+ *                                                                            *
+ * REQUIREMENTS:                                                              *
+ *                                                                            *
+ * - Libraries:                                                               *
+ *                                                                            *
+ * - Tools (in C:):       tomcopy                                             *
+ *                                                                            *
+ ******************************************************************************/
 
 if exists('EMU68BOOT:Kickstarts/') then nop
 else do
