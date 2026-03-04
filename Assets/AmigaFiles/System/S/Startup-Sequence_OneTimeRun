@@ -38,27 +38,27 @@ ELSE
 ENDIF
 c:ce >NIL: S:OneTimeRun 
 IF WARN 
-	ECHO "Running One Time Scripts" 
-	ECHO >T:RunTimeScript "FAILAT 21" 
-	IF $SYSTEM EQ "UAE" 
-		LIST >>T:RunTimeScript S:OneTimeRun PAT=~(#?.info|#?_pistorm) LFORMAT="ECHO *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES
-	ELSE
-		LIST >>T:RunTimeScript S:OneTimeRun PAT=~(#?.info|) LFORMAT="ECHO *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES		
-	ENDIF
-	EXECUTE T:RunTimeScript
-	DELETE >NIL: T:RunTimeScript 
+   ECHO "Running One Time Scripts" 
+   ECHO >T:RunTimeScript "FAILAT 21" 
+   IF $SYSTEM EQ "UAE" 
+      LIST >>T:RunTimeScript S:OneTimeRun PAT=~(#?.info|#?_pistorm) LFORMAT="ECHO *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES
+   ELSE
+      LIST >>T:RunTimeScript S:OneTimeRun PAT=~(#?.info|) LFORMAT="ECHO *"Running Script: %n*"*nEcho *"*"*nExecute *"%p%n*"*nDelete *"%p%n*"*n" ALL FILES      
+   ENDIF
+   EXECUTE T:RunTimeScript
+   DELETE >NIL: T:RunTimeScript 
 ENDIF 
 
 IF $FIRSTTIMEBOOT EQ "TRUE"
-	IF NOT $SYSTEM EQ "UAE"
-		ECHO "FALSE" > SYS:PREFS/ENV-ARCHIVE/FIRSTTIMEBOOT
-	ENDIF
+   IF NOT $SYSTEM EQ "UAE"
+      ECHO "FALSE" > SYS:PREFS/ENV-ARCHIVE/FIRSTTIMEBOOT
+   ENDIF
 ENDIF
 IF $REBOOT EQ "TRUE" 
-	ECHO "FALSE" > SYS:PREFS/ENV-ARCHIVE/REBOOT
-	ECHO "The Amiga will REBOOT in 3 seconds!"
-	DISKCHANGE SDH0:
-	WAIT 3
-	REBOOT 
+   ECHO "FALSE" > SYS:PREFS/ENV-ARCHIVE/REBOOT
+   ECHO "The Amiga will REBOOT in 3 seconds!"
+   DISKCHANGE SDH0:
+   WAIT 3
+   REBOOT 
 ENDIF
 FAILAT 10

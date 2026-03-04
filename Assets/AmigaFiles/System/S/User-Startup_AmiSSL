@@ -1,7 +1,7 @@
 ;BEGIN AmiSSL
 Assign AmiSSL: SYS:Programs/AmiSSL
 If Exists AmiSSL:Libs
-  Assign LIBS: AmiSSL:Libs ADD
+   Assign LIBS: AmiSSL:Libs ADD
 EndIf
 Path AmiSSL: ADD
 ;END AmiSSL
