@@ -43,7 +43,7 @@ function Update-AmigaScripts {
             $ScriptChanges += $_
         }
         $ScriptChanges += ""  
-        $ScriptChanges += ";$NameofChange - Added by Emu68 Imager version $([string]$Script:Settings.Version) - BEGIN"
+        $ScriptChanges += ";$NameofChange - Added by Emu68 Imager version $([string]$Script:Settings.Version) - END"
         $ScriptChanges += ""   
         
         $RevisedScript += $OriginalScript 
