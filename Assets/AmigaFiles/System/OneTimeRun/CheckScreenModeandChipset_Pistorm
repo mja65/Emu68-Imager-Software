@@ -1,5 +1,5 @@
 IF EXISTS SYS:System/RexxMast
-	SYS:System/RexxMast >NIL:
+   SYS:System/RexxMast >NIL:
 ENDIF
 IF $KickstartVersion EQ 3.9
    C:AddDataTypes REFRESH QUIET
