@@ -36,8 +36,8 @@ Do until InProgressStatus = "COMPLETE" | InProgressStatus = "ERROR"
    InProgressStatus = upper(GETENV(InProgressBar))
    if InProgressStatus = "COMPLETE" | InProgressStatus = "ERROR" then leave
 END
-if InProgressStatus="ERROR" then 'mecho -e  " 'Task' -   ERROR!                                                      " \r\n' 
-if InProgressStatus="COMPLETE" then 'mecho -e  " 'Task' -   Completed!                                                   " \r\n'
+if InProgressStatus="ERROR" then 'mecho -e  "'Task' -   ERROR!                                                      " \r\n' 
+if InProgressStatus="COMPLETE" then 'mecho -e  "'Task' -   Completed!                                                   " \r\n'
 'unsetenv InprogressBar'
 say ""
 EXIT
