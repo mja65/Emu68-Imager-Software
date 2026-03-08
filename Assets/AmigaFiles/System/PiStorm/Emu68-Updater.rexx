@@ -1,402 +1,790 @@
-/* $VER: Emu68Updater.rexx 1.1 (24.02.26)                                     */
+/* $VER: Emu68Updater.rexx 1.1 (10.03.26)                                     */
 /* Script to update Emu68 and Videocore files                                 */
 /*                                                                            */
+/******************************************************************************/
+/* REQUIREMENTS:                                                              */
+/* - Libraries:           rexxtricks.library                                  */
+/* - Tools (in C:):       aget, areweonline, copyreplace, llist, ListDevices, */ 
+/*                        unzip                                               */
+/* - Scripts (in S:):     progressbar.rexx                                    */ 
+/******************************************************************************/
 
-/******************************************************************************
- *                                                                            *
- * REQUIREMENTS:                                                              *
- *                                                                            *
- * - Libraries:           rexxtricks.library                                  *
- *                                                                            *
- * - Tools (in C:):       aget, areweonline, ListDevices, unzip               *
- *                                                                            *
- ******************************************************************************/
-
-
+OPTIONS FAILAT 21 
 if ~SHOW('L','rexxtricks.library') then addlib('rexxtricks.library',0,-30,0) 
 
 PARSE ARG input 
-input = upper(TRANSLATE(input,' ','='))
-PARSE VAR input . 'FAT32DEVICE' InputFAT32Device
+input = upper(TRANSLATE(input, ' ', '='))
+PARSE VAR input . 'PISTORMFOLDER' InputPistormSearchFolder .
+PARSE VAR input . 'PROGRAMSFOLDER' InputProgramsSearchFolder .
+PARSE VAR input . 'FAT32DEVICE' InputFAT32Device .
+PARSE VAR input . 'SCRIPTPATH' InputScriptPath .
 
-InputFAT32Device = STRIP(InputFAT32Device)||":"
+DEBUG = "FALSE"
+IF POS('DEBUG', input) > 0 THEN DEBUG = "TRUE"
 
+If InputFAT32Device ~= '' then InputFAT32Device = STRIP(InputFAT32Device)||":"
+
+InputPistormSearchFolder = strip(InputPistormSearchFolder)
+InputProgramsSearchFolder = strip(InputProgramsSearchFolder)
+InputScriptPath = strip(InputScriptPath)
+
+/*
+DebugScriptPath = 'Work:'
+DebugFat32Device = 'SD0:'
+DebugPistormSearchFolder = 'SYS:'
+DebugProgramsSearchFolder = 'Work:Applications'
+*/
 
 ADDRESS COMMAND
+
+/* Variable Setup - BEGIN */
+
+ScriptPath = ''
+Fat32DeviceToMount = ''
+PistormSearchFolder = ''
+ProgramsSearchFolder = ''
+
+If DebugScriptPath ~= '' then ScriptPath = DebugScriptPath
+If DebugFat32Device ~= '' then FAT32DeviceToMount = DebugFat32Device
+If DebugPistormSearchFolder ~= '' then PistormSearchFolder = DebugPistormSearchFolder
+If DebugProgramsSearchFolder ~= '' then ProgramsSearchFolder = DebugProgramsSearchFolder
+
+If InputScriptPath ~= '' then ScriptPath = InputScriptPath
+If InputFat32Device ~= '' then FAT32DeviceToMount = InputFat32Device
+If InputPistormSearchFolder ~= '' then PistormSearchFolder = InputPistormSearchFolder
+If InputProgramsSearchFolder ~= '' then ProgramsSearchFolder = InputProgramsSearchFolder
+
+DefaultScriptPath = 'SYS:PiStorm'
+
+TempFolder = 'T:Updater'
+DownloadFolder = TempFolder||'/DownloadedFiles'
+PrerequisiteDownloadFolder = TempFolder||'/PrerequisiteFiles/DownloadedFiles'
+PrerequisiteExtractFolder = TempFolder||'/PrerequisiteFiles/ExtractedFiles'
+ExtractedFilesFolder = TempFolder||'/ExtractedFiles'
+PiStormVariantPath = TempFolder||'/pistormvariant.txt'
+ListofEmu68DisksFile = TempFolder||'/DriveInfo.txt'
+VersionDataFolder = TempFolder||'/VersionData'
+Emu68UpdaterScriptFolder = TempFolder||'/Emu68UpdaterScript'
+
+If DEBUG = 'TRUE' then DO
+   Say ScriptPath
+   Say FAT32DeviceToMount
+   Say PistormSearchFolder
+   Say ProgramsSearchFolder 
+END
 
 DeviceListPath = 'C:ListDevices'
 Drivername1 = 'brcm-emmc.device'
 Drivername2 = 'brcm-sdhc.device'
 TargetDostype = '0x46415401'
-Emu68BackupFolderName = 'Backup_Emu68'
-VideoCoreBackupFolderName = 'Backup_Videocore'
+Emu68FilePath = ''
 
-PiStormVariantPath = 'T:Emu68Updater/PistormVariant'
- 
-Emu68GithubPathJSONURL =  'https://api.github.com/repos/michalsc/Emu68/releases'
-Emu68ToolsGithubPathJSONURL =  'https://api.github.com/repos/michalsc/Emu68-tools/releases'
+Call CreateFolder(TempFolder)
+Call CreateFolder(DownloadFolder)
+Call CreateFolder(PrerequisiteDownloadFolder)
+Call CreateFolder(PrerequisiteExtractFolder)
+Call CreateFolder(VersionDataFolder)
+Call CreateFolder(Emu68UpdaterScriptFolder)
 
-Emu68GithubPathURL = 'https://github.com/michalsc/Emu68/releases'
-Emu68ToolsGithubPathURL = 'https://github.com/michalsc/Emu68-tools/releases'
+UpdateSheetScriptGID = '1689832058'
+UpdateSheetGID = '6947660'
+UpdateSheetURL = "https://docs.google.com/spreadsheets/d/12UcKD7INDH9y7Tw_w1q3ebQOUS9JtARIs8Z9JWfLUWg/export?format=tsv&gid="
 
-Emu68json_path = 'T:Emu68Updater/ReleasesEmu68.json'
-Emu68Toolsjson_path = 'T:ReleasesTools.json'
+UpdateFilePath = TempFolder||"/Update.txt"
+ScriptUpdateFilePath = TempFolder||"/ScriptUpdate.txt"
 
-ListofEmu68DisksFile = "T:Emu68Updater/DriveInfo.txt"
-Emu68FilesLocation = "T:Emu68Updater/Emu68FilesLocation.txt"
+/* Variable Setup - END */
 
-Emu68TempFilesFolder = 'T:Emu68Updater/Emu68TempFiles'
-Emu68ToolsTempFilesFolder = 'T:Emu68Updater/Emu68ToolsTempFiles'
+SAY 'Welcome to Emu68 Updater!'
+SAY ''
+SAY 'This script will update your current Emu68 version and VideoCore version to the latest official release available on Github.'
+SAY 'It will also update other files from your default install where possible'
+SAY ''
 
-SAY "Welcome to Emu68 & VideoCore Updater!"
-SAY ""
-SAY "This script will update your current Emu68 version and VideoCore"
-Say "version to the latest official release available on Github."
-
-SAY ""
-Say "Section 1: Emu68 - Starting update processs for Emu68"
-Say ""
-
-if Exists('t:Emu68Updater') then do
-   'delete >NIL: t:Emu68Updater ALL QUIET'   
-end
-
-'makedir t:Emu68Updater'
-
-'SYS:C/EMU68INFO variant >'PiStormVariantPath 
-IF RC>0 then Call CloseProgram("It seems you're not running Emu68",10,3) 
-  
-If ~READFILE(PiStormVariantPath,PiStormVariantLine) then Call CloseProgram("Error reading PiStorm variant",10,3) 
-
-PistormVariant = PiStormVariantLine.1
-say 'Identified Pistorm as: 'PistormVariant
-
-Emu68FileName = 'Emu68-'||PistormVariant
-Emu68FileNameLength = Length(Emu68FileName)
-
-'c:AreWeOnline'
+vCmd = 'c:AreWeOnline'
+vCmd
 if RC>0 then Call CloseProgram("System is currently offline, please enable your internet connection then try again.",10,3)
 
-'ASSIGN >NIL: AmiSSL: EXISTS'
-if RC>0 then Call CloseProgram("AmiSSL not found!",10,3)
+if ~IsAmiSSL() then call CloseProgram("AmiSSL not available",10,3)
 
-DeviceListPath 'raw_dostype='TargetDostype' NOFORMATTABLE >'ListofEmu68DisksFile 
+/* Stage One - Perform Prerequisite Checks - Start */
 
-if ~READFILE(ListofEmu68DisksFile,ListofDisks) then Call CloseProgram("Error accessing list of drives!",10,3)
+Say 'Stage 1 - Perform Prerequisite Checks'
 
-found_count = 0
-FAT32Device = ""
-
-DO i=1 to ListofDisks.0
-    parse var ListofDisks.i vDevice';'vRawDosType';'vDosType';'vDeviceName';'vUnit';'vVolume
-    found_count = found_count + 1
-    if found_count = 1 then FAT32Device = vDevice':'
+If ~Exists('c:copyreplace') then DO
+   Say 'copyreplace does not exist.'
+   Call DownloadFile('Downloading copyreplace','http://aminet.net/util/sys/CopyReplace.lha',PrerequisiteDownloadFolder||'/copyreplace.lha',3,1)
+   Call Unlha(PrerequisiteDownloadFolder||'/copyreplace.lha',PrerequisiteExtractFolder||'/')
+   vCmd = 'copy >NIL: FROM "'PrerequisiteExtractFolder||'/copy" TO c:copyreplace CLONE QUIET'
+   If DEBUG = 'TRUE' then say vCmd
+   else vCmd
 END
 
-If found_count = 0 then DO
-   Say "FAT32 device not mounted!"
-   If InputFAT32Device=":" then DO 
-      Say 'No FAT32 Device defined in tooltype'
-      Call CloseProgram("Error finding FAT32 drive!",10,3)
+If ~Exists('c:llist') then DO
+   Say 'llist does not exist.'
+   Call DownloadFile('Downloading llist','http://aminet.net/util/shell/LList.lha',PrerequisiteDownloadFolder||'/llist.lha',3,1)
+   Call Unlha(PrerequisiteDownloadFolder||'/llist.lha',PrerequisiteExtractFolder||'/')
+   vCmd = 'copyreplace >NIL: FROM "'PrerequisiteExtractFolder||'/LList-V39-030" TO c:llist CLONE FOOVR QUIET'
+   If DEBUG = 'TRUE' then say vCmd
+   else vCmd
+END
+
+If ~Exists('c:unzip') then DO
+   Say 'unzip does not exist.'
+   Call DownloadFile('Downloading llist','http://aminet.net/util/arc/UnZIP552.lha',PrerequisiteDownloadFolder||'/Unzip.lha',3,1)
+   Call Unlha(PrerequisiteDownloadFolder||'/unzip.lha',PrerequisiteExtractFolder||'/')
+   vCmd = 'copyreplace >NIL: FROM "'PrerequisiteExtractFolder||'/UnZip552/UnZip" TO c: CLONE FOOVR QUIET'
+   If DEBUG = 'TRUE' then say vCmd
+   else vCmd
+END
+
+Call DownloadFile('Getting link to server',UpdateSheetURL||UpdateSheetScriptGID,ScriptUpdateFilePath,3,0)
+
+if ~Exists(ScriptUpdateFilePath) then call CloseProgram("Download Failed",10,3)
+
+If ReadFile(ScriptUpdateFilePath,ScriptURL) then do
+   URL = strip(ScriptURL.1)
+   Call DownloadFile('Downloading Emu68 Updater',URL,Emu68UpdaterScriptFolder||'/Emu68-Updater.rexx',3,0)
+   VersionNewScript = GetVersion(Emu68UpdaterScriptFolder||'/Emu68-Updater.rexx','FILE')
+   If EXISTS(DefaultScriptPath||'/Emu68-Updater.rexx') then VersionOldScriptPath = DefaultScriptPath||'/Emu68-Updater.rexx'
+   ELSE DO
+      If right(ScriptPath,1) = ':' | right(ScriptPath,1) = '/' then VersionOldScriptPath = ScriptPath||'Emu68-Updater.rexx'
+      else VersionOldScriptPath = ScriptPath||'/Emu68-Updater.rexx'
+   END
+   VersionOldScript = GetVersion(VersionOldScriptPath,'FILE')
+   If VersionOldScript ~= 'ERROR' then DO   
+      UpdateNeeded = CheckUpdateNeeded(VersionOldScript,VersionNewScript)
+      say 'Current version of script: 'VersionOldScript'. Version of script on server: 'VersionNewScript'.'
    END
    ELSE DO
-      Say "Attempting mount of "InputFAT32Device
-      'mount 'InputFAT32Device
-      IF RC>0 THEN Call CloseProgram("Error finding FAT32 drive!",10,3)
-      FAT32Device = InputFAT32Device
-   END
-END
-
-SAY ''
-Say 'Found FAT32 partition at device: 'FAT32Device 
-
-if ~Readfile(FAT32Device||'config.txt',ConfigtxtLines) then Call CloseProgram("Error accessing Config.txt!",10,3)
-
-PathsFound=0
-Emu68FilePath=""
-
-do i=1 to ConfigtxtLines.0
-   line = strip(ConfigtxtLines.i)
-   if left(upper(line),7)='KERNEL=' & right(upper(line),Emu68FileNameLength) = upper(Emu68FileName) then DO
-      PathsFound = PathsFound + 1
-      If Emu68FilePath ~= "" & upper(Emu68FilePath) ~= upper(substr(line,8)) then Call CloseProgram("Multiple different entries for 'Kernel=' lline in config.txt file!",10,3)
-      else do
-         if Emu68FilePath = "" then do
-            Emu68FilePath = substr(line,8)
-            if left(Emu68FilePath,1)='/' then Emu68FilePath =  substr(EMU68FilePath,2)
-         end
-      end
-   END
-end
-
-if Emu68FilePath="" then exit
-Emu68FilePath = FAT32Device||Emu68FilePath
-
-Emu68FolderLocation = left(Emu68FilePath,(Length(Emu68FilePath)-Emu68FileNameLength))
-
-if right(Emu68FolderLocation,1)~=':' & right(Emu68FolderLocation,1)~='/' then Emu68FolderLocation = Emu68FolderLocation||'/' 
-
-Say 'Found Emu68 files at:'Emu68FilePath
-
-BackupFolderPathEmu68 = Emu68FolderLocation||Emu68BackupFolderName
-
-Say ""
-Say "Obtaining list of Emu68 releases"
-
-Call DownloadFile('Trying download from Github for available Emu68 releases.',Emu68GithubPathJSONURL,Emu68json_path,3)
-
-Emu68TagValue = ProcessJSONFile(Emu68json_path)
-
-SAY  'Downloading latest Emu68-'PistormVariant' release...'
-
-Emu68FilesDownloadURL = Emu68GithubPathURL||'/download/'||Emu68TagValue||'/Emu68-'||PistormVariant||'.zip'
-DestinationEmu68Zip = 'T:Emu68Updater/Emu68-'||PistormVariant'.zip'
-
-Call DownloadFile('Trying download from Github for Emu68 files',Emu68FilesDownloadURL,DestinationEmu68Zip,3)
-
-call Unzip(DestinationEmu68Zip,Emu68TempFilesFolder) 
-
-SAY "Files unzipped"
-
-Say ""
-SAY "Starting Emu68 update process..."
-SAY ""
-
-FilePathNewversion = Emu68TempFilesFolder||'/Emu68-'PistormVariant
-
-'version 'Emu68FilePath' FILE >T:Emu68Updater/Emu68OldVersion.txt'
-'version 'FilePathNewversion' FILE >T:Emu68Updater/Emu68NewVersion.txt'
-
-if ~READFILE('T:Emu68Updater/Emu68OldVersion.txt',OldVersionEmu68Line) then Call CloseProgram("Error accessing version of Emu68!",10)
-if ~READFILE('T:Emu68Updater/Emu68NewVersion.txt',NewVersionEmu68Line) then Call CloseProgram("Error accessing version of Emu68!",10)
-
-OldEmu68Version = OldVersionEmu68Line.1
-NewEmu68Version = NewVersionEmu68Line.1
-
-SAY 'Version on your Amiga: 'OldEmu68Version
-SAY 'Version found online: 'NewEmu68Version
-
-if POS("EMU68 ",upper(OldEmu68Version)) >0 then Emu68BackupSuffix = SUBSTR(OldEmu68Version,7)
-else Emu68BackupSuffix = ""
-
-Emu68BackupFileName = Emu68FileName||Emu68BackupSuffix
- 
-Emu68UpdateNeeded = CheckUpdateNeeded(OldEmu68Version,NewEmu68Version)
-
-
-if Emu68UpdateNeeded="FALSE" then DO
-   SAY "Your version of Emu68 is already up to date. Nothing to do!"
-   SAY ""
-END   
-ELSE DO
-   say""
-   'echo "New 'NewEmu68Version' version found, do you want to update your"'
-   'echo "current 'OldEmu68Version' version? Y/N? " NOLINE'
-   Pull Response
-   if upper(Response)='Y' | upper(Response)='YES' then do
-      say ""
-      say 'Copying file from: 'Emu68FilePath' to: 'BackupFolderPathEmu68
-      if ~EXISTS(BackupFolderPathEmu68) then DO
-         vCmd = 'makedir "'BackupFolderPathEmu68'"'
-         /* say vCmd */ 
-         vCmd
-      END
-      Emu68BackupFullPath = BackupFolderPathEmu68||"/"||Emu68BackupFileName
-      vCmd = 'copyreplace "'Emu68FilePath'" TO "'Emu68BackupFullPath'" FORCE QUIET >NIL:'
-      /* say vCmd */
-      vCmd 
-      say 'Copying file from: 'FilePathNewversion' to: 'Emu68FilePath
-      vCmd = 'copyreplace "'FilePathNewversion'" TO "'Emu68FilePath'" FORCE QUIET >NIL:'
-      /* say vCmd */
+      vCmd = 'echo "Current version of Script cannot be found! Do you want to overwrite with server version ('VersionNewScript')? Y/N" NOLINE'
       vCmd
+      Pull Response
+      if upper(Response)='Y' | upper(Response)='YES' then UpdateNeeded = 'TRUE'
+      ELSE UpdateNeeded = 'FALSE'   
+   END   
+   if UpdateNeeded = 'TRUE' then DO
+      say 'Script needs updating! Please restart to complete update'
+      vCmd = 'copyreplace >NIL: FROM 'Emu68UpdaterScriptFolder'/Emu68-Updater.rexx TO 'ScriptPath' CLONE FOOVR QUIET'
+      If DEBUG = 'TRUE' then say vCmd
+      else vCmd
+      EXIT
+   END
+   ELSE SAY 'Script is up-to-date'
+end
+
+Say ''
+
+vCmd = 'SYS:C/EMU68INFO variant >'PiStormVariantPath 
+VCmd
+
+IF RC>0 then DO 
+   Say 'Identifying variant of PiStorm: You are not running PiStorm'
+   PistormVariant='None'
+   Flag_UpdateEmu68 = "FALSE"
+   Flag_UpdateVideoCore = "FALSE"
+END
+else DO
+   If ~READFILE(PiStormVariantPath,PiStormVariantLine) then Call CloseProgram("Error reading PiStorm variant",10,3) 
+   'delete 'PiStormVariantPath' QUIET >NIL:' 
+   PistormVariant = PiStormVariantLine.1
+   Emu68Version = GetEmu68Version()
+   say 'Identifying variant of PiStorm: Running 'PistormVariant' Emu68 Version: 'Emu68Version 
+
+   if Pos('1.1',Emu68Version) = 0 & (PistormVariant = 'pistorm' | PistormVariant = 'pistorm32lite') THEN DO 
+      Flag_UpdateEmu68 = "TRUE"
+      Flag_UpdateVideoCore = "TRUE"
    end
-   else do
-      say "No update to Emu68 made!"
-      say ""
-   end
+   Else DO
+      Say 'Cannot update Emu68 and Videocore with this version of Emu68'
+      Flag_UpdateEmu68 = "FALSE"
+      Flag_UpdateVideoCore = "FALSE"
+   END
 END
 
-Say "Section 1: Emu68 - Starting update processs for Emu68 - COMPLETE"
-Say ""
-
-Say "Section 2: Videocore - Starting update processs for Videocore"
-Say ""
-Say "Obtaining list of Emu68-tools releases"
-Call DownloadFile('Trying download from Github for available Emu68-Tools releases.',Emu68ToolsGithubPathJSONURL,Emu68Toolsjson_path,3)
-
-Emu68ToolsTagValue = ProcessJSONFile(Emu68Toolsjson_path)
-
-SAY  'Downloading latest Emu68-Tools release...'
-
-Emu68ToolsDownloadURL = Emu68ToolsGithubPathURL||'/download/'||Emu68ToolsTagValue||'/Emu68-Tools.zip'
-
-DestinationEmu68ToolsZip = 'T:Emu68Updater/Emu68-Tools.zip'
-
-Call DownloadFile('Trying download from Github for Emu68 files',Emu68ToolsDownloadURL,DestinationEmu68ToolsZip,3)
-
-call Unzip(DestinationEmu68ToolsZip,Emu68ToolsTempFilesFolder) 
-
-SAY "Files unzipped"
-Say ""
-SAY "Starting VideoCore update process..."
-SAY ""
-
-FilePathVideocoreOldversion = 'LIBS:Picasso96/VideoCore.card' 
-FilePathVideocoreNewversion = Emu68ToolsTempFilesFolder||'/VideoCore/VideoCore.card'
-
-'version 'FilePathVideocoreOldversion' FILE >T:Emu68Updater/VideocoreOldVersion.txt'
-'version 'FilePathVideocoreNewversion' FILE >T:Emu68Updater/VideoCoreNewVersion.txt'
-
-if ~READFILE('T:Emu68Updater/VideocoreOldVersion.txt',OldVersionVideocoreLine) then Call CloseProgram("Error accessing version of Videocore!",10)
-if ~READFILE('T:Emu68Updater/VideoCoreNewVersion.txt',NewVersionVideocoreLine) then Call CloseProgram("Error accessing version of Videcore!",10)
-
-OldVideocoreVersion = OldVersionVideocoreLine.1
-NewVideocoreVersion = NewVersionVideocoreLine.1
-
-SAY 'Version on your Amiga: 'OldVideocoreVersion
-SAY 'Version found online: 'NewVideocoreVersion
-Say ""
-VideocoreUpdateNeeded = CheckUpdateNeeded(OldVideocoreVersion,NewVideocoreVersion) 
-
-If VideocoreUpdateNeeded ="FALSE" then Do 
-   say "Your version of Videocore is up to date. Nothing to do!"
-   Call CloseProgram('Update process complete!',0,3)
-end
-
-BackupFolderPathVideocore = "Sys:Libs/Picasso96/"||VideoCoreBackupFolderName
-
-if POS("VIDEOCORE ",upper(OldVideocoreVersion)) >0 then VideocoreBackupSuffix = SUBSTR(OldVideocoreVersion,11)
-else VideocoreBackupSuffix = ""
-
-
-
-VideocoreBackupFileName = 'Videocore.card'||VideocoreBackupSuffix
-
-
-'echo "New 'NewVideocoreVersion' version found, do you want to update your"' 
-'echo "current 'OldVideocoreVersion' version? Y/N? " NOLINE'
-Pull Response
-if upper(Response)='Y' | upper(Response)='YES' then do
-   say ""
-   if ~EXISTS(BackupFolderPathVideocore) then DO
-      vCmd = 'makedir 'BackupFolderPathVideocore
-      vCmd 
+If Flag_UpdateEmu68 = "TRUE" then DO
+   DeviceListPath 'raw_dostype='TargetDostype' NOFORMATTABLE >'ListofEmu68DisksFile 
+   FAT32Device = ''
+   if READFILE(ListofEmu68DisksFile,ListofDisks) then DO
+      found_count = 0
+      DO i=1 to ListofDisks.0
+         parse var ListofDisks.i vDevice';'vRawDosType';'vDosType';'vDeviceName';'vUnit';'vVolume
+         found_count = found_count + 1
+         if found_count = 1 then FAT32Device = vDevice':'
+      END
+      SELECT
+         WHEN found_count = 1 then DO
+            Say 'Found FAT32 partition at device: 'FAT32Device 
+         END
+         WHEN found_count > 1 then DO
+            Say 'Error finding FAT32 partition. Not updating Emu68 or Videocore.card'
+            FAT32Device = 'ERROR'
+         END
+         OTHERWISE DO
+            Say "FAT32 device not mounted!"
+            If FAT32DevicetoMount=":" then DO 
+               Say 'No FAT32 Device defined in tooltype. Not updating Emu68 or Videocore.card'
+               FAT32Device = 'ERROR'
+            END
+            ELSE Do
+               Say "Attempting mount of "FAT32DevicetoMount
+               'mount 'FAT32DevicetoMount
+               IF RC>0 THEN DO 
+                  Say 'Unable to mount FAT32 Device as device not defined in tooltype. Not updating Emu68 or Videocore.card'
+                  FAT32Device = 'ERROR'
+               END
+               Else DO
+                  Say 'Mount successful'
+                  FAT32Device = FAT32DevicetoMount
+               END
+            END
+         END
+      END   
    END
-   say 'Copying file from: 'FilePathVideocoreOldversion' to: 'BackupFolderPathVideocore  
-   vCmd = 'copyreplace >NIL: "'FilePathVideocoreOldversion'" TO "'BackupFolderPathVideocore'/'VideocoreBackupFileName'" FORCE QUIET'
-   /* say vCmd */
-   vCmd
-   say 'Copying file from: 'FilePathVideocoreNewversion' to: 'FilePathVideocoreOldversion 
-   vCmd = 'copyreplace >NIL: "'FilePathVideocoreNewversion'" TO "'FilePathVideocoreOldversion'" FORCE QUIET'
-   /* say vCmd */
-   vCmd
-   say ""  
-end
+   IF FAT32Device = 'ERROR' | FAT32Device = '' then DO
+      Flag_UpdateEmu68 = "FALSE"
+      Flag_UpdateVideoCore = "FALSE"
+      Emu68FileName = ''
+   END
+   ELSE DO
+      Flag_UpdateVideoCore = "TRUE"
+      Emu68FileName = 'Emu68-'||PistormVariant
+      Emu68FileNameLength = Length(Emu68FileName)
+   END   
+END
+      
 
-SAY "Identifying Monitor .info file for Videocore"
-   
-if ~GETDIR('SYS:Devs/Monitors','~(#?.info)',ListofFiles,'FILES','PATH',) then Call CloseProgram("Error identifying monitor files",10)
-   
-VideocoreFilePath = ""
+If Flag_UpdateEmu68 = "TRUE" then DO
+   if Readfile(FAT32Device||'Config.txt',ConfigtxtLines) then Do 
+      PathsFound = 0
+      Emu68FilePath = ''
+      do i=1 to ConfigtxtLines.0
+         line = strip(ConfigtxtLines.i)
+         if left(upper(line),7)='KERNEL=' & right(upper(line),Emu68FileNameLength) = upper(Emu68FileName) then DO
+            If Emu68FilePath ~= substr(line,8) then DO
+               PathsFound = PathsFound + 1
+               If PathsFound > 1 then leave
+               Emu68FilePath = substr(line,8) 
+            END            
+         end
+      end      
+   end
+   Select
+     WHEN PathsFound = 0 then DO
+        Say 'No references to Emu68 found! Cannot update Emu68 or Videocore.'
+        Flag_UpdateEmu68 = "FALSE"
+        Flag_UpdateVideoCore = "FALSE"
+        Emu68FilePath = ''
+     END
+     WHEN PathsFound > 1 then DO
+        Say 'Multiple references to Emu68 found! Cannot update Emu68 or Videocore.'
+        Flag_UpdateEmu68 = "FALSE"
+        Flag_UpdateVideoCore = "FALSE"
+        Emu68FilePath = ''
+     END
+     Otherwise DO
+        if left(Emu68FilePath,1) = '/' then Emu68FilePath = substr(EMU68FilePath,2)
+        Say 'Found Emu68 files at:'FAT32Device||Emu68FilePath                     
+     END
+   END  
+end            
 
-FoundCount = 0
-do i = 1 to ListofFiles.0
-   If GetToolTypes(ListofFiles.i,VideocoreToolTypeLines) then DO
-      Do j =1 to VideocoreToolTypeLines.0
-         TooltipLine = upper(strip(VideocoreToolTypeLines.j))
-         if TooltipLine="BOARDTYPE=VIDEOCORE" then DO
-            FoundCount = FoundCount + 1
-            VideocoreFilePath = ListofFiles.i
-            say "Videocore found in: "ListofFiles.i".info"
-         END   
+/* Stage One - Perform Prerequisite Checks - Finish */
+
+/* Stage One - Retrieve List of Files for Update - Start */
+
+Call DownloadFile('Stage 1 - Retrieve List of Files for Update',UpdateSheetURL||UpdateSheetGID,UpdateFilePath,3,0)
+
+if ~Exists(UpdateFilePath) then call CloseProgram("Download Failed",10,3)
+
+KickstartVersionFound = GetVersion("","")
+Select 
+   When KickstartVersionFound = '47.115' then KickstartVersionFound = '3.2.3'
+   WHEN KickstartVersionFound = '47.111' then KickstartVersionFound = '3.2.2.1'
+   WHEN KickstartVersionFound = '47.96' then KickstartVersionFound = '3.2'
+   WHEN KickstartVersionFound = '40.68' then KickstartVersionFound = '3.1'
+   WHEN KickstartVersionFound > 40.99 & KickstartVersionFound < 47 then KickstartVersionFound = '3.9'
+   Otherwise KickstartVersionFound = "Unknown"
+END
+
+delimiter = d2c(9)
+ListofUpdateLinesCleansed.0 = "Unknown"
+Counter = 0
+
+If ReadFile(UpdateFilePath,UpdateLines) then Do
+   do i=2 to UpdateLines.0
+      If POS(';',UpdateLines.i) > 0 then do    
+         Parse var UpdateLines.i Keep(delimiter)Trash
+         Keep = strip(Keep)
+         Parse var Keep Trash1';'Trash2';'KickstartVersion';'
+         If Keep ~= '' & POS(KickstartVersionFound,KickstartVersion) > 0 then DO
+             Counter = Counter + 1
+             ListofUpdateLinesCleansed.Counter = Keep 
+         END
+      END  
+   END
+END
+
+ListofUpdateLinesCleansed.0 = Counter
+
+/* Say 'Found 'ListofUpdateLinesCleansed.0' lines to process' */
+
+
+/* Stage One - Retrieve List of Files for Update - Finish */
+
+/* Stage Two  - Download Files -START */
+
+
+Say 'Stage 2 - Downloading Files for Update and Uncompresssing'
+Say ''
+
+PackageNametoReport = ''
+
+Do i = 1 to ListofUpdateLinesCleansed.0
+   VersionFound = ''
+   Line = strip(ListofUpdateLinesCleansed.i) 
+   parse var line Sequence';'AmigaVersionCheck';'KickstartVersion';'PackageName';'AminetSearch';'Source';'GithubPage';'GithubName';'GithubRelease';'SourceLocation';'FileDownloadName';'FilestoInstall';'DrivetoInstall';'LocationtoInstall';'FilesToDelete';'BackupFolder';'SearchPathType';'SearchPathFile';'NewFileName
+   if AmigaVersionCheck ~= 'TRUE' then iterate
+   If PackageName ~= PackageNametoReport then DO
+      RevisedPath = ''
+      Say 'Processing Package: 'PackageName
+   end
+   PackageNametoReport = PackageName
+   if POS('EMU68 PISTORM',upper(PackageName)) > 0 then DO
+      If Flag_UpdateEmu68 = "TRUE" then DO
+        If upper(PackageName) = 'EMU68 PISTORM32LITE' & upper(PistormVariant) ~= 'PISTORM32LITE' then DO
+           say ''
+           iterate
+        end
+        If upper(PackageName) = 'EMU68 PISTORM' & upper(PistormVariant) ~= 'PISTORM' then DO
+           say ''
+           iterate
+           END
+      END
+      ELSE DO
+         Say 'Cannot update Emu68 as either you are not using PiStorm, the version is too recent (1.1), or the files could not be found'
+         Say ''
+         iterate
       END
    END
-end 
-         
-Select
-   WHEN FoundCount = 0 THEN DO
-      SAY "Could not find monitor file for Videocore! Cannot check tooltypes!"
-      UpdateToolType = "FALSE"
+   if POS('VIDEOCORE',upper(PackageName)) > 0 & Flag_UpdateVideocore = "FALSE"  then do
+      say 'Cannot update Videocore as either you are not using PiStorm or the version is too recent (1.1)'
+      say ''
+      iterate
+   end
+   FilesToInstall = Translate(FilestoInstall,'/','\')
+   LocationtoInstall = Translate(LocationtoInstall,'/','\')     
+   Select 
+      WHEN upper(DrivetoInstall) = 'EMU68BOOT' then DO
+         DrivetoInstall = FAT32Device
+         If LastPos('/',Emu68FilePath) > 0 then LocationtoInstall = left(Emu68FilePath,(LastPos('/',Emu68FilePath)-1))
+         Else LocationtoInstall = ''
+      END
+      WHEN upper(DrivetoInstall) = 'SYSTEM' then DrivetoInstall = 'SYS:'
+      Otherwise DrivetoInstall = DrivetoInstall||':'
    END
-   WHEN FoundCount = 1 THEN DO
-      UpdateToolType = "TRUE"        
+   if NewFileName~='' then FileName = NewFileName   
+   ELSE DO    
+      FileNameStartPoint = LastPos('/',FilestoInstall)
+      If FileNameStartPoint > 1 then FileName = substr(FilestoInstall,FileNameStartPoint+1)
+      Else FileName = FilestoInstall          
    END
-   WHEN FoundCount > 1 THEN DO
-      Say "More than one monitor file found for Videocore! Cannot check tooltypes!"
-      UpdateToolType = "FALSE"
-   END
-   Otherwise NOP
-END
-
-say ""
-
-If UpdateToolType = "TRUE" then DO
-   SAY "Checking .info file to determine if Tooltype set"
-   If ~GetToolTypes(VideocoreFilePath,VideocoreToolTypeLines) then Call CloseProgram('Could not open Videocore.card',10,3)
-   LegacyIDFound="FALSE" 
-   do i=1 to VideocoreToolTypeLines.0
-      if POS('VC4_LEGACY_ID',VideocoreToolTypeLines.i)>0 then Do
-         LegacyIDFound="TRUE"
-         Leave
+   If LocationtoInstall ~='' then ExistingFiletoCheckPath = DrivetoInstall||LocationtoInstall||'/'||FileName
+   Else ExistingFiletoCheckPath = DrivetoInstall||FileName
+   If ~Exists(ExistingFiletoCheckPath) then do
+      If SearchPathFile ~='' then do 
+         SELECT
+            WHEN upper(SearchPathType)='PROGRAMS' & ProgramsSearchFolder ~= '' then RevisedPath = FindFile(ProgramsSearchFolder,SearchPathFile)
+            WHEN upper(SearchPathType)='PISTORM' & PistormSearchFolder ~= '' then RevisedPath = FindFile(PistormSearchFolder,SearchPathFile)
+            Otherwise RevisedPath = 'ERROR'
+         END
+         If RevisedPath ~= 'ERROR' then DO
+            SAY 'Could not find default install location. Default path: "'ExistingFiletoCheckPath'" replaced with "'RevisedPath||'/'||FileName'"' 
+            ExistingFiletoCheckPath = RevisedPath||'/'||FileName             
+         END      
       end
+   END   
+   ListofUpdateLinesCleansed.i = ListofUpdateLinesCleansed.i||';'||RevisedPath
+   /* Say 'DEBUG - Line Number: 'Sequence' ExistingFilePath: 'ExistingFiletoCheckPath */
+   If ~Exists(ExistingFiletoCheckPath) then DO
+      say 'Cannot update "'PackageName'" as not installed (or not installed in expected location)!'
+      say ''
+      iterate
+   END
+   VersionFound = GetVersion(ExistingFiletoCheckPath,'FILE')
+   vCmd = 'echo "'FilestoInstall||';'||VersionFound'" >"'VersionDataFolder'/'PackageName'"'
+   vCmd       
+   DownloadLocation = DownloadFolder"/"FileDownloadName
+   Say 'Found 'Filename' version 'VersionFound
+   if Exists(DownloadLocation) then DO
+      say FileDownloadName' already downloaded'
+      say ''
    end
-   if LegacyIDFound="TRUE" then SAY "VC4_LEGACY_ID tooltype already set"
-   else do
-      say ""
-      'echo "VC4_LEGACY_ID tooltype not found! If you are using the shareware version"'
-      'echo "of P96 (version 2.x) you will need to add this."'
-      'echo "Do you want to update the Tooltype Y/N? " NOLINE'
-      PULL Response
-      if upper(Response)='Y' | upper(Response)='YES' then do
-         say ""
-         SAY "Adding VC4_LEGACY_ID tooltype to Videocore.card"
-         If ~SETTOOLTYPEVALUE(VideocoreFilePath,'VC4_LEGACY_ID','') then Call CloseProgram('Could not open Videocore.card',10,3)
+   ELSE DO
+      Select
+         WHEN Source="Web" then DO        
+            Message = 'DLing 'FileDownloadName
+            Call DownloadFile(Message,SourceLocation,DownloadLocation,3,1)
+         END
+         When Source="Web - SearchforPackageAminet" then DO
+            AminetDLLocation = GetLatestAminetURL(AminetSearch)
+            if AminetDLLocation ~="ERROR" then do
+               Message = 'DLing 'FileDownloadName
+               Call DownloadFile(Message,AminetDLLocation,DownloadLocation,3,1) 
+            end
+         end   
+         When Source="Github" then DO
+            GithubFilesDownloadURL =''
+            GithubPathJSONURL = SourceLocation
+            GithubPathURL = GitHubPage
+            JsonDownloadPath = TempFolder||'/'||PackageName||'.json'
+            Call DownloadFile('Looking for release information from Github for '||PackageName,SourceLocation,JsonDownloadPath,3,0)
+            TagValue = ProcessJSONFile(JsonDownloadPath)
+            if right(GithubName,1)='.' then GithubName = left(GithubName,(length(GithubName)-1))
+            GithubFilesDownloadURL = GitHubPage||'/download/'||TagValue||'/'||GithubName||'.zip'
+            Message = 'DLing 'FileDownloadName
+            Call DownloadFile(Message,GithubFilesDownloadURL,DownloadLocation,3,1) 
+         END
+         Otherwise nop                        
       END
+   END
+END
+
+say ''
+say "Completed Downloads!"
+say ''
+Say 'Uncompressing Downloaded Files'
+say ''
+if Getdir(DownloadFolder||'/','(#?.lha|#?.zip)','ListofFiles','FILES','PATH','SUBDIRS') then DO
+   do i = 1 to ListofFiles.0
+      Parse Var ListofFiles.i SubFolder'.'
+      SubFolder = substr(SubFolder,(lastpos('/',SubFolder)+1))
+      if ~IsFolder(ExtractedFilesFolder||'/'||SubFolder) then do 
+         say 'Extracting file 'ListofFiles.i
+         If upper(Right(ListofFiles.i,4))=".LHA" then call Unlha(ListofFiles.i,ExtractedFilesFolder||'/'||SubFolder||'/')
+         If upper(Right(ListofFiles.i,4))=".ZIP" then call Unzip(ListofFiles.i,ExtractedFilesFolder||'/'||SubFolder)
+      END
+      Else Say ListofFiles.i' already extracted'
    end
-END   
+END
 
+/* Stage Two  - Download Files - Finish */
 
-Call CloseProgram('Update process complete!',0,3)
-   
+/* Stage Three - Perform Updates - Start */
+
+Say ''
+Say 'Stage 3 - Peforming Updates where needed'
+Say ''
+
+PackageNametoReport = ''
+PackageNeedsUpdating = ''
+
+Do i = 1 to ListofUpdateLinesCleansed.0
+   PathtoCurrentVersion = ''
+   Line = strip(ListofUpdateLinesCleansed.i) 
+   parse var line Sequence';'AmigaVersionCheck';'KickstartVersion';'PackageName';'AminetSearch';'Source';'GithubPage';'GithubName';'GithubRelease';'SourceLocation';'FileDownloadName';'FilestoInstall';'DrivetoInstall';'LocationtoInstall';'FilesToDelete';'BackupFolder';'SearchPathType';'SearchPathFile';'NewFileName';'RevisedPath
+   if PackageName = '' then iterate
+   PathtoCurrentVersion = VersionDataFolder'/'PackageName 
+   If PackageName ~= PackageNametoReport then DO
+      PathtoFutureVersion = ''
+      PackageNeedsUpdating = ''      
+      Say ''
+      If Exists(PathtoCurrentVersion) then Do
+         Say 'Processing Package: 'PackageName
+         if READFILE(PathtoCurrentVersion,'FilePathandVersion') then do
+            parse Var FilePathandVersion.1 FilePathtoExtractedFile';'CurrentVersion
+            If Pos('#?',FilePathtoExtractedFile) > 0 then do
+               parse Var FileDownloadName NameofFile'.'                 
+               ExtensiontoUse = upper(substr(FilePathtoExtractedFile,(LastPos('.',FilePathtoExtractedFile)+1)))
+               PathtoFutureVersion = FindFilewithWildCard(FilePathtoExtractedFile,(ExtractedFilesFolder||'/'NameofFile),ExtensiontoUse)
+               say PathtoFutureVersion
+            end
+            else Do
+               If upper(right(FileDownloadName,4)) ~= ".LHA" & upper(right(FileDownloadName,4)) ~= ".ZIP" then PathtoFutureVersion = DownloadFolder||'/'FilePathtoExtractedFile
+               ELSE DO            
+                  parse Var FileDownloadName NameofFile'.'                        
+                  PathtoFutureVersion =  ExtractedFilesFolder||'/'NameofFile||'/'||FilePathtoExtractedFile
+               END            
+            END
+            DownloadedFileVersion = GetVersion(PathtoFutureVersion,'FILE')
+            If DownloadedFileVersion = 'ERROR' then DO
+               say 'Error identifying version of downloaded file! Skipping!' 
+               iterate
+            END        
+            If CurrentVersion = 'ERROR' & DownloadedFileVersion ~= 'ERROR' then DO          
+               vCmd = 'echo "Current version cannot be found! Do you want to overwrite with server version ('DownloadedFileVersion')? Y/N" NOLINE'
+               vCmd
+               Pull Response
+               if upper(Response)='Y' | upper(Response)='YES' then PackageNeedsUpdating = 'TRUE'
+               ELSE PackageNeedsUpdating  = 'FALSE'   
+            END
+            If PackageNeedsUpdating = '' & DownloadedFileVersion ~= 'ERROR' then DO
+               PackageNeedsUpdating = CheckUpdateNeeded(CurrentVersion,DownloadedFileVersion,'FILE')
+               If PackageNeedsUpdating = "FALSE" then say 'Current version is: 'CurrentVersion'. New version is: 'DownloadedFileVersion'. Nothing to do!'
+               Else DO
+                  say 'Current version is: 'CurrentVersion'. New version is: 'DownloadedFileVersion'. Current installed package is out-of-date.' 
+                  If AskResponse() then say 'Performing update of 'PackageName
+                  ELSE DO
+                     say 'Not updating 'PackageName
+                     PackageNeedsUpdating = 'FALSE'
+                  END
+               END
+            END
+         END
+      End
+      Else say 'Not updating 'PackageName
+   end
+   /* Say Sequence */
+   PackageNametoReport = PackageName
+   /* Comment out below line for testing */
+   If PackageNeedsUpdating = '' | PackageNeedsUpdating = "FALSE" then iterate
+   FilesToInstall = Translate(FilestoInstall,'/','\')
+   LocationtoInstall = Translate(LocationtoInstall,'/','\')  
+   Select 
+      WHEN upper(DrivetoInstall) = 'SYSTEM' then DrivetoInstall = 'SYS:'
+      WHEN upper(DrivetoInstall) = 'EMU68BOOT' then DrivetoInstall = FAT32Device
+      OTHERWISE DrivetoInstall = DrivetoInstall||':'
+   END
+   if NewFileName ~= '' then FileName = NewFileName 
+   ELSE FileName = '' 
+   DO
+      FileNameStartPoint = LastPos('/',FilestoInstall)
+      If FileNameStartPoint > 1 then FileName = substr(FilestoInstall,FileNameStartPoint+1)
+      Else FileName = FilestoInstall
+   END
+   If RevisedPath ~= '' then DO
+      Say 'Not installed in default location. Revising path to:' RevisedPath
+      Select
+         WHEN upper(SearchPathType)='PISTORM' then LocationtoInstall = RevisedPath
+         WHEN upper(SearchPathType)='PROGRAMS' then LocationtoInstall = RevisedPath
+         Otherwise nop
+      END 
+   END  
+   If DrivetoInstall = FAT32Device then InstallPath = FAT32Device||Emu68FilePath                     
+   ELSE DO             
+      If LocationtoInstall ~='' then InstallPath = DrivetoInstall||LocationtoInstall||'/'
+      Else InstallPath = DrivetoInstall
+      If NewFileName ~= '' then InstallPath = InstallPath||NewFileName
+   END
+   If upper(right(FileDownloadName,4)) ~= ".LHA" & upper(right(FileDownloadName,4)) ~= ".ZIP" then FullPathFilestoInstall = DownloadFolder||'/'FilestoInstall
+   ELSE FullPathFilestoInstall = ExtractedFilesFolder||'/'NameofFile||'/'FilestoInstall
+   If BackupFolder ~= '' then DO
+      If LocationtoInstall = '' then BackupFolderPath = DrivetoInstall||BackupFolder
+      ELSE BackupFolderPath = DrivetoInstall||LocationtoInstall||'/'||BackupFolder
+      If DrivetoInstall = FAT32Device then FiletoBackup = InstallPath
+      ELSE FiletoBackup = InstallPath||FileName 
+      Say 'Backing up file: "'FiletoBackup'" to Backup folder: "'BackupFolderPath'"'
+      vCmd = 'c:copyreplace >NIL: FROM "'FiletoBackup'" TO "'BackupFolderPath'/'FileName||CurrentVersion'" CLONE FOOVR QUIET'
+      If DEBUG = 'TRUE' then say vCmd
+      else vCmd
+   END
+   If FilesToDelete ~= '' then DO
+      vCmd = 'c:delete >NIL: 'InstallPath||FilesToDelete' FORCE QUIET'
+      If DEBUG = 'TRUE' then say vCmd
+      else vCmd
+   END
+   vCmd = 'c:copyreplace >NIL: FROM "'FullPathFilestoInstall'" TO "'InstallPath'" CLONE FOOVR QUIET'
+   If DEBUG = 'TRUE' then say vCmd
+   else vCmd 
+end
+
+/* Stage Three - Perform Updates - Finish */
+
+Say 'Updates Completed! Deleting Temporary Files'
+vCmd = 'c:delete >NIL: "'TempFolder'" ALL QUIET' 
+If DEBUG = 'TRUE' then say vCmd
+else vCmd
+Say 'This window will close in 3 seconds'
+'wait 3'
 
 EXIT
-/* ================= FUNCTIONS ================= */
 
+/* ================= FUNCTIONS ================= */
+CreateFolder:
+   parse arg FoldertoCreatePath
+   FullPathtoCreate = ''
+   DO WHILE FoldertoCreatePath ~= ''
+      PARSE VAR FoldertoCreatePath segment '/' FoldertoCreatePath
+      IF FullPathtoCreate = '' then FullPathtoCreate = segment
+      ELSE FullPathtoCreate = FullPathtoCreate||'/'||segment
+      If ~EXISTS(FullPathtoCreate) then DO      
+         vCmd = 'c:makedir "'FullPathtoCreate'"'
+         vCmd
+      END  
+   END
+   return
+AskResponse:
+   vCmd = 'echo "New version found! Do you want to update your current version? Y/N " NOLINE'
+   vCmd
+   Pull Response
+   if upper(Response)='Y' | upper(Response)='YES' then Return 1
+   ELSE Return 0
+FindFilewithWildCard:
+   Parse Arg SearchTerm,PathtoSearch,FileExtensiontoSearch
+   FoundPath = 'Not Found'
+   Wildcard = '#?'
+   TempFile = TempFolder||'/SearchFile.txt' 
+   PositionofWildCard = POS(Wildcard,SearchTerm)
+   FirstPart = left(SearchTerm,(PositionofWildCard-1))
+   SecondPart = substr(SearchTerm,(PositionofWildCard+Length(Wildcard)))
+   vCmd = 'llist DIR='PathtoSearch'  pat="#?.'FileExtensiontoSearch'" ALL FILES LFORMAT="%p%m" >'TempFile
+   VCmd
+   If ReadFile(TempFile,ListofFiles) then Do
+      do tempi=1 to ListofFiles.0
+      if POS(FirstPart,ListofFiles.tempi) > 0 & POS(SecondPart,ListofFiles.tempi) > 0 then DO
+         FoundPath = ListofFiles.tempi
+         leave
+      END
+   end
+   Return FoundPath
+IsFolder:
+   Parse ARG TempPath
+   TempFile = TempFolder||'/SearchFolder.txt'
+   vCmd = 'c:llist "'TempPath'" LFORMAT="" >'TempFile
+   vCmd
+   If ReadFile(TempFile,FoundFolders) then Do
+      if POS('object not found',FoundFolders.1)>0 then RETURN 0
+      Else Return 1 
+   END 
+FindFile:
+   Parse ARG TempPath,SearchTerm 
+   TempFile = TempFolder||'/SearchFile.txt' 
+   vCmd = 'c:llist "'TempPath'" p=#?'SearchTerm' ALL FILES LFORMAT="%p;%n" >'TempFile
+   vCmd
+   If ReadFile(TempFile,FoundFiles) then Do
+      Counter = 0
+      do tempi=1 to FoundFiles.0
+         if POS(';',FoundFiles.tempi) = 0 then iterate
+         Divider = pos(";",FoundFiles.tempi)
+         FileNameFound = Substr(FoundFiles.tempi,Divider+1)
+         If upper(FileNameFound) = upper(SearchTerm) then do
+            Counter = Counter + 1
+            If Counter > 1 then Do
+               Say "Multiple copies of program found!"
+               leave 
+            END
+            PathtoReturn = left(FoundFiles.tempi,Divider-1)
+            if right(PathtoReturn,1) = '/' then PathtoReturn = left(PathtoReturn,(length(PathtoReturn)-1))
+         end
+      End
+   End
+   If Counter = 1 then Return PathtoReturn
+   ELSE Return 'ERROR'
+GetLatestAminetURL:
+   Parse ARG AminetURL
+   TempFile = TempFolder'/AminetReleaseData.txt'
+   call DownloadFile('DLing latest Release from Aminet',AminetURL,TempFile,3,0)
+   download_url = ""
+   if READFILE(TempFile,SearchResultData) then do
+      tempj = 0
+      tempi = 0
+      do tempi=1 to SearchResultData.0   
+         IF POS('pkg_row',SearchResultData.tempi) > 0 THEN DO
+            tempj = tempi+2
+            IF POS('<a href="', SearchResultData.tempj) > 0 THEN DO
+               PARSE VAR SearchResultData.tempj '<a href="' download_url '"' .
+               LEAVE
+            END    
+         END 
+      END
+   END
+   IF download_url ~= "" THEN Return "https://aminet.net"download_url
+   ELSE RETURN "ERROR"
+GetEmu68Version:
+   TempFile = TempFolder||'/VersionCheck.txt'
+   vCmd = 'c:emu68info idstring >'TempFile
+   VCmd
+   Version = ''
+   if ~READFILE(Tempfile,VersionData) then call CloseProgram("Error Reading version information",10,3)
+   parse VAR VersionData.1 'Emu68 'Version' '
+   return Version
+GetVersion:
+   Vcmd = ''
+   parse ARG path,FileSwitch
+   TempFile = TempFolder||'/VersionCheck.txt'
+   Version = ''
+   SELECT
+      WHEN FileSwitch = "FILE" & path ~="" then vCmd = 'version >'TempFile' "'path'" FILE'
+      WHEN path ="" & FileSwitch = "" then vCmd = 'version >'TempFile
+      OTHERWISE vCmd = 'version >'TempFile' "'path'"'
+   end   
+   vCmd
+   If RC > 0 then DO
+      Version = 'ERROR'
+      return Version
+   END
+   if ~READFILE(Tempfile,VersionData) then call CloseProgram("Error Reading version information",10,3)
+   If path = '' then do
+      parse VAR VersionData.1 LibraryName Version
+      Parse Var Version VersionToReturn","
+      Version = Strip(VersionToReturn)
+   end
+   else do
+      if left(VersionData.1,6) = '$VER: ' then VersionData.1 = substr(VersionData.1,7)
+      Parse Var VersionData.1 ProgramName' 'VersiontoCleanse
+      Parse Var VersiontoCleanse Version' '
+      Version = Strip(Version)
+    end
+   return Version
+IsAmiSSL:
+   if (GetVersion('amisslmaster.library','') > 4) THEN RETURN 1 
+   ELSE RETURN 0
+   Return  
 CloseProgram:
-   Parse ARG Message, ExitNumber, TimetoClose
+   Parse ARG CloseProgramMessage, ExitNumber, TimetoClose
    Say ""
-   Say Message
+   Say CloseProgramMessage
    'delete >NIL: t:Emu68Updater ALL QUIET'
    Say 'This window will close in 'TimetoClose' seconds'
    'wait sec='TimetoClose 
-   Exit ExitNumber
-   Return
+   Exit
+   Return   
 DownloadFile:
-   Parse ARG Message,URL,DLLocation,NumberAttempts
+   Parse ARG TempMessage,URL,DLLocation,NumberAttempts,EnableProgressBar
    Attempt = 1
-   Say Message
-   /*
+   If TempMessage = '' then TempMessage = 'Downloading'
+   if EnableProgressBar = 1 then DO  
+      'setenv InProgressBar 'TempMessage
+      'run >T:Progressbar.txt rx S:ProgressBar.rexx'
+   END
+   ELSE Say TempMessage
    Do until IsDLed="TRUE"
-      Say 'Attempt number: 'Attempt 
-      'c:aget 'URL'  TO 'DLLocation' >NIL:'
+      If Attempt > 1 then Say 'Download Failed! Trying Again. Attempt number: 'Attempt 
+      vCmd = 'c:aget "'URL'" TO "'DLLocation'" >NIL:'
+      VCmd
       if RC = 0 then IsDLed="TRUE"
       ELSE Attempt = Attempt +1
       IF Attempt > NumberAttempts then DO
-         SAY "It seems the system is currently unable to connect to Github, please try again later."
-         SAY "This window will close in 3 seconds."
-         'Wait sec=3'
-         EXIT 10
+         if EnableProgressBar = 1 then DO
+            'setenv InProgressBar ERROR'
+            'delete T:Progressbar.txt >NIL: QUIET'
+         END
+         ELSE DO
+            say "Unable to download file!"
+            Say ""
+         END
       END
    END
-   */
-   Say "Download Successful!"
-   Say ""
-   RETURN
+   IF EnableProgressBar = 1 then DO
+      'setenv InProgressBar COMPLETE'
+      'delete T:Progressbar.txt >NIL: QUIET'
+      'wait 1'
+   END
+   ELSE DO
+      Say "Download Successful!"
+      Say ""
+   END
+   Return
 Unzip:
     Parse ARG SourcePath, DestinationPath
-    'c:unzip -o 'SourcePath' -d 'DestinationPath' >NIL:'
+    vCmd = 'c:unzip -o "'SourcePath'" -d "'DestinationPath'" >NIL:'
+    vCmd
     RETURN   
-    
+Unlha:
+   Parse ARG SourcePath, DestinationPath
+   vCmd = 'c:lha -aexrm x "'SourcePath'" "'DestinationPath'" >NIL:' 
+   VCmd
+   Return  
 ProcessJsonFile:
    Parse arg  PathtoJsonFile
    IF ~OPEN(inputfile, PathtoJsonFile, 'R') THEN Call CloseProgram('Could not open Emu68 file details',10,3)
@@ -423,17 +811,20 @@ ProcessJsonFile:
       END
    END
    CALL CLOSE(inputfile)
-   IF tag_value = "" THEN CALL CloseProgram('Could not find a valid release (draft:false, prerelease:false) in the file.',3,10)
+   IF tag_value = "" THEN CALL CloseProgram('Could not find a valid release (draft:false, prerelease:false) in the file.',3,3)
    ELSE Return tag_value  
 CheckUpdateNeeded:
-   parse ARG OldVersion,NewVersion
-   parse var OldVersion vFieldThowAwayOLD OV_Major'.'OV_Minor'.'OV_Patch'.'OV_Build
-   parse var NewVersion vFieldThrowAwayNEW NV_Major'.'NV_Minor'.'NV_Patch'.'NV_Build
+   parse arg OldVersion,NewVersion
+  
+   parse var OldVersion vFieldThowAway OV_Major'.'OV_Minor'.'OV_Patch'.'OV_Build
+   parse var NewVersion vFieldThrowAway NV_Major'.'NV_Minor'.'NV_Patch'.'NV_Build
 
    if OV_Major = "" then OV_Major = 0; if NV_Major = "" then NV_Major = 0
    if OV_Minor = "" then OV_Minor = 0; if NV_Minor = "" then NV_Minor = 0
    if OV_Patch = "" then OV_Patch = 0; if NV_Patch = "" then NV_Patch = 0
    if OV_Build = "" then OV_Build = 0; if NV_Build = "" then NV_Build = 0
+
+   If upper(left(OV_Major,1)) = 'V' then OV_Major = substr(OV_Major,2)
 
    UpdateNeeded="FALSE"
 
@@ -450,4 +841,4 @@ CheckUpdateNeeded:
          end
       end
    END
-   RETURN UpdateNeeded
+   RETURN UpdateNeeded      
