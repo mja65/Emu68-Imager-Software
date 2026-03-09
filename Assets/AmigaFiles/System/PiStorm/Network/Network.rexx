@@ -45,9 +45,7 @@ END
 
 SAY ""
 SAY "**********************************************"
-SAY ""
 SAY "Running Network script for action: "action
-SAY ""
 SAY "**********************************************"
 
 /* Check IPStack */
