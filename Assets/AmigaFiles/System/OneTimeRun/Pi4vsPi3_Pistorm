@@ -5,6 +5,7 @@ IF $RpiType EQ "RPi4"
       delete Sys:Tools/HDToolbox.info QUIET
    ENDIF
    IF $KickstartVersion EQ 3.9
+      Delete Sys:Devs/DOSDrivers/SD0Pi3 QUIET
       Skip END
    ENDIF
    rename from Sys:Tools/HDToolboxPi4.info to Sys:Tools/HDToolbox.info QUIET
@@ -18,6 +19,7 @@ IF $RpiType EQ "RPi3"
       delete Sys:Tools/HDToolbox.info QUIET
    ENDIF
    IF $KickstartVersion EQ 3.9
+      Delete Sys:Tools/HDToolboxPi4.info QUIET
       Skip END
    ENDIF
    rename from Sys:Tools/HDToolboxPi3.info to Sys:Tools/HDToolbox.info QUIET
