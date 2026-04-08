@@ -1,4 +1,4 @@
-/* $VER: Emu68Updater.rexx 1.1 (10.03.26)                                     */
+/* $VER: Emu68Updater.rexx 1.1.1 (09.04.26)                                   */
 /* Script to update Emu68 and Videocore files                                 */
 /*                                                                            */
 /******************************************************************************/
@@ -33,6 +33,10 @@ DebugScriptPath = 'Work:'
 DebugFat32Device = 'SD0:'
 DebugPistormSearchFolder = 'SYS:'
 DebugProgramsSearchFolder = 'Work:Applications'
+If DebugScriptPath ~= '' then ScriptPath = DebugScriptPath
+If DebugFat32Device ~= '' then FAT32DeviceToMount = DebugFat32Device
+If DebugPistormSearchFolder ~= '' then PistormSearchFolder = DebugPistormSearchFolder
+If DebugProgramsSearchFolder ~= '' then ProgramsSearchFolder = DebugProgramsSearchFolder
 */
 
 ADDRESS COMMAND
@@ -43,11 +47,6 @@ ScriptPath = ''
 Fat32DeviceToMount = ''
 PistormSearchFolder = ''
 ProgramsSearchFolder = ''
-
-If DebugScriptPath ~= '' then ScriptPath = DebugScriptPath
-If DebugFat32Device ~= '' then FAT32DeviceToMount = DebugFat32Device
-If DebugPistormSearchFolder ~= '' then PistormSearchFolder = DebugPistormSearchFolder
-If DebugProgramsSearchFolder ~= '' then ProgramsSearchFolder = DebugProgramsSearchFolder
 
 If InputScriptPath ~= '' then ScriptPath = InputScriptPath
 If InputFat32Device ~= '' then FAT32DeviceToMount = InputFat32Device
@@ -164,8 +163,9 @@ If ReadFile(ScriptUpdateFilePath,ScriptURL) then do
       ELSE UpdateNeeded = 'FALSE'   
    END   
    if UpdateNeeded = 'TRUE' then DO
-      say 'Script needs updating! Please restart to complete update'
-      vCmd = 'copyreplace >NIL: FROM 'Emu68UpdaterScriptFolder'/Emu68-Updater.rexx TO 'ScriptPath' CLONE FOOVR QUIET'
+      say 'Script needs updating! Please restart Emu68 Updater to complete the update'
+      If Exists(DefaultScriptPath||'/Emu68-Updater.rexx') then vCmd = 'copyreplace >NIL: FROM 'Emu68UpdaterScriptFolder'/Emu68-Updater.rexx TO 'DefaultScriptPath' CLONE FOOVR QUIET'
+      ELSE vCmd = 'copyreplace >NIL: FROM 'Emu68UpdaterScriptFolder'/Emu68-Updater.rexx TO 'ScriptPath' CLONE FOOVR QUIET'
       If DEBUG = 'TRUE' then say vCmd
       else vCmd
       EXIT
@@ -700,6 +700,7 @@ GetEmu68Version:
    return Version
 GetVersion:
    Vcmd = ''
+   QuoteMark = d2c(34)
    parse ARG path,FileSwitch
    TempFile = TempFolder||'/VersionCheck.txt'
    Version = ''
@@ -721,8 +722,15 @@ GetVersion:
    end
    else do
       if left(VersionData.1,6) = '$VER: ' then VersionData.1 = substr(VersionData.1,7)
-      Parse Var VersionData.1 ProgramName' 'VersiontoCleanse
-      Parse Var VersiontoCleanse Version' '
+      /* Exception for Hippoplayer */
+      If Pos('(',VersionData.1) > 0 & Pos(')',VersionData.1) > 0 then DO
+         Parse Var VersionData.1 ProgramName' 'VersiontoCleanse
+         Parse Var VersiontoCleanse Version' '
+      END
+      ELSE DO    
+         VersionDelimitPosition = (Lastpos(' ',VersionData.1))+1
+         Version = substr(VersionData.1,VersionDelimitPosition)
+      END
       Version = Strip(Version)
     end
    return Version
