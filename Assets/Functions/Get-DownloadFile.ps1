@@ -9,9 +9,17 @@ function Get-DownloadFile {
 #    $DownloadURL = "https://mja65.github.io/Emu68-Imager/InstructionsEmu68ImagerV1.html"
 #    $DownloadURL = "http://www.ibrowse-dev.net/resources/IBrowse3.0a-OS31.lha"
 #    $OutputLocation = 'E:\PiStorm\Docs\Test.html'
-   
+
+    $uri = [System.Uri]$DownloadURL
+    
     $client = [System.Net.Http.HttpClient]::new()
-    $client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerShellHttpClient")
+            
+    if (($uri.Host -eq 'ftp2.grandis.nu') -or ($uri.Host -eq 'ftp2.grandis.nu')){
+        $client.DefaultRequestHeaders.UserAgent.ParseAdd("AmigaHttpClient")    
+    }
+    else {
+        $client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerShellHttpClient")
+    }
     
     $attempt = 1
     $success = $false
