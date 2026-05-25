@@ -12,11 +12,24 @@ function Find-WHDLoadWrapperURL {
         # $SearchCriteria = "WHDLoadWrapper"
         # $ResultLimit =  "10" 
 
+        $headers = @{
+            "User-Agent" = "AmigaHttpClient"
+        }
+
+        Write-InformationMessage -Message "Looking for latest version of WHDLoadWrapper"
+
         do {
             try {
                 #$SearchResults = Invoke-WebRequest "http://ftp2.grandis.nu/turransearch/search.php?_search_=1&search=$SearchCriteria&category_id=Misc&exclude=&limit=$ResultLimit&httplinks=on&username=ftp%2Cany&filesonly=on" -UseBasicParsing                     
-                $SearchResults = Invoke-WebRequest "http://ftp2.grandis.nu/turransearch/search.php?_search_=1&search=$SearchCriteria&category_id=&exclude=&limit=$ResultLimit&httplinks=on&username=ftp%2Cany&filesonly=on" -UseBasicParsing 
-                $IsSuccess = $true  
+                $SearchResults = Invoke-WebRequest "http://ftp2.grandis.nu/turransearch/search.php?_search_=1&search=$SearchCriteria&category_id=&exclude=&limit=$ResultLimit&httplinks=on&username=ftp%2Cany&filesonly=on" -UseBasicParsing -TimeoutSec 10 -Headers $headers
+                if ($SearchResults){
+                    $IsSuccess = $true  
+                }
+                else {
+                    Write-InformationMessage -message 'Site timed out!'
+                    $IsSuccess = $false
+                    return
+                }
             }
             catch {
                 Write-InformationMessage -message 'Download failed! Retrying in 3 seconds'
