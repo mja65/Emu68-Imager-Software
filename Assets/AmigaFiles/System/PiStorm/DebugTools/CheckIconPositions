@@ -1,9 +1,0 @@
-ECHO "Running CheckIconPositions"
-ECHO "This will generate a text file with the Icon Positions of all the files on your Amiga"
-DELETE >NIL: T:RunIconPositions
-ECHO "Generating script to run"
-LIST ALL FILES >>T:RunIconPositions SYS: PAT=(#?.info) LFORMAT="C:iconpos *"%p%n*" >>*"RAM:IconPositions.txt*"" 
-DELETE >NIL: RAM:IconPositions.txt
-ECHO "Generating all Icon Positions and creating file at RAM:IconPositions.txt. This may take some time."
-EXECUTE t:RunIconPositions
-ECHO "Completed!"

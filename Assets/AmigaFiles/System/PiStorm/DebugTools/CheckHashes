@@ -1,9 +1,0 @@
-ECHO "Running CheckHashes"
-ECHO "This will generate a text file with the MD5 hashes of all the files on your Amiga"
-DELETE >NIL: T:RunHashes
-ECHO "Generating script to run"
-LIST ALL FILES >>T:RunHashes SDH0: PAT=~(#?.info) LFORMAT="C:MD5sum *"%p%n*" >>*"Transfer:Filehashes.txt*"" 
-DELETE >NIL: RAM:FileHashes.txt
-ECHO "Generating all hashes and creating file at RAM:FileHashes.txt. This may take some time."
-EXECUTE t:RunHashes 
-ECHO "Completed!"
