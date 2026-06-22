@@ -37,6 +37,11 @@ Get-ChildItem -Path '.\Assets\Functions\' -Recurse | Where-Object { $_.PSIsConta
     . ($_).fullname
 }
 
+if ((Get-Location).Path -match '[^a-zA-Z0-9\s\.\-_:\\]'){
+    Write-ErrorMessage -Message "The path to the Emu68 Imager contains special characters which may cause issues with some of the tools used in the image creation process. Please move Emu68 Imager to a location that does not contain any special characters and try again." -Title "Invalid Path" -ShowPopup
+    exit
+}
+
 #$DebugPreference = 'SilentlyContinue'
 
 #$DebugPreference = 'Continue'
