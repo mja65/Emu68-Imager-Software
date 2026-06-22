@@ -1,0 +1,790 @@
+<!-- Creator     : groff version 1.23.0 -->
+<!-- CreationDate: Sat Aug  2 01:57:06 2025 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>lha</title>
+
+</head>
+<body>
+
+<h1 align="center">lha</h1>
+
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#COMMAND SYNTAX">COMMAND SYNTAX</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#LIST OUTPUT FORMAT">LIST OUTPUT FORMAT</a><br>
+<a href="#LIST FORMAT DIFFERENCES">LIST FORMAT DIFFERENCES</a><br>
+<a href="#COMPRESSION FORMATS">COMPRESSION FORMATS</a><br>
+<a href="#UNSUPPORTED FORMATS">UNSUPPORTED FORMATS</a><br>
+<a href="#EXAMPLES">EXAMPLES</a><br>
+<a href="#WWW">WWW</a><br>
+<a href="#BUG REPORTS">BUG REPORTS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+<a href="#HISTORY">HISTORY</a><br>
+<a href="#BUGS">BUGS</a><br>
+<a href="#AUTHOR">AUTHOR</a><br>
+<a href="#COPYRIGHT">COPYRIGHT</a><br>
+
+<hr>
+
+
+<h2>NAME
+<a name="NAME"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">lha &minus;
+compression tool for .lzh archive files.</p>
+
+<h2>SYNOPSIS
+<a name="SYNOPSIS"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em"><b>lha</b>
+[<b>-</b>]{<b>lvtxep</b>[<b>q</b>{<i>num</i>}][<b>finv</b>]}[<b>w=</b>&lt;<i>dir</i>&gt;]
+<i>archive_file</i> [<i>file ...</i>]</p>
+
+<h2>DESCRIPTION
+<a name="DESCRIPTION"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em"><b>lha</b> is a
+tool for extracting .lzh archive files. It also supports
+variants of the .lzh archive, such as .lzs and .pma.</p>
+
+<p style="margin-left:9%; margin-top: 1em">This version of
+the lha tool is part of Lhasa, a free implementation of the
+.lzh format.</p>
+
+<h2>COMMAND SYNTAX
+<a name="COMMAND SYNTAX"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">The lha tool has
+an unusual command syntax, compared to most other Unix
+commands. The first parameter to the program specifies the
+command to perform and all additional options. The second
+parameter specifies the path to the archive file to operate
+on. Following this is a list of wildcard patterns to match
+against the filenames of the archived files.</p>
+
+<p style="margin-left:9%; margin-top: 1em">The first
+character of the command parameter specifies the command to
+perform, which is one of the following:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="3%">
+
+
+<p><b>-l</b></p></td>
+<td width="6%"></td>
+<td width="82%">
+
+
+<p>List contents of the specified archive.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="3%">
+
+
+<p><b>-v</b></p></td>
+<td width="6%"></td>
+<td width="82%">
+
+
+<p>Verbosely list contents of the specified archive.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="3%">
+
+
+<p><b>-t</b></p></td>
+<td width="6%"></td>
+<td width="82%">
+
+
+<p>Test the integrity of the specified archive: decompress
+its contents and check the CRC.</p></td></tr>
+</table>
+
+<p style="margin-left:9%;"><b>-e</b> or <b>-x</b></p>
+
+<p style="margin-left:18%;">Extract archive. Files are
+extracted to the current working directory unless the
+&rsquo;w&rsquo; option is specified.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="3%">
+
+
+<p><b>-p</b></p></td>
+<td width="6%"></td>
+<td width="82%">
+
+
+<p>Extract archive, sending decompressed files to stdout
+rather than writing them to the filesystem as actual files.
+This is useful when used as part of a shell pipeline.</p></td></tr>
+</table>
+
+<h2>OPTIONS
+<a name="OPTIONS"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">The remainder of
+the command parameter is used to specify additional
+options:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="8%">
+
+
+<p style="margin-top: 1em"><b>q[012]</b></p></td>
+<td width="1%"></td>
+<td width="82%">
+
+
+<p style="margin-top: 1em">Quiet mode. Higher numbers
+suppress more output. Level 0 is normal operation. If no
+number is specified, full suppression (level 2) is used. The
+quiet option also turns on the force overwrite option
+(&rsquo;f&rsquo;).</p> </td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="8%">
+
+
+<p><b>f</b></p></td>
+<td width="1%"></td>
+<td width="82%">
+
+
+<p>Force overwrite of existing files: do not prompt.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="8%">
+
+
+<p><b>i</b></p></td>
+<td width="1%"></td>
+<td width="82%">
+
+
+<p>Ignore paths of archived files: extract all archived
+files to the same directory, ignoring subdirectories.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="8%">
+
+
+<p><b>n</b></p></td>
+<td width="1%"></td>
+<td width="82%">
+
+
+<p>Do not perform any actual operations: instead, perform a
+dry run of the requested operation and describe what would
+have been done on standard output.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="8%">
+
+
+<p><b>v</b></p></td>
+<td width="1%"></td>
+<td width="82%">
+
+
+<p>Verbose mode: causes extra information to be written to
+standard output.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="8%">
+
+
+<p><b>w=dir</b></p></td>
+<td width="1%"></td>
+<td width="82%">
+
+
+<p>Specify destination directory for extracting files. This
+must be the last option of the first parameter.</p></td></tr>
+</table>
+
+<h2>LIST OUTPUT FORMAT
+<a name="LIST OUTPUT FORMAT"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">Lhasa inherits
+its list output format from the original Unix port of lha,
+and retains the same format for compatibility, since some
+tools parse the output. Four different output formats are
+supported, depending on the command line arguments: <b><br>
+lha -l filename.lzh</b></p>
+
+<p style="margin-left:18%;">Shows: Unix permissions / OS
+type, UID/GID, uncompressed size, compression ratio,
+modification time, filename.</p>
+
+<p style="margin-left:9%;"><b>lha -lv filename.lzh</b></p>
+
+<p style="margin-left:18%;">Two line output. First line
+shows the filename, second line shows: Unix permissions / OS
+type, UID/GID, uncompressed size, compression ratio,
+modification time, filename, header level.</p>
+
+<p style="margin-left:9%;"><b>lha -v filename.lzh</b></p>
+
+<p style="margin-left:18%;">Shows: Unix permissions / OS
+type, UID/GID, compressed size, uncompressed size,
+compression ratio, compression format, checksum,
+modification time, filename.</p>
+
+<p style="margin-left:9%;"><b>lha -vv filename.lzh</b></p>
+
+<p style="margin-left:18%;">Two line output. First line
+shows the filename, second line shows: Unix permissions / OS
+type, UID/GID, compressed size, uncompressed size,
+compression ratio, compression format, checksum, long form
+modification time, header level.</p>
+
+<p style="margin-left:9%; margin-top: 1em">The following
+are detailed descriptions of each of these fields: <b><br>
+Unix permissions / OS type (PERMSSN)</b></p>
+
+<p style="margin-left:18%;">For files compressed on a Unix
+system, this lists the permissions in the same format that
+<b>ls</b>(1) uses when it is invoked with the <b>-l</b>
+option. If the file was not created on a Unix system, the OS
+type is instead displayed in square brackets. Examples are
+&quot;[MS-DOS]&quot; and &quot;[MacOS]&quot;; the OS name
+never contains a space. If the file was created on Microware
+OS-9, the permissions for that system will also be
+shown.</p>
+
+<p style="margin-left:9%;"><b>Unix user ID / group IDs
+(UID/GID)</b></p>
+
+<p style="margin-left:18%;">For files compressed on a Unix
+system, this lists the user and group IDs of the file,
+similar to the output seen from <b>ls</b>(1) when it is
+invoked with the <b>-ln</b> option. If the file was not
+created on a Unix system, &quot;*****/*****&quot; is shown;
+see <b>LIST FORMAT DIFFERENCES</b> below.</p>
+
+<p style="margin-left:9%;"><b>Compressed size
+(PACKED)</b></p>
+
+<p style="margin-left:18%;">Size of the file in bytes as it
+is stored inside the archive (not including the header,
+which contains metadata about the file). If an uncompressed
+format like <b>-lh0-</b> is used, this will be equal to
+SIZE.</p>
+
+<p style="margin-left:9%;"><b>Uncompressed size
+(SIZE)</b></p>
+
+<p style="margin-left:18%;">Size of the file in bytes
+before it was compressed.</p>
+
+<p style="margin-left:9%;"><b>File compression ratio
+(RATIO)</b></p>
+
+<p style="margin-left:18%;">Compressed size as a percentage
+of uncompressed size. This measures the effectiveness of the
+compression format; the smaller the percentage, the better.
+The value is (pessimistically) rounded up to the next 0.1%.
+If an uncompressed format like <b>-lh0-</b> is used, this
+will be equal to 100%. For directories, &quot;******&quot;
+is shown. Note that the value here is backwards relative to
+<b>unzip</b>(1), which instead shows the percentage of the
+original file size reduced.</p>
+
+<p style="margin-left:9%;"><b>Compression format
+(METHOD)</b></p>
+
+<p style="margin-left:18%;">The compression format used to
+store this file. See the <b>COMPRESSION FORMATS</b> section
+below.</p>
+
+<p style="margin-left:9%;"><b>Checksum (CRC)</b></p>
+
+<p style="margin-left:18%;">CRC16 checksum of the
+file&rsquo;s contents in hexadecimal format. Warning: while
+this is useful for casually checking file integrity, it is
+only a 16-bit checksum and should not be considered reliable
+for protecting files larger than a few kilobytes.</p>
+
+<p style="margin-left:9%;"><b>Modification time
+(STAMP)</b></p>
+
+<p style="margin-left:18%;">Date and time that the file was
+last modified before it was stored in the archive. If the
+file doesn&rsquo;t have a timestamp stored, nothing is
+shown. The output can be in one of two forms: if the date is
+within the past six months, the month, day and time are
+shown; an example is &quot;Aug 24 12:38&quot;. For older
+files, the month, day and year are shown; an example is
+&quot;Aug 24 2020&quot;.</p>
+
+<p style="margin-left:9%;"><b>Long form modification time
+(STAMP)</b></p>
+
+<p style="margin-left:18%;">This is only used when listing
+in the <b>-vv</b> format. The full date and timestamp are
+listed in numeric form, close to ISO 8601 format (though not
+quite conformant with that standard). An example is
+&quot;2020-08-24 12:38:25&quot;.</p>
+
+<p style="margin-left:9%;"><b>Header level (LV)</b></p>
+
+<p style="margin-left:18%;">Lha header format used to store
+this file. Supported formats are 0-3.</p>
+
+<h2>LIST FORMAT DIFFERENCES
+<a name="LIST FORMAT DIFFERENCES"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">The list mode
+output from the original Unix lha tool was not designed to
+be machine-readable. Since some tools do try to parse the
+list output, Lhasa&rsquo;s list output has been deliberately
+tweaked slightly to make the output more consistent and
+easier to parse.</p>
+
+<p style="margin-left:9%; margin-top: 1em">Here are the
+main differences:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="1%">
+
+
+<p>&bull;</p></td>
+<td width="8%"></td>
+<td width="82%">
+
+
+<p>If a file was not created on a Unix system, a spacer
+word is shown in the UID/GID column. The original lha just
+showed whitespace.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="1%">
+
+
+<p>&bull;</p></td>
+<td width="8%"></td>
+<td width="82%">
+
+
+<p>The OS type for archives generated by MacLHA is listed
+as &quot;MacOS&quot; (no space). The original lha showed
+&quot;Mac OS&quot;.</p></td></tr>
+</table>
+
+<p style="margin-left:9%; margin-top: 1em">Note that in
+general, the approach of parsing text output is inherently
+fragile and prone to bugs. It&rsquo;s recommended that you
+instead use the proper API (liblhasa).</p>
+
+<h2>COMPRESSION FORMATS
+<a name="COMPRESSION FORMATS"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">The following
+gives some basic description of the various different
+supported compression formats (as listed when using the list
+command documented above). All formats are variants on the
+LZSS compression algorithm.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p style="margin-top: 1em"><b>&minus;lz4&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p style="margin-top: 1em">Uncompressed (stored) data, as
+used by the original LArc tool. This is not related to the
+LZ4 compression algorithm of the same name.</p></td></tr>
+</table>
+
+<p style="margin-left:9%;"><b>&minus;lz5&minus;</b>,
+<b>&minus;lzs&minus;</b></p>
+
+<p style="margin-left:18%;">Compression formats introduced
+with the original LArc tool. &minus;lzs&minus; uses a 2KiB
+sliding window while &minus;lz5&minus; uses a 4KiB
+window.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;lhd&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p>Directory entry. No data is stored, only headers.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;lh0&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p>Uncompressed (stored) data, as used in LHarc and
+LHa.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;lh1&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p>Compression algorithm introduced with LHarc. This uses a
+4KiB sliding window with dynamic Huffman encoding.</p></td></tr>
+</table>
+
+<p style="margin-left:9%;"><b>&minus;lh4&minus;</b>,
+<b>&minus;lh5&minus;</b>, <b>&minus;lh6&minus;</b>,
+<b>&minus;lh7&minus;</b></p>
+
+<p style="margin-left:18%;">New algorithm introduced with
+LHa (aka LHarc v2.0). The original versions
+(&minus;lh4&minus; and &minus;lh5&minus;) used 8KiB and
+16KiB sliding window sizes, respectively. Later versions
+introduced new variants with larger window sizes:
+&minus;lh6&minus; (64KiB) and &minus;lh7&minus;
+(128KiB).</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;lhx&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p>Variant on the &minus;lh4&minus; format listed above
+introduced by UNLHA32.dll that extends the window size to
+1MiB.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;lk7&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p>Variant on the &minus;lh4&minus; format listed above
+that was introduced by the LHark tool (a fork of LHa). This
+is actually named &minus;lh7&minus; within the archive
+files, but Lhasa renames it internally to avoid clashing
+with the other algorithm of the same name. Uses a 128KiB
+sliding window, with some minor improvement to the
+algorithm.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;pm0&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p>Uncompressed (stored) data, as used by the PMarc
+tool.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;pm1&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p>Algorithm used by version 1 of the PMarc tool.</p></td></tr>
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;pm2&minus;</b></p></td>
+<td width="3%"></td>
+<td width="82%">
+
+
+<p>Algorithm used by version 2 of the PMarc tool.</p></td></tr>
+</table>
+
+<h2>UNSUPPORTED FORMATS
+<a name="UNSUPPORTED FORMATS"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">The following
+formats are <b>not</b> currently supported by Lhasa (but
+possibly will be in the future): <b><br>
+&minus;lh2&minus;</b>, <b>&minus;lh3&minus;</b></p>
+
+<p style="margin-left:18%;">These formats can be
+decompressed by LHa v2.0 but the tool could not actually
+generate archives with these formats; they appear to have
+only been supported in beta versions before the v2.0
+release. As a result, few if any examples exist in the
+wild.</p>
+
+<p style="margin-left:9%;"><b>&minus;lh8&minus;</b>,
+<b>&minus;lh9&minus;</b>, <b>&minus;lha&minus;</b>,
+<b>&minus;lhb&minus;</b>, <b>&minus;lhc&minus;</b>,
+<b>&minus;lhe&minus;</b></p>
+
+<p style="margin-left:18%;">Extensions of the
+&minus;lh4&minus; format to even larger window sizes.</p>
+
+<p style="margin-left:9%;"><b>&minus;ll0&minus;</b>,
+<b>&minus;ll1&minus;</b></p>
+
+<p style="margin-left:18%;">Generated by
+ThunderSoft&rsquo;s PAKLEO utility (.pll).</p>
+
+<p style="margin-left:9%;"><b>&minus;sw0&minus;</b>,
+<b>&minus;sw1&minus;</b></p>
+
+<p style="margin-left:18%;">Used in SourceWare Archival
+Group&rsquo;s .swg (SWAG packet) format.</p>
+
+<p style="margin-left:9%;"><b>&minus;lz6&minus;</b>,
+<b>&minus;LD6&minus;</b></p>
+
+<p style="margin-left:18%;">Generated by LDarc and LDIFF
+(.lzd).</p>
+
+<p style="margin-left:9%;"><b>&minus;hf0&minus;</b>,
+<b>&minus;ah0&minus;</b>, <b>&minus;ari&minus;</b>,
+<b>&minus;arn&minus;</b>, <b>&minus;arw&minus;</b></p>
+
+<p style="margin-left:18%;">Generated by the Micrognosis
+Compression Archiver utility.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="9%"></td>
+<td width="6%">
+
+
+<p><b>&minus;pc1&minus;</b></p></td>
+<td width="3%"></td>
+<td width="78%">
+
+
+<p>Format generated by the PopCom! compression utility for
+CP/M.</p> </td>
+<td width="4%">
+</td></tr>
+</table>
+
+<p style="margin-left:9%; margin-top: 1em">If you encounter
+examples of these in the wild, please get in touch.</p>
+
+<h2>EXAMPLES
+<a name="EXAMPLES"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">Here are some
+examples for how to invoke the program: <br>
+lha -v foobar.lzs</p>
+
+<p style="margin-left:18%;">List the contents of the file
+<b>foobar.lzs</b> (producing verbose output).</p>
+
+<p style="margin-left:9%;">lha -xf foobar.exe</p>
+
+<p style="margin-left:18%;">Extract the contents of a
+self-extracting archive file named <b>foobar.exe</b> to the
+current directory, overwriting existing files with the same
+names if they exist.</p>
+
+<p style="margin-left:9%;">lha -xqw=/tmp foobar.lzh</p>
+
+<p style="margin-left:18%;">Extract the contents of
+<b>foobar.lzh</b> to <b>/tmp</b>, overwriting any existing
+files found there, and suppressing normal output (similar to
+how other Unix tools such as <b>cp</b>(1) or <b>tar</b>(1)
+act silently by default).</p>
+
+<h2>WWW
+<a name="WWW"></a>
+</h2>
+
+
+
+<p style="margin-left:9%; margin-top: 1em"><a href="https://lhasa.soulsphere.org/">https://lhasa.soulsphere.org/</a></p>
+
+<h2>BUG REPORTS
+<a name="BUG REPORTS"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">Bugs can be
+reported to the GitHub issue tracker:
+<a href="https://github.com/fragglet/lhasa">https://github.com/fragglet/lhasa</a></p>
+
+<h2>SEE ALSO
+<a name="SEE ALSO"></a>
+</h2>
+
+
+
+<p style="margin-left:9%; margin-top: 1em"><b>unzip</b>(1),
+<b>tar</b>(1), <b>gzip</b>(1), <b>bzip2</b>(1),
+<b>xz</b>(1), <b>lzip</b>(1)</p>
+
+<h2>HISTORY
+<a name="HISTORY"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">The .lzh format
+originated with Kazuhiko Miki&rsquo;s MS&minus;DOS archive
+tool, LArc, using the LZSS algorithm developed by Haruhiko
+Okumura, and the .lzs filename extension. The container
+format was reused for LHarc, by Haruyasu Yoshizaki (Yoshi),
+which used a new algorithm named LZHUF and the .lzh
+extension. In later versions, LHarc was renamed to LHA and
+extended with more effective compression algorithms.</p>
+
+<p style="margin-left:9%; margin-top: 1em">Versions of the
+LHA tool were later ported to various different operating
+systems, including the Amiga, Atari, MacOS, OS/2 and Unix. A
+tool for MSX&minus;DOS named PMarc reused the container
+format with a new compression algorithm (.pma
+extension).</p>
+
+<p style="margin-left:9%; margin-top: 1em">The Unix version
+of the tool was developed by Masaru Oki, Nobutaka Watazaki
+and Tsugio Okamoto, but was released under a software
+license that does not conform to the Free Software or Open
+Source Definitions. Lhasa was developed as a drop&minus;in
+replacement that is Free Software and Open Source.</p>
+
+<p style="margin-left:9%; margin-top: 1em">The name
+&quot;LHA&quot; and the .lzh filename extension are a
+reference to the compression algorithm: a combination of
+Lempel&acirc;Ziv&acirc;Storer&acirc;Szymanski dictionary
+coding and Huffman encoding. Similar schemes are used in
+other compression algorithms such as Deflate (used in
+gzip/zlib, PNG image files, and the .zip format).</p>
+
+<h2>BUGS
+<a name="BUGS"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">The current
+version does not allow the creation of new archive
+files.</p>
+
+<p style="margin-left:9%; margin-top: 1em">Some obscure
+compression algorithms are not currently supported (see the
+UNSUPPORTED FORMATS section above).</p>
+
+<p style="margin-left:9%; margin-top: 1em">The tool does
+not currently do text format conversion for non-ASCII
+filenames when listing the contents of archives. Non-ASCII
+characters are replaced by a question mark.</p>
+
+<h2>AUTHOR
+<a name="AUTHOR"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">Lhasa was
+written and is maintained by
+<a href="mailto:fraggle@gmail.com">Simon Howard</a>.</p>
+
+<h2>COPYRIGHT
+<a name="COPYRIGHT"></a>
+</h2>
+
+
+<p style="margin-left:9%; margin-top: 1em">Copyright &copy;
+2011-2025 Simon Howard.</p>
+
+<p style="margin-left:9%; margin-top: 1em">Permission to
+use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that
+the above copyright notice and this permission notice appear
+in all copies.</p>
+
+<p style="margin-left:9%; margin-top: 1em">THE SOFTWARE IS
+PROVIDED &quot;AS IS&quot; AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO
+EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+OF THIS SOFTWARE.</p>
+<hr>
+</body>
+</html>
