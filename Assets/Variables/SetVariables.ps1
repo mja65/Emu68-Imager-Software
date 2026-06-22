@@ -45,61 +45,9 @@ $Script:Settings = [PSCustomObject]@{
     DownloadedFileSystems = '.\UserFiles\FileSystems'
     DefaultAmigaFileSystemLocation = '.\Assets\AmigaFileSystems'
     InputFiles = [PSCustomObject]@{
-        Path = '.\InputFiles'
-        InputFileSpreadsheetURL = 'https://docs.google.com/spreadsheets/d/12UcKD7INDH9y7Tw_w1q3ebQOUS9JtARIs8Z9JWfLUWg/'
+        InputFileSpreadsheetURL = 'https://docs.google.com/spreadsheets/d/1GeggL_zOH4MpJs-Kx0ywXR6RyOwLbp7Wb0_9qcTYftw/'
+        GID = '765528653'
     }
-    AminetMirrorsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\AminetMirrors.CSV'
-        GID = '1378987830'
-    }
-    StartupFilesCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\StartupFiles.CSV'
-        GID = '970627624'
-    }
-    OSVersionstoInstallCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\OSVersionstoInstall.CSV'
-        GID = '280506415'
-    }
-    IconSetsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\IconSets.CSV'
-        GID = '26108954'
-    }
-    ROMHashesCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\RomHashes.CSV'
-        GID = '1439711656'
-    }
-    InstallMediaHashesCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\InstallMediaHashes.CSV'
-        GID = '0'
-    }
-    ListofPackagestoInstallCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\ListofPackagestoInstall.CSV'
-        GID = '550697464'
-    }
-    ScreenModesCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\ScreenModes.CSV'
-        GID = '1007905875'       
-    }
-    ScreenModesWBCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\ScreenModesWB.CSV'
-        GID = '491578007'
-    }
-    FileSystemsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\FileSystems.CSV'
-        GID = '379284989'
-    }
-    DiskDefaultsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\DiskDefaults.CSV'
-        GID = '784658683'
-    }
-    IconPositionsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\IconPositions.CSV'
-        GID = '49639817'
-    }        
-    DocumentationURLsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\DocumentationURLs.CSV'
-        GID = '432393286'
-    }         
     TotalNumberofTasks = $null
     CurrentTaskNumber = 0
     CurrentTaskName = $null
