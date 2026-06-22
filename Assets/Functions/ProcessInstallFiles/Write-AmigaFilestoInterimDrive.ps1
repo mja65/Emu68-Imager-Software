@@ -48,7 +48,17 @@ function Write-AmigaFilestoInterimDrive {
         $HashTableforInstallMedia = @{} # Clear Hash
         $Script:GUIActions.FoundInstallMediatoUse | ForEach-Object {
             $HashTableforInstallMedia[$_.ADF_Name] = @($_.Path) 
+
+    if ($Script:GUIActions.DeleteAllDownloadedFiles -eq $true){
+        $PathtoDelete = [System.IO.Path]::GetFullPath($($Script:Settings.WebPackagesDownloadLocation))
+        Write-informationMessage -Message "Deleting existing files in $PathtoDelete"
+        if (Test-Path $PathtoDelete) {
+            Show-SpinnerWhileDeleting -ScriptBlock {
+                $PathtoDeletetoUse = Join-Path $using:PathtoDelete "\*"
+                Remove-Item $PathtoDeletetoUse -Recurse -Force -ErrorAction SilentlyContinue               
+            }      
         }
+    }
         
         $ListofPackagestoInstall| ForEach-Object {
             if ($HashTableforInstallMedia.ContainsKey($_.SourceLocation)){

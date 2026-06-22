@@ -179,6 +179,7 @@ $Script:GUIActions = [PSCustomObject]@{
     #InstallType = $null
     InstallType = 'PiStorm'
     #Not in GUI - End
+    DeleteAllDownloadedFiles = $null
     ScreenModetoUse = $null
     CustomScreenMode_Width = $null
     CustomScreenMode_Height = $null
