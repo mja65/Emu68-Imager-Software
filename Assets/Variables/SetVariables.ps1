@@ -309,10 +309,10 @@ $Script:SDCardMinimumsandMaximums = [PSCustomObject]@{
 }
 
 $Script:ExternalProgramSettings = [PSCustomObject]@{
-    SevenZipFilePath = '.\Programs\7z.exe'
-    UnlzxFilePath = '.\Programs\unlzx.exe'
-    FindFreeSpacePath = '.\Programs\FindFreeSpace.exe'
-    DDTCPath = '.\Programs\ddtc.exe'
+    UnADFFilePath = '.\Programs\unadf\bin\unadf.exe'
+    SevenZipFilePath = '.\Programs\7z\7z.exe'
+    UnlzxFilePath = '.\Programs\Unlzx\unlzx.exe'
+    UnLHAFilePath = '.\Programs\Lhasa\lha.exe'
     HSTImagerPath = '.\Programs\HSTImager\hst.imager.exe'
     HSTAmigaPath =  '.\Programs\HSTAmiga\Hst.amiga.exe'
 }
