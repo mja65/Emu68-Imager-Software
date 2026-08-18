@@ -10,6 +10,10 @@ function Check-ProcessingImage {
                $null = $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Rows.Add("Start","No OS selected")
                $Script:GUICurrentStatus.ProcessImageStatus = $false
            }
+           If (($Script:GUICurrentStatus.OperationMode -eq 'Advanced') -and (-not $Script:GUIActions.PiStormModel)){
+               $null = $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Rows.Add("Start","No PiStorm model selected")
+               $Script:GUICurrentStatus.ProcessImageStatus = $false
+           }
            If (-not ($Script:GUIActions.FoundKickstarttoUse)){
                $null = $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Rows.Add("Start","Kickstart file has not been located")
                $Script:GUICurrentStatus.ProcessImageStatus = $false

@@ -1,0 +1,70 @@
+# Amiga packages and compressed boot artifacts are binary. Git must never
+# normalize their contents or attempt to produce text diffs.
+*.lha binary
+*.lzx binary
+*.zip binary
+*.gz binary
+
+# Disk images, ROMs, firmware, executables, Amiga icons, and preferences are
+# binary as well. Keep these patterns explicit when adding new bundled assets.
+*.adf binary
+*.hdf binary
+*.img binary
+*.iso binary
+*.rom binary
+*.bin binary
+*.elf binary
+*.dat binary
+*.info binary
+*.prefs binary
+*.csv binary
+*.library binary
+*.device binary
+*.card binary
+*.___ binary
+
+# Raster images are binary assets.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+
+# Text consumed on the Amiga or Raspberry Pi must be LF-only. These rules are
+# intentionally explicit because many binary Amiga files have no extension.
+Assets/AmigaFiles/EMU68Boot/*.txt text eol=lf
+Assets/AmigaFiles/System/Devs/DOSDrivers/SD0pi3 text eol=lf
+Assets/AmigaFiles/System/Devs/DOSDrivers/SD0pi4 text eol=lf
+Assets/AmigaFiles/System/Devs/DOSDrivers/*.info.txt text eol=lf
+Assets/AmigaFiles/System/Devs/Monitors/*.info.txt text eol=lf
+Assets/AmigaFiles/System/Devs/NetInterfaces/genet text eol=lf
+Assets/AmigaFiles/System/Devs/NetInterfaces/wifipi text eol=lf
+Assets/AmigaFiles/System/OneTimeRun/* text eol=lf
+Assets/AmigaFiles/System/OneTimeRunWB/* text eol=lf
+Assets/AmigaFiles/System/PiStorm/DebugTools/CheckHashes text eol=lf
+Assets/AmigaFiles/System/PiStorm/DebugTools/CheckIconPositions text eol=lf
+Assets/AmigaFiles/System/PiStorm/Documentation text eol=lf
+"Assets/AmigaFiles/System/PiStorm/Emu68 Utilities/Emu68Info.r" text eol=lf
+Assets/AmigaFiles/System/PiStorm/Emu68-Updater.rexx text eol=lf
+"Assets/AmigaFiles/System/PiStorm/Install Packages" text eol=lf
+Assets/AmigaFiles/System/PiStorm/Network/*.rexx text eol=lf
+Assets/AmigaFiles/System/PiStorm/Network/*ScriptMenu* text eol=lf
+Assets/AmigaFiles/System/PiStorm/RoadshowParameters text eol=lf
+Assets/AmigaFiles/System/PiStorm/TransferKick text eol=lf
+Assets/AmigaFiles/System/Prefs/Env-Archive/FIRSTTIMEBOOT text eol=lf
+Assets/AmigaFiles/System/Prefs/Env-Archive/FIRSTTIMEBOOTWB text eol=lf
+Assets/AmigaFiles/System/Prefs/Env-Archive/REBOOT text eol=lf
+Assets/AmigaFiles/System/Prefs/Env-Archive/genet_*.prefs text eol=lf
+Assets/AmigaFiles/System/Programs/DOpus/C/DOpusEdit text eol=lf
+Assets/AmigaFiles/System/Programs/DOpus/*.info.txt text eol=lf
+Assets/AmigaFiles/System/S/*.rexx text eol=lf
+Assets/AmigaFiles/System/S/DST.dat text eol=lf
+Assets/AmigaFiles/System/S/KickstartRomHashes text eol=lf
+Assets/AmigaFiles/System/S/Startup-Sequence_* text eol=lf
+Assets/AmigaFiles/System/S/User-Startup* text eol=lf
+Assets/AmigaFiles/System/Storage/DosDrivers/SMB0 text eol=lf
+Assets/AmigaFiles/System/Storage/DosDrivers/*.info.txt text eol=lf
+Assets/AmigaFiles/System/Tools/*.info.txt text eol=lf
+Assets/AmigaFiles/System/WBStartup/Menutools_1 text eol=lf
+Assets/AmigaFiles/System/WBStartup/Menutools_2 text eol=lf
+Assets/AmigaFiles/System/WBStartup/OnetimeRunWB text eol=lf
+Assets/PackageManifests/*.CSV text eol=lf

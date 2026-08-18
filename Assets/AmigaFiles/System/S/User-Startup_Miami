@@ -1,3 +1,4 @@
 ;BEGIN Miami
 Assign Miami: SYS:Programs/Miami
+Run >NIL: RX SYS:PiStorm/Network/SyncTime.rexx
 ;END Miami

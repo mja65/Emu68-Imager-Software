@@ -73,6 +73,7 @@ function Read-SettingsFile {
    }
    
    $Script:GUIActions.InstallType = 'PiStorm'
+   $Script:GUIActions.PiStormModel = $null
    $Script:GUIActions.ScreenModetoUse = $null
    $Script:GUIActions.ScreenModetoUseFriendlyName =$null
    $Script:GUIActions.DefaultPackagesSelected = $null 
@@ -83,6 +84,9 @@ function Read-SettingsFile {
    $Script:GUIActions.KickstartVersiontoUse = $null
    $Script:GUIActions.KickstartVersiontoUseFriendlyName = $null
    $Script:GUIActions.OSInstallMediaType = $null
+   # Settings files created before this option existed keep the historical
+   # behaviour: automatic network time synchronisation remains enabled.
+   $Script:GUIActions.AutomaticTimeSyncEnabled = $true
    $Script:GUIActions.SSID = $null
    $Script:GUIActions.WifiPassword = $null
    $Script:GUIActions.FoundInstallMediatoUse = $null
@@ -327,6 +331,22 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
             (Get-Variable -Scope Script -Name "GUIActions").Value.$($_.Setting) = $_.Value
         }
     }  
+
+    # Keep settings saved before the PiStorm menu labels were simplified.
+    switch ($Script:GUIActions.PiStormModel) {
+        'PiStorm16 (FPGA)' { $Script:GUIActions.PiStormModel = 'PiStorm16' }
+        'Classic PiStorm (CPLD)' { $Script:GUIActions.PiStormModel = 'Classic PiStorm' }
+    }
+
+    if ($null -eq $Script:GUIActions.AutomaticTimeSyncEnabled -or
+        [string]::IsNullOrWhiteSpace("$($Script:GUIActions.AutomaticTimeSyncEnabled)")) {
+        $Script:GUIActions.AutomaticTimeSyncEnabled = $true
+    }
+    else {
+        $Script:GUIActions.AutomaticTimeSyncEnabled = [System.Convert]::ToBoolean(
+            "$($Script:GUIActions.AutomaticTimeSyncEnabled)"
+        )
+    }
    
     if ($FoundKickstarttoUse.KickstartPath){
         if (Test-Path $FoundKickstarttoUse.KickstartPath){
@@ -378,6 +398,12 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
 
     $WPF_StartPage_ScreenMode_Dropdown.SelectedItem = $Script:GUIActions.ScreenModetoUseFriendlyName
     $WPF_StartPage_KickstartVersion_Dropdown.SelectedItem = $Script:GUIActions.KickstartVersiontoUseFriendlyName
+    if (Get-Variable -Name 'WPF_StartPage_PiStormModel_Dropdown' -ErrorAction SilentlyContinue) {
+        $WPF_StartPage_PiStormModel_Dropdown.SelectedItem = $Script:GUIActions.PiStormModel
+    }
+    if (Get-Variable -Name 'WPF_StartPage_TimeSync_CheckBox' -ErrorAction SilentlyContinue) {
+        $WPF_StartPage_TimeSync_CheckBox.IsChecked = $Script:GUIActions.AutomaticTimeSyncEnabled
+    }
     $WPF_StartPage_Password_Textbox.Text = $Script:GUIActions.Password
     $WPF_StartPage_SSID_Textbox.Text = $Script:GUIActions.SSID
     
@@ -541,6 +567,9 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
     }
 
 
+    # UI synchronization fires selection/checked events. The package table
+    # loaded from the settings file must remain authoritative afterwards.
+    $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $false
     $Script:GUICurrentStatus.LoadingSettings = $null
 
     return $true

@@ -55,6 +55,7 @@ $MessageBody =
         $Script:GUIActions.WorkbenchBackDropEnabled = $null
         $Script:GUIActions.AvailableScreenModesWB = $null
         $Script:GUIActions.NetworkStack = $null
+        $Script:GUIActions.AutomaticTimeSyncEnabled = $null
 
         Update-UI -Emu68Settings -MainWindowButtons
     }

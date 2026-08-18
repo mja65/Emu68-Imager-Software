@@ -24,7 +24,7 @@ function Get-PackagesfromInternet {
             $GithubDownloadLocation = $Settings.WebPackagesDownloadLocation
             #Write-debug "GithubRepository: $($line.SourceLocation) GithubReleaseType: $($Line.GithubReleaseType) Tag_Name: $($line.GithubRelease) Name: $($line.GithubName) LocationforDownload: $("$GithubDownloadLocation\") FileNameforDownload: $($line.FileDownloadName)"
             if (-not(Get-GithubRelease -GithubRepository $line.SourceLocation -GithubReleaseType $Line.GithubReleaseType -Tag_Name $line.GithubRelease -Name $line.GithubName -LocationforDownload "$GithubDownloadLocation\" -FileNameforDownload "$($line.FileDownloadName)")){
-                Write-ErrorMessage -Message "Error downloading $($line.GithubName)! Cannot continue!"
+                Write-ErrorMessage -Message "Error downloading the official GitHub release asset $($line.GithubName)! Cannot continue!"
                 return $false
             }
         }

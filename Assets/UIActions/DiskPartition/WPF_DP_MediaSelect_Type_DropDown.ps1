@@ -25,7 +25,8 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUIActions.ImageSizeSelected = $null
                 $Script:GUIActions.DiskSizeSelected = $null
                 $Script:GUIActions.OutputType = "Image" 
-                $Script:GUIActions.NetworkStack = "Roadshow"         
+                $Script:GUIActions.NetworkStack = "Roadshow"
+                $Script:GUIActions.AutomaticTimeSyncEnabled = $true
                 #$Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
              
                 Remove-Variable -Scope Script -Name 'WPF_DP_Partition*'
@@ -61,6 +62,7 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUIActions.DiskSizeSelected = $null
                 $Script:GUIActions.OutputType = "Disk"        
             $Script:GUIActions.NetworkStack = "Roadshow"
+            $Script:GUIActions.AutomaticTimeSyncEnabled = $true
                 #$Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
                 $WPF_DP_MediaSelect_DropDown.SelectedItem = $null
             

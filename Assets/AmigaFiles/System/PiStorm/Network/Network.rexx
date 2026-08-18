@@ -1,11 +1,11 @@
-/* $VER: Network.rexx 1.0 (2026-02-14)                                        */
+/* $VER: Network.rexx 1.1 (2026-08-17)                                        */
 /* Script to take Amiga online and offline including sync of clock            */
 /*                                                                            */
 
 /******************************************************************************
  *                                                                            *
  * REQUIREMENTS:                                                              *
- * - IP Stack:            Miami or Roadshow                                   *
+ * - IP Stack:            AmiNetXDuo, Miami or Roadshow                       *
  * - Devices:             genet.device or wifipi.device or                    *
  *                        uaenet.device(for UAE, built-in)                    *
  *                        or v2expeth.device (Apollo V2)                      *
@@ -50,8 +50,8 @@ SAY "**********************************************"
 
 /* Check IPStack */
 IF action = "CONNECT" then DO
-   IF FIND("ROADSHOW MIAMI",ipstack) = 0 THEN DO
-      SAY "Error: Invalid IPSTACK '"ipstack"'. Must be Roadshow or Miami."
+   IF FIND("AMINETXDUO ROADSHOW MIAMI",ipstack) = 0 THEN DO
+      SAY "Error: Invalid IPSTACK '"ipstack"'. Must be AmiNetXDuo, Roadshow or Miami."
       CALL CloseWindowMessage()
       EXIT 10
    END
@@ -88,8 +88,9 @@ IF POS('NOSHUTDOWNROADSHOW', input) > 0 THEN SwitchNoShutDownRoadshow = "TRUE"
 
 IF device ~= "" & ~POS(".", device) > 0 THEN device = device || ".DEVICE"
 
+IF device ~= "" THEN DevicebaseName = left(device,(LENGTH(device) - 7))
+
 IF action = "CONNECT" then DO
-   DevicebaseName = left(device,(LENGTH(device) - 7))
    IF FIND("WIFIPI GENET UAENET V2EXPETH",DevicebaseName) = 0 THEN DO
       SAY "Error: Unsupported DEVICE '"DevicebaseName"'. Supported: wifipi.device, genet.device, uaenet.device, v2expeth.device"
       CALL CloseWindowMessage()
@@ -110,6 +111,12 @@ If IPStack = "ROADSHOW" then DO
 END
 If IPStack = "MIAMI" then DO
    IF ~IsMiamiInstalled() THEN DO
+      CALL CloseWindowMessage()
+      EXIT 10
+   END
+END
+If IPStack = "AMINETXDUO" then DO
+   IF ~IsAmiNetXDuoInstalled() THEN DO
       CALL CloseWindowMessage()
       EXIT 10
    END
@@ -271,17 +278,19 @@ IF action = "CONNECT" then DO
          EXIT 10
       END
    END
-   IF ipstack = "ROADSHOW" THEN DO
-      CALL LoadRoadshowParams(DevicebaseName)
+   IF ipstack = "ROADSHOW" | ipstack = "AMINETXDUO" THEN DO
+      IF ipstack = "ROADSHOW" THEN CALL LoadRoadshowParams(DevicebaseName)
       'setenv InProgressBar Connecting to Network'
       'run >T:Progressbar.txt rx S:ProgressBar.rexx'
       'AddNetInterface 'DevicebaseName' TIMEOUT=50 >T:AddInterface.txt'
+      AddInterfaceRC = RC
       'Search T:AddInterface.txt "Could not add" >NIL:'
-      IF RC = 0 THEN DO
+      AddInterfaceError = RC
+      IF AddInterfaceRC ~= 0 | AddInterfaceError = 0 THEN DO
          'setenv InProgressBar ERROR'
          'delete T:Progressbar.txt >NIL: QUIET'
          SAY ""
-         SAY "Error connecting to Roadshow"
+         SAY "Error connecting to "ipstack
 
          If ~KillWirelessManager() then DO
             CALL CloseWindowMessage()
@@ -371,13 +380,13 @@ IF action = "CONNECT" then DO
          EXIT 5
       End
       ELSE DO
-         TZONE = GETENV(TZONE) 
+         TZONE = GETENV('TZONE')
          if TZONE="" THEN DO
-            TimeZoneOverride = GETENV(TZONEOVERRIDE)
+            TimeZoneOverride = GETENV('TZONEOVERRIDE')
             if TimeZoneOverride~="" then DO
                say TimeZoneOverride 
                say "Using Timezone override"
-               'C:SetDST ZONE='vTimeZoneOverride' NOASK NOREQ QUIET >NIL:'
+               'C:SetDST ZONE='TimeZoneOverride' NOASK NOREQ QUIET >NIL:'
             END
             ELSE 'C:SetDST NOASK NOREQ QUIET >NIL:'
             If ~SyncTime() THEN DO
@@ -388,7 +397,7 @@ IF action = "CONNECT" then DO
       END 
       SAY "Time set and DST applied if applicable"
    END
-   IF ipstack = "ROADSHOW" THEN DO
+   IF ipstack = "ROADSHOW" | ipstack = "AMINETXDUO" THEN DO
       SAY ""
       say "Successfully connected to Network!" 
       SAY ""
@@ -403,6 +412,7 @@ IF action = "DISCONNECT" then DO
    SAY "Killing network shares"
    CALL KillNetworkShares()
    If ipstack = "ROADSHOW" THEN CALL KillRoadshow()
+   If ipstack = "AMINETXDUO" THEN CALL KillAmiNetXDuo()
    IF ipstack = "MIAMI" THEN DO
       IF ~SHOW('P', 'MIAMI.1') THEN DO
          SAY ""
@@ -457,14 +467,23 @@ EXIT 0
 /* ================= FUNCTIONS ================= */
 
 SyncTime:
- 'c:sntp pool.ntp.org >'sntpLog
- 'Search' sntpLog '"Unknown host" >NIL:'
- IF RC = 0 THEN DO
-    SAY "Unable to synchronise time"
-    'Delete' sntpLog 'QUIET'
-    RETURN 0
+ /* AddNetInterface can return before DHCP and DNS are fully ready,
+    especially with AmiNetXDuo. SNTP itself is the readiness test because
+    AreWeOnline depends on an unrelated HTTP host. */
+ DO FOREVER
+    IF ~EXISTS('C:sntp') THEN DO
+       SAY "Waiting for C:sntp"
+       'Wait 5'
+       ITERATE
+    END
+    'C:sntp pool.ntp.org >'sntpLog
+    'Search' sntpLog '"Correction applied to system time" >NIL:'
+    IF RC = 0 THEN DO
+       RETURN 1
+    END
+    SAY "Time synchronisation failed; retrying"
+    'Wait 10'
  END
- ELSE RETURN 1
 IsMiamiInstalled:
    'assign exists Miami: >NIL:'
    IF RC >= 5 then DO
@@ -519,8 +538,22 @@ IsRoadshowInstalled:
       END
       RETURN 0
    END
+IsAmiNetXDuoInstalled:
+   IF EXISTS('Libs:bsdsocket.library') & EXISTS('SYS:Programs/AmiNetXDuo/ReadMe') THEN DO
+      IF DEBUG = "TRUE" then SAY "AmiNetXDuo installed"
+      RETURN 1
+   END
+   ELSE DO
+      SAY "AmiNetXDuo is not installed!"
+      RETURN 0
+   END
 KillRoadshow:
    'c:Netshutdown >NIL:'
+   Return
+KillAmiNetXDuo:
+   /* AmiNetXDuo is designed to stay loaded until reboot. Offline only the
+      selected interface instead of racing NetShutdown against socket users. */
+   IF device ~= "" THEN 'C:Offline 'DevicebaseName' 0 >NIL:'
    Return
 KillMiami:
    IF SHOW('P', 'MIAMI.1') THEN DO
@@ -621,12 +654,12 @@ CloseWindowMessage:
 
 ShowUsage:
    SAY ""
-   SAY "Arexx program to connect to network using via Miami or Roadshow and to synchronise time"
+   SAY "Arexx program to connect to network via AmiNetXDuo, Miami or Roadshow and to synchronise time"
    SAY ""
    SAY "Usage: Rx Network.rexx ACTION=<Action Type> DEVICE=<Selected Device> IPSTACK=<IP Stack> <Options>"
    SAY "<Action Type>: Connect, Disconnect"
    SAY "<Selected Device>: WifiPi, Genet, Uaenet, V2expeth (applicable for Connect action type)"
-   SAY "<IP Stack>: Miami, Roadshow"
+   SAY "<IP Stack>: AmiNetXDuo, Miami, Roadshow"
    SAY "<Options>: NoSyncTime, NoRestartMiami, NoRestartWirelessManager, NoShutdownRoadshow (applicable for connect action type)"
    SAY "<Options>: NoCloseWirelessManager, NoCloseMiami (applicable for disconnect action type)"
    SAY "<Options>: Debug, WaitatEnd"

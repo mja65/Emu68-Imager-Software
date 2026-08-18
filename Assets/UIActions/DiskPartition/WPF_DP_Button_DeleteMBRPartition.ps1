@@ -81,6 +81,7 @@ Press OK to continue otherwise cancel
         $Script:GUIActions.WorkbenchBackDropEnabled = $null
         $Script:GUIActions.AvailableScreenModesWB = $null
         $Script:GUIActions.NetworkStack = $null
+        $Script:GUIActions.AutomaticTimeSyncEnabled = $null
 
         }
 

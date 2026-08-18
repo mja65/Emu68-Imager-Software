@@ -2,4 +2,5 @@
 If EXISTS S:Network-Startup
    Execute S:Network-Startup
 EndIf
+Run >NIL: RX SYS:PiStorm/Network/SyncTime.rexx
 ;END Roadshow

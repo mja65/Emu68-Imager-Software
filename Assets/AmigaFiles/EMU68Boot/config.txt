@@ -3,6 +3,7 @@
 [pi4]
 arm_boost=1
 [all]
+[DEFAULT_KERNEL]
 disable_splash=1
 arm_64bit=1
 bootcode_delay=1
@@ -15,15 +16,11 @@ boot_delay=0
 
 # This is important so that GPU firmware does not add its overlay icons on the screen
 # If you also want to disable speed throttling in case of undervoltage, set this value to 2
-avoid_warnings=1
+[AVOID_WARNINGS]
 
 # Enable the options below to increase speed of ARM cpu to 1.5GHz
 # Keep in mind this may render your RasPi3 unstable and eventually void the warranty!
-#force_turbo=1
-#over_voltage=4
-#arm_freq=1800
-#core_freq=500
-#sdram_freq=600
+[CPU_SETTINGS]
 
 # Force HDMI signal even if nothing is connected
 hdmi_force_hotplug=1
@@ -31,9 +28,11 @@ hdmi_force_hotplug=1
 # Limit GPU memory a little, force 1080p video mode. Comment out the hdmi_mode line if your monitor
 # does not like it. For list of all modes please refer to RasPi documentation
 # https://www.raspberrypi.com/documentation/computers/config_txt.html#hdmi-mode
-gpu_mem=32
+[GPU_MEMORY]
 
 [VIDEOMODES]
+
+[FRAMETHROWER]
 
 # Experimental 2560x1440 50Hz mode for RaspberryPi which you can give a try. If you do, 
 # comment the hdmi_mode above
@@ -70,12 +69,12 @@ kernel=Emu68-pistorm32lite
 [all]
 # PiStorm16 Boot
 [gpio24=1]
-kernel=Emu68-pistorm16
+[KERNEL_PISTORM16]
 [ROMPATH]
 
 [all]
 ## PiStorm Boot 
 [gpio17=0]
-kernel=Emu68-pistorm
+[KERNEL_PISTORM]
 [ROMPATH]
 

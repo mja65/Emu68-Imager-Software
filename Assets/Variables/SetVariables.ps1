@@ -76,6 +76,9 @@ $Script:Settings = [PSCustomObject]@{
         Path = '.\InputFiles\ListofPackagestoInstall.CSV'
         GID = '550697464'
     }
+    SupplementalPackagesCSV = [PSCustomObject]@{
+        Path = '.\Assets\PackageManifests\AmiNetXDuo.CSV'
+    }
     ScreenModesCSV = [PSCustomObject]@{
         Path = '.\InputFiles\ScreenModes.CSV'
         GID = '1007905875'       
@@ -230,6 +233,7 @@ $Script:GUIActions = [PSCustomObject]@{
     # Not in GUI - Start
     #InstallType = $null
     InstallType = 'PiStorm'
+      PiStormModel = $null
     #Not in GUI - End
     ScreenModetoUse = $null
     CustomScreenMode_Width = $null
@@ -267,6 +271,7 @@ $Script:GUIActions = [PSCustomObject]@{
     OSInstallMediaType = $null
     #UseGlowIcons = $null
     NetworkStack = $null
+    AutomaticTimeSyncEnabled = $true
     SSID = $null
     WifiPassword = $null
     FoundInstallMediatoUse = $null

@@ -47,6 +47,7 @@ $WPF_DP_ResettoDefault.Add_Click({
             $Script:GUIActions.InstallOSFiles = $true
             $Script:GUIActions.DiskSizeSelected = $null
             $Script:GUIActions.NetworkStack = "Roadshow"
+            $Script:GUIActions.AutomaticTimeSyncEnabled = $true
         
             $Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
             $WPF_DP_MediaSelect_DropDown.SelectedItem = $null

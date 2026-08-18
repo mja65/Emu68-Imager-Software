@@ -482,7 +482,7 @@ function Write-AmigaFilestoInterimDrive {
       $Script:Settings.CurrentSubTaskNumber ++
       $Script:Settings.CurrentSubTaskName = "Cleaning up files"
       Write-StartSubTaskMessage
-      
+
       (Get-ChildItem -Path "$($Script:Settings.InterimAmigaDrives)\System" -Recurse | Where-Object {$_.name -eq 'Disk.info'} ).FullName | ForEach-Object {
         if ($_){
             if ((Split-Path -path $_ -Parent) -ne  [System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\System")){
@@ -543,6 +543,10 @@ function Write-AmigaFilestoInterimDrive {
                                 -Action $_.ModifyScriptAction
         }
     }
+
+    Set-AutomaticTimeSyncStartup `
+        -UserStartupPath "$($Script:Settings.InterimAmigaDrives)\System\S\User-Startup" `
+        -Enabled ($Script:GUIActions.AutomaticTimeSyncEnabled -eq $true)
 
     $Script:Settings.CurrentSubTaskNumber ++
     $Script:Settings.CurrentSubTaskName = "Modifying tooltypes"
@@ -678,7 +682,7 @@ function Write-AmigaFilestoInterimDrive {
     Write-TaskCompleteMessage 
    }
 
-   if ($AdjustWBStartup){
+    if ($AdjustWBStartup){
 
         $Script:Settings.CurrentTaskName = "Moving WBStartup files for first boot"
         
@@ -703,7 +707,12 @@ function Write-AmigaFilestoInterimDrive {
         Write-TaskCompleteMessage
 
     }
+
+    # Run this after every copy, script edit, and generated launcher. This is
+    # the final safeguard against Git/Windows reintroducing CRLF into files
+    # parsed by AmigaDOS, ARexx, mount handlers, or Raspberry Pi firmware.
+    $AmigaTextFiles = Get-AmigaTextFiles -RootPath $Script:Settings.InterimAmigaDrives
+    if ($AmigaTextFiles.Count -gt 0) {
+        ConvertTo-AmigaLineEndings -Path $AmigaTextFiles
+    }
 }
-
-
-   

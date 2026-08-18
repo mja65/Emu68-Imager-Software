@@ -84,6 +84,10 @@ function Update-UI {
 
     if ($Emu68Settings){
 
+        if (Get-Variable -Name 'WPF_StartPage_PiStormModel_Dropdown' -ErrorAction SilentlyContinue) {
+            $WPF_StartPage_PiStormModel_Dropdown.SelectedItem = $Script:GUIActions.PiStormModel
+        }
+
         if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
             $WPF_StartPage_Unicam_button.Visibility = "Hidden"
             $WPF_StartPage_NetworkStack_RadioButtonNone.Visibility = "Hidden"            
@@ -162,7 +166,12 @@ function Update-UI {
         if ($Script:GUIActions.NetworkStack -eq "Roadshow"){
             $WPF_StartPage_NetworkStack_RadioButtonRoadshow.IsChecked = 1
         }
-
+        if ($Script:GUIActions.NetworkStack -eq "AmiNetXDuo"){
+            $WPF_StartPage_NetworkStack_RadioButtonAmiNetXDuo.IsChecked = 1
+        }
+        if (Get-Variable -Name 'WPF_StartPage_TimeSync_CheckBox' -ErrorAction SilentlyContinue) {
+            $WPF_StartPage_TimeSync_CheckBox.IsChecked = ($Script:GUIActions.AutomaticTimeSyncEnabled -eq $true)
+        }
         if (($Script:GUIActions.ScreenModetoUseFriendlyName) -and (-not ($WPF_StartPage_ScreenMode_Dropdown.SelectedItem))) {
            $WPF_StartPage_ScreenMode_Dropdown.SelectedItem = $Script:GUIActions.ScreenModetoUseFriendlyName
         }

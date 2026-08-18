@@ -55,10 +55,18 @@ function Get-InputCSVs {
     #$caller = (Get-PSCallStack)[1]
     #Write-debug "I was called by: $($caller.FunctionName) at line $($caller.ScriptLineNumber)"
         
-    import-csv -path $Pathtouse -Delimiter ";" | ForEach-Object {
-        if ($_.MinimumInstallerVersion -ne "" -and $_.InstallerVersionLessThan -ne ""){
-            if (($Script:Settings.Version -ge [system.version]$_.MinimumInstallerVersion) -and ($Script:Settings.Version -lt [system.version]$_.InstallerVersionLessThan)){
-                $CSV += $_
+    $Pathstouse = @($Pathtouse)
+    if (($PackagestoInstall -or $PackagestoInstallEmu68Only) -and
+        (Test-Path -LiteralPath $Script:Settings.SupplementalPackagesCSV.Path)) {
+        $Pathstouse += $Script:Settings.SupplementalPackagesCSV.Path
+    }
+
+    $Pathstouse | ForEach-Object {
+        Import-Csv -Path $_ -Delimiter ";" | ForEach-Object {
+            if ($_.MinimumInstallerVersion -ne "" -and $_.InstallerVersionLessThan -ne ""){
+                if (($Script:Settings.Version -ge [system.version]$_.MinimumInstallerVersion) -and ($Script:Settings.Version -lt [system.version]$_.InstallerVersionLessThan)){
+                    $CSV += $_
+                }
             }
         }
     }
@@ -182,6 +190,7 @@ function Get-InputCSVs {
                         KickstartVersion = [system.version](($_.KickstartVersion -split ',')[$Counter]) 
                         IconSetName = $_.IconSetName
                         NetworkStack = $_.NetworkStack
+                        InstallCondition = $_.InstallCondition
                         AmigaUpdate = $_.AmigaUpdate
                         PackageType = $_.PackageType
                         PackageName = $_.PackageName
@@ -239,6 +248,7 @@ function Get-InputCSVs {
                     KickstartVersion = [system.version]$_.KickstartVersion
                     IconSetName = $_.IconSetName
                     NetworkStack = $_.NetworkStack
+                    InstallCondition = $_.InstallCondition
                     AmigaUpdate = $_.AmigaUpdate
                     PackageType = $_.PackageType
                     PackageName = $_.PackageName
@@ -292,6 +302,23 @@ function Get-InputCSVs {
         } 
         elseif ($PackagestoInstallEmu68Only){
             $CSVtoReturn = $CSVtoReturn | Where-Object {$_.DrivetoInstall -eq 'Emu68Boot'}
+        }
+
+        if ($Script:GUIActions.UnicamEnabled -ne $true) {
+            $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -notmatch '^FrameThrower'}
+        }
+        elseif ($Script:GUIActions.PiStormModel -eq 'Classic PiStorm') {
+            $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -ne 'FrameThrowerPiStorm'}
+        }
+        elseif ($Script:GUIActions.PiStormModel) {
+            $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -ne 'FrameThrowerClassic'}
+        }
+        else {
+            $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -notin @('FrameThrowerPiStorm', 'FrameThrowerClassic')}
+        }
+
+        if ($Script:GUIActions.AutomaticTimeSyncEnabled -ne $true) {
+            $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -ne 'TimeSync'}
         }
     }
     

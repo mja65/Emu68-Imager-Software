@@ -40,6 +40,7 @@ function Get-OptionsBeforeRunningImage {
     $Script:GUICurrentStatus.RunOptionstoReport.Clear()
     
     $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Type of Install",$InstallType)
+    $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("PiStorm model",$Script:GUIActions.PiStormModel)
 
     If ($Script:GUIActions.InstallOSFiles -eq $true){
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("OS to be Installed",$Script:GUIActions.KickstartVersiontoUseFriendlyName)
@@ -75,6 +76,7 @@ function Get-OptionsBeforeRunningImage {
     $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Workbench Screen Mode selected (Raspberry Pi):",$Script:GUIActions.ScreenModetoUse)
     If ($Script:GUIActions.InstallOSFiles -eq $true){
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Network TCP/IP Stack:",$Script:GUIActions.NetworkStack)
+        $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Automatic network time sync:",$Script:GUIActions.AutomaticTimeSyncEnabled)
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("SSID to configure:",$SSID)
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Wifi Password to set:",$WifiPassword)
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Screen Mode selected (Workbench):",$Script:GUIActions.ScreenModetoUseWB)

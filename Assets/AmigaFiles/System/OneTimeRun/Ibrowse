@@ -1,7 +1,61 @@
-c:spatch -oSYS:Programs/Ibrowse/codecs/gif.codec -pSYS:Programs/Ibrowse/codecs040fpu/gif.codec.spatch SYS:Programs/Ibrowse/codecs/gif.codec
-c:spatch -oSYS:Programs/Ibrowse/codecs/jpeg.codec -pSYS:Programs/Ibrowse/codecs040fpu/jpeg.codec.spatch SYS:Programs/Ibrowse/codecs/jpeg.codec
-c:spatch -oSYS:Programs/Ibrowse/codecs/png.codec -pSYS:Programs/Ibrowse/codecs040fpu/png.codec.spatch SYS:Programs/Ibrowse/codecs/png.codec
-c:spatch -oSYS:Programs/Ibrowse/codecs/xbm.codec -pSYS:Programs/Ibrowse/codecs040fpu/xbm.codec.spatch SYS:Programs/Ibrowse/codecs/xbm.codec
-c:spatch -oSYS:Programs/Ibrowse/codecs/imagedecode.module -pSYS:Programs/Ibrowse/codecs040fpu/imagedecode.module.spatch SYS:Programs/Ibrowse/codecs/imagedecode.module
-delete SYS:Programs/Ibrowse/codecs040fpu/#?  SYS:Programs/Ibrowse/codecs040fpu ALL FORCE QUIET
-makedir SYS:Programs/Ibrowse/cache
+IF EXISTS SYS:Programs/Ibrowse/codecs/gif.codec
+   IF EXISTS SYS:Programs/Ibrowse/codecs040fpu/gif.codec.spatch
+      c:spatch -oT:IBrowse-gif.codec -pSYS:Programs/Ibrowse/codecs040fpu/gif.codec.spatch SYS:Programs/Ibrowse/codecs/gif.codec
+      IF NOT WARN
+         copy T:IBrowse-gif.codec TO SYS:Programs/Ibrowse/codecs/gif.codec QUIET
+      ENDIF
+      IF EXISTS T:IBrowse-gif.codec
+         delete T:IBrowse-gif.codec FORCE QUIET
+      ENDIF
+   ENDIF
+ENDIF
+IF EXISTS SYS:Programs/Ibrowse/codecs/jpeg.codec
+   IF EXISTS SYS:Programs/Ibrowse/codecs040fpu/jpeg.codec.spatch
+      c:spatch -oT:IBrowse-jpeg.codec -pSYS:Programs/Ibrowse/codecs040fpu/jpeg.codec.spatch SYS:Programs/Ibrowse/codecs/jpeg.codec
+      IF NOT WARN
+         copy T:IBrowse-jpeg.codec TO SYS:Programs/Ibrowse/codecs/jpeg.codec QUIET
+      ENDIF
+      IF EXISTS T:IBrowse-jpeg.codec
+         delete T:IBrowse-jpeg.codec FORCE QUIET
+      ENDIF
+   ENDIF
+ENDIF
+IF EXISTS SYS:Programs/Ibrowse/codecs/png.codec
+   IF EXISTS SYS:Programs/Ibrowse/codecs040fpu/png.codec.spatch
+      c:spatch -oT:IBrowse-png.codec -pSYS:Programs/Ibrowse/codecs040fpu/png.codec.spatch SYS:Programs/Ibrowse/codecs/png.codec
+      IF NOT WARN
+         copy T:IBrowse-png.codec TO SYS:Programs/Ibrowse/codecs/png.codec QUIET
+      ENDIF
+      IF EXISTS T:IBrowse-png.codec
+         delete T:IBrowse-png.codec FORCE QUIET
+      ENDIF
+   ENDIF
+ENDIF
+IF EXISTS SYS:Programs/Ibrowse/codecs/xbm.codec
+   IF EXISTS SYS:Programs/Ibrowse/codecs040fpu/xbm.codec.spatch
+      c:spatch -oT:IBrowse-xbm.codec -pSYS:Programs/Ibrowse/codecs040fpu/xbm.codec.spatch SYS:Programs/Ibrowse/codecs/xbm.codec
+      IF NOT WARN
+         copy T:IBrowse-xbm.codec TO SYS:Programs/Ibrowse/codecs/xbm.codec QUIET
+      ENDIF
+      IF EXISTS T:IBrowse-xbm.codec
+         delete T:IBrowse-xbm.codec FORCE QUIET
+      ENDIF
+   ENDIF
+ENDIF
+IF EXISTS SYS:Programs/Ibrowse/codecs/imagedecode.module
+   IF EXISTS SYS:Programs/Ibrowse/codecs040fpu/imagedecode.module.spatch
+      c:spatch -oT:IBrowse-imagedecode.module -pSYS:Programs/Ibrowse/codecs040fpu/imagedecode.module.spatch SYS:Programs/Ibrowse/codecs/imagedecode.module
+      IF NOT WARN
+         copy T:IBrowse-imagedecode.module TO SYS:Programs/Ibrowse/codecs/imagedecode.module QUIET
+      ENDIF
+      IF EXISTS T:IBrowse-imagedecode.module
+         delete T:IBrowse-imagedecode.module FORCE QUIET
+      ENDIF
+   ENDIF
+ENDIF
+IF EXISTS SYS:Programs/Ibrowse/codecs040fpu
+   delete SYS:Programs/Ibrowse/codecs040fpu/#? SYS:Programs/Ibrowse/codecs040fpu ALL FORCE QUIET
+ENDIF
+IF EXISTS SYS:Programs/Ibrowse/IBrowse
+   makedir SYS:Programs/Ibrowse/cache
+ENDIF

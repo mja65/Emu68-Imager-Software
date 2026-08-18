@@ -1,0 +1,49 @@
+# Runtime downloads and extracted working files
+/Temp/
+
+# Prerequisite tools downloaded by the imager at startup
+/Programs/HSTAmiga/
+/Programs/HSTImager/
+/Assets/AmigaFileSystems/pfs3aio
+/Assets/AmigaFileSystems/pfs3aio-custom
+
+# CSV files refreshed dynamically from the online spreadsheet
+/InputFiles/
+
+# Local application state and logs
+/Settings/
+/Logs/
+
+# User-supplied files, downloaded filesystems, and generated images
+/UserFiles/
+
+# Disk images accidentally written directly to the repository root
+/*.img
+/*.hdf
+/*.vhd
+/*.vhdx
+/*.iso
+
+# Test output
+/TestResults/
+/test-results/
+/coverage/
+
+# Local implementation plan
+/PLAN.md
+/release_notes.md
+.codex/
+
+# Local state for the Codex documentation hook
+/.codex/.docs-hook-state.json
+
+# Local state for the Codex documentation hook
+/.codex/.docs-hook-state.json
+
+# Common PowerShell/editor artifacts
+*.tmp
+*.bak
+*.log
+*~
+.DS_Store
+Thumbs.db

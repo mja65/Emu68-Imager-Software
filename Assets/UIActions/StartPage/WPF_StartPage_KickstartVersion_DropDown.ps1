@@ -5,6 +5,9 @@ foreach ($Kickstart in $Script:GUIActions.AvailableKickstarts) {
 }
 
  $WPF_StartPage_KickstartVersion_Dropdown.Add_SelectionChanged({
+     if ($Script:GUICurrentStatus.LoadingSettings) {
+         return
+     }
      foreach ($Kickstart in $Script:GUIActions.AvailableKickstarts) {
          if ($Kickstart.Kickstart_VersionFriendlyName -eq $WPF_StartPage_KickstartVersion_Dropdown.SelectedItem){
              if ($Kickstart.Kickstart_Version -ne $Script:GUIActions.KickstartVersiontoUse){

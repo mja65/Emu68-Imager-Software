@@ -44,16 +44,18 @@
 
                 </Grid>
             </GroupBox>
-                   <GroupBox x:Name="SettingsNetwork_GroupBox" Header="Network Settings" Height="100" Background="Transparent" Margin="154,250,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Right">
+                   <GroupBox x:Name="SettingsNetwork_GroupBox" Header="Network Settings" Height="110" Background="Transparent" Margin="154,250,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Right">
                 <Grid>
-                    <TextBox x:Name="NetworkStack_Label" HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="Wrap" Text="TCP/IP Stack" VerticalAlignment="Top" Width="150" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
-                    <RadioButton x:Name="NetworkStack_RadioButtonRoadshow" Content="Roadshow" HorizontalAlignment="Left" Margin="180,5,0,0"/>
-                    <RadioButton x:Name="NetworkStack_RadioButtonMiami" Content="Miami" HorizontalAlignment="Left" Margin="260,5,0,0"/>
-                    <RadioButton x:Name="NetworkStack_RadioButtonNone" Content="None" HorizontalAlignment="Left" Margin="320,5,0,0"/>
+                    <TextBox x:Name="NetworkStack_Label" HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="Wrap" Text="TCP/IP Stack" VerticalAlignment="Top" Width="75" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
+                    <RadioButton x:Name="NetworkStack_RadioButtonRoadshow" Content="Roadshow" HorizontalAlignment="Left" Margin="90,5,0,0"/>
+                    <RadioButton x:Name="NetworkStack_RadioButtonAmiNetXDuo" Content="AmiNetXDuo" HorizontalAlignment="Left" Margin="170,5,0,0"/>
+                    <RadioButton x:Name="NetworkStack_RadioButtonMiami" Content="Miami" HorizontalAlignment="Left" Margin="275,5,0,0"/>
+                    <RadioButton x:Name="NetworkStack_RadioButtonNone" Content="None" HorizontalAlignment="Left" Margin="335,5,0,0"/>
                     <TextBox x:Name="SSID_Label" HorizontalAlignment="Left" Margin="10,30,0,0" TextWrapping="Wrap" Text="Enter your SSID" VerticalAlignment="Top" Width="150" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
                     <TextBox x:Name="Password_Label" HorizontalAlignment="Left" Margin="10,50,0,0" TextWrapping="Wrap" Text="Enter your Wifi password"  VerticalAlignment="Top" Width="150" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" />
                     <TextBox x:Name="SSID_Textbox" ToolTip="Set your SSID for wifi on the Amiga (leave empty if you wish to configure on the Amiga)" HorizontalAlignment="Left" Margin="177,30,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="200" />
                     <TextBox x:Name="Password_Textbox" ToolTip="Set your password for wifi on the Amiga (leave empty if you wish to configure on the Amiga)" HorizontalAlignment="Left" Margin="177,50,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="200" />
+                    <CheckBox x:Name="TimeSync_CheckBox" Content="Synchronise time from internet" ToolTip="Automatically set the Amiga clock after the selected TCP/IP stack becomes ready" HorizontalAlignment="Left" Margin="177,72,0,0" VerticalAlignment="Top" IsChecked="True"/>
                 </Grid>
 
             </GroupBox>
@@ -65,6 +67,12 @@
                     <Button x:Name="CustomScreenMode_button" Content="Click to set Custom Resolution" Width="375" Height="20" Margin="10,52,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden" IsEnabled="False"/>
                 </Grid>
 
+            </GroupBox>
+            <GroupBox x:Name="PiStormModel_GroupBox" Header="PiStorm Hardware" Height="100" Background="Transparent" Margin="154,360,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Right">
+                <Grid>
+                    <TextBox x:Name="PiStormModel_Label" HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="Wrap" Text="Select PiStorm model" VerticalAlignment="Top" Width="375" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                    <ComboBox x:Name="PiStormModel_Dropdown" ToolTip="Select the PiStorm hardware model so the imager installs the matching Emu68 kernel" HorizontalAlignment="Left" Margin="10,30,0,0" VerticalAlignment="Top" Width="375"/>
+                </Grid>
             </GroupBox>
               <GroupBox x:Name="SettingsScreenWB_GroupBox" Header="Screen Settings - Workbench" Height="200" Background="Transparent" Margin="154,350,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Left">
           <Grid>
@@ -88,8 +96,8 @@
               <TextBox x:Name="WorkbenchColour_Value" HorizontalAlignment="Left" Margin="273,120,0,0" TextWrapping="Wrap" Width="40" Text="16.7M" VerticalAlignment="Top" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" HorizontalContentAlignment="Center" FontSize="12"/>
 
 
-              <CheckBox x:Name="Unicam_CheckBox" Content="Enable Unicam (Framethrower)" HorizontalAlignment="Left" Margin="10,155,0,0" Height="20" Width="185" IsEnabled="False" VerticalAlignment="Top"/>
-              <Button x:Name="Unicam_button" Content="Click to set Unicam Settings" Width="169" Height="20" Margin="200,154,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="False"/>
+              <CheckBox x:Name="Unicam_CheckBox" Content="Enable FrameThrower (Unicam)" HorizontalAlignment="Left" Margin="10,155,0,0" Height="20" Width="185" IsEnabled="False" VerticalAlignment="Top"/>
+              <Button x:Name="Unicam_button" Content="FrameThrower settings" Width="169" Height="20" Margin="200,154,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="False"/>
           </Grid>
 
       </GroupBox>

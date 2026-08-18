@@ -53,6 +53,7 @@ function Get-GithubRelease {
     $IsSuccess = $null
            
     do {
+      try {
         $GithubDetails = $client.GetStringAsync($GithubRepository).Result | ConvertFrom-Json
         if ($GithubDetails){
             $IsSuccess = $true  
@@ -62,14 +63,19 @@ function Get-GithubRelease {
             Start-Sleep -Seconds 3
             $IsSuccess = $false
         }
+      }
+      catch {
+        Write-InformationMessage -Message "Unable to retrieve GitHub release information: $($_.Exception.Message)"
+        $IsSuccess = $false
+      }
         $Counter ++              
     } until (
         $IsSuccess -eq $true -or $Counter -eq 3 
     )
 
     if ( -not $GithubDetails){
-        Write-ErrorMessage -Message "Error accessing Github! Quitting Program"
-        exit
+        Write-ErrorMessage -Message "Error accessing Github release information"
+        return $false
     }  
 
     If (($GithubReleaseType -eq "Release") -or ($GithubReleaseType -eq "Release-NoArchive")){
@@ -77,7 +83,7 @@ function Get-GithubRelease {
             $GithubDetails_ForDownload = $GithubDetails | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name }             
         }
         else {
-            $GithubDetails_Sorted = $GithubDetails | Where-Object { $_.tag_name -ne 'nightly' -and ($_.draft).tostring() -eq 'False' -and ($_.prerelease).tostring() -eq 'False' -and ($_.name).tostring() -notmatch 'Release Candidate'} | Sort-Object -Property 'tag_name' -Descending | Select-Object -ExpandProperty assets 
+            $GithubDetails_Sorted = $GithubDetails | Where-Object { $_.tag_name -ne 'nightly' -and ($_.draft).tostring() -eq 'False' -and ($_.prerelease).tostring() -eq 'False' -and ($_.name).tostring() -notmatch 'Release Candidate'} | Sort-Object -Property 'published_at' -Descending | Select-Object -ExpandProperty assets
             $NametoCheck = $Name
             $GithubDetails_ForDownload = $GithubDetails_Sorted  | Where-Object { $_.name -match $NametoCheck } | Select-Object -First 1
         }
@@ -90,6 +96,11 @@ function Get-GithubRelease {
         Write-ErrorMessage -Message "Error with input! Exiting!"
         exit
 
+    }
+
+    if (-not $GithubDetails_ForDownload) {
+        Write-ErrorMessage -Message "No matching release asset found for $Name"
+        return $false
     }
 
     $GithubDownloadURL = $GithubDetails_ForDownload[0].browser_download_url 
