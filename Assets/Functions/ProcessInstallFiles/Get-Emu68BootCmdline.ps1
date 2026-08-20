@@ -18,20 +18,10 @@ function Get-Emu68BootCmdline {
         } 
     }
     
-    if ($UnicamSettings -and $Script:GUIActions.UnicamEnabled -eq $true) {
-        if ($Script:GUIActions.UnicamStartonBoot -eq $true) {
-            $CmdlineToReturn = "$CmdLinetoReturn unicam.boot"
-        }
-
-        if ($Script:GUIActions.UnicamScalingType -eq "Smooth") {
-            $CmdlineToReturn = "$CmdLinetoReturn unicam.smooth unicam.b=$($Script:GUIActions.UnicamBParameter) unicam.c=$($Script:GUIActions.UnicamCParameter)"
-        }
-        elseif ($Script:GUIActions.UnicamScalingType -eq "Integer") {
-            $CmdlineToReturn = "$CmdLinetoReturn unicam.integer"
-        }
-    }
+    # Emu68 1.1 configures FrameThrower through dtoverlay=unicam in config.txt.
+    # Keep the switch for shared callers, but never emit obsolete unicam.*
+    # cmdline parameters alongside the overlay.
 
     return $CmdLinetoReturn
     
 }
-

@@ -117,11 +117,7 @@ function Update-ConfigTXT {
             $RevisedConfigTxt += "initramfs $($Script:GUIActions.FoundKickstarttoUse.Fat32Name)"
         }
         elseif ($line -eq '[DEFAULT_KERNEL]') {
-            if ($Script:GUIActions.UnicamEnabled -eq $true) {
-                # The official 1.1 alpha config and the known-good SD backup
-                # select the compressed classic kernel globally.
-                $RevisedConfigTxt += 'kernel=Emu68-pistorm.gz'
-            }
+            # Each GPIO section below selects the matching kernel.
         }
         elseif ($line -eq '[AVOID_WARNINGS]') {
             if ($Script:GUIActions.UnicamEnabled -eq $true) {
@@ -229,13 +225,30 @@ function Update-ConfigTXT {
                 elseif ($Script:GUIActions.UnicamScalingType -eq 'Integer') {
                     $UnicamParameters += 'integer'
                 }
+                $OverlaySuffix = if ($UnicamParameters.Count) { ",$($UnicamParameters -join ',')" } else { '' }
                 $RevisedConfigTxt += '# FrameThrower / Unicam settings for Emu68 1.1'
-                $RevisedConfigTxt += "dtoverlay=unicam,$($UnicamParameters -join ',')"
+                $RevisedConfigTxt += "dtoverlay=unicam$OverlaySuffix"
             }
         }
-        elseif ($line -eq '[KERNEL_PISTORM16]' -or $line -eq '[KERNEL_PISTORM]') {
+        elseif ($line -eq '[KERNEL_PISTORM32LITE]') {
             if ($Script:GUIActions.UnicamEnabled -eq $true) {
                 $RevisedConfigTxt += 'kernel=Emu68-pistorm.gz'
+            }
+            else {
+                $RevisedConfigTxt += 'kernel=Emu68-pistorm32lite'
+            }
+        }
+        elseif ($line -eq '[KERNEL_PISTORM16]') {
+            if ($Script:GUIActions.UnicamEnabled -eq $true) {
+                $RevisedConfigTxt += 'kernel=Emu68-pistorm.gz'
+            }
+            else {
+                $RevisedConfigTxt += 'kernel=Emu68-pistorm'
+            }
+        }
+        elseif ($line -eq '[KERNEL_PISTORM]') {
+            if ($Script:GUIActions.UnicamEnabled -eq $true) {
+                $RevisedConfigTxt += 'kernel=Emu68-pistorm-classic.gz'
             }
             else {
                 $RevisedConfigTxt += 'kernel=Emu68-pistorm'

@@ -17,6 +17,7 @@ if (Get-Variable -Name 'WPF_StartPage_PiStormModel_Dropdown' -ErrorAction Silent
             $Script:GUIActions.PiStormModel -ne $WPF_StartPage_PiStormModel_Dropdown.SelectedItem) {
             $Script:GUIActions.PiStormModel = $WPF_StartPage_PiStormModel_Dropdown.SelectedItem
             $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $true
+            Update-UI -Emu68Settings
         }
     })
 }

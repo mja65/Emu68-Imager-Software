@@ -76,7 +76,6 @@ function Get-OptionsBeforeRunningImage {
     $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Workbench Screen Mode selected (Raspberry Pi):",$Script:GUIActions.ScreenModetoUse)
     If ($Script:GUIActions.InstallOSFiles -eq $true){
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Network TCP/IP Stack:",$Script:GUIActions.NetworkStack)
-        $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Automatic network time sync:",$Script:GUIActions.AutomaticTimeSyncEnabled)
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("SSID to configure:",$SSID)
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Wifi Password to set:",$WifiPassword)
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Screen Mode selected (Workbench):",$Script:GUIActions.ScreenModetoUseWB)
@@ -95,4 +94,3 @@ function Get-OptionsBeforeRunningImage {
 # $WPF_RunWindow_RunOptions_Datagrid.Columns
 
 }
-

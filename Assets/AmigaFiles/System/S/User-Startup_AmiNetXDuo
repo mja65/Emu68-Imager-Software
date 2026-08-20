@@ -1,3 +1,0 @@
-;BEGIN AmiNetXDuo
-Run >NIL: RX SYS:PiStorm/Network/Network.rexx Action=Connect device=wifipi ipstack=AmiNetXDuo
-;END AmiNetXDuo

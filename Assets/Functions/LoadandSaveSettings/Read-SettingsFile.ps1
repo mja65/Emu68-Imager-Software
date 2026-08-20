@@ -84,9 +84,6 @@ function Read-SettingsFile {
    $Script:GUIActions.KickstartVersiontoUse = $null
    $Script:GUIActions.KickstartVersiontoUseFriendlyName = $null
    $Script:GUIActions.OSInstallMediaType = $null
-   # Settings files created before this option existed keep the historical
-   # behaviour: automatic network time synchronisation remains enabled.
-   $Script:GUIActions.AutomaticTimeSyncEnabled = $true
    $Script:GUIActions.SSID = $null
    $Script:GUIActions.WifiPassword = $null
    $Script:GUIActions.FoundInstallMediatoUse = $null
@@ -327,7 +324,7 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
         if ($_.Setting -eq 'DiskTypeSelected'){
             $DiskTypetouse = $_.Value       
         }        
-        else {
+        elseif ($_.Setting -ne 'AutomaticTimeSyncEnabled') {
             (Get-Variable -Scope Script -Name "GUIActions").Value.$($_.Setting) = $_.Value
         }
     }  
@@ -338,15 +335,6 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
         'Classic PiStorm (CPLD)' { $Script:GUIActions.PiStormModel = 'Classic PiStorm' }
     }
 
-    if ($null -eq $Script:GUIActions.AutomaticTimeSyncEnabled -or
-        [string]::IsNullOrWhiteSpace("$($Script:GUIActions.AutomaticTimeSyncEnabled)")) {
-        $Script:GUIActions.AutomaticTimeSyncEnabled = $true
-    }
-    else {
-        $Script:GUIActions.AutomaticTimeSyncEnabled = [System.Convert]::ToBoolean(
-            "$($Script:GUIActions.AutomaticTimeSyncEnabled)"
-        )
-    }
    
     if ($FoundKickstarttoUse.KickstartPath){
         if (Test-Path $FoundKickstarttoUse.KickstartPath){
@@ -400,9 +388,6 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
     $WPF_StartPage_KickstartVersion_Dropdown.SelectedItem = $Script:GUIActions.KickstartVersiontoUseFriendlyName
     if (Get-Variable -Name 'WPF_StartPage_PiStormModel_Dropdown' -ErrorAction SilentlyContinue) {
         $WPF_StartPage_PiStormModel_Dropdown.SelectedItem = $Script:GUIActions.PiStormModel
-    }
-    if (Get-Variable -Name 'WPF_StartPage_TimeSync_CheckBox' -ErrorAction SilentlyContinue) {
-        $WPF_StartPage_TimeSync_CheckBox.IsChecked = $Script:GUIActions.AutomaticTimeSyncEnabled
     }
     $WPF_StartPage_Password_Textbox.Text = $Script:GUIActions.Password
     $WPF_StartPage_SSID_Textbox.Text = $Script:GUIActions.SSID
@@ -575,7 +560,6 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
     return $true
 
 }
-
 
 
 

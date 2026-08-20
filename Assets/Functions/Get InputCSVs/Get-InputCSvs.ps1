@@ -56,13 +56,25 @@ function Get-InputCSVs {
     #Write-debug "I was called by: $($caller.FunctionName) at line $($caller.ScriptLineNumber)"
         
     $Pathstouse = @($Pathtouse)
-    if (($PackagestoInstall -or $PackagestoInstallEmu68Only) -and
-        (Test-Path -LiteralPath $Script:Settings.SupplementalPackagesCSV.Path)) {
-        $Pathstouse += $Script:Settings.SupplementalPackagesCSV.Path
+    if ($PackagestoInstall -or $PackagestoInstallEmu68Only) {
+        @($Script:Settings.SupplementalPackagesCSV.Path) | ForEach-Object {
+            if (Test-Path -LiteralPath $_ -PathType Leaf) {
+                $Pathstouse += $_
+            }
+        }
     }
 
     $Pathstouse | ForEach-Object {
         Import-Csv -Path $_ -Delimiter ";" | ForEach-Object {
+            # AmiNetXDuo is under active development. Keep all of its manifest
+            # rows on the release that has been reviewed with this imager.
+            if ($_.PackageName -eq 'AmiNetXDuo') {
+                $_.GithubName = '^AmiNetXDuo-0\.24\.1\.lha$'
+                $_.GithubRelease = 'v0.24.1'
+                $_.FileDownloadName = 'AmiNetXDuo-0.24.1.lha'
+                $_.PerformHashCheck = 'TRUE'
+                $_.Hash = '7a155a1946f8e4cca74d4009a0b1937f3045025c7a0e3c5d8c16e83054a6ade0'
+            }
             if ($_.MinimumInstallerVersion -ne "" -and $_.InstallerVersionLessThan -ne ""){
                 if (($Script:Settings.Version -ge [system.version]$_.MinimumInstallerVersion) -and ($Script:Settings.Version -lt [system.version]$_.InstallerVersionLessThan)){
                     $CSV += $_
@@ -215,6 +227,7 @@ function Get-InputCSVs {
                         FileDownloadName = $_.FileDownloadName
                         PerformHashCheck = $_.PerformHashCheck
                         Hash = $_.Hash
+                        RequiredArchiveEntries = $_.RequiredArchiveEntries
                         FilestoInstall = $_.FilestoInstall
                         UseUAEFSDB = $_.UseUAEFSDB
                         DrivetoInstall = $_.DrivetoInstall
@@ -223,6 +236,7 @@ function Get-InputCSVs {
                         CopyRecursive = $_.CopyRecursive
                         UncompressZFiles = $_.UncompressZFiles
                         CreateFolderInfoFile = $_.CreateFolderInfoFile
+                        CreateToolInfoFiles = $_.CreateToolInfoFiles
                         NewFileName = $_.NewFileName
                         ScriptBeingModified = $_.ScriptBeingModified
                         ModifyScript  = $_.ModifyScript 
@@ -273,6 +287,7 @@ function Get-InputCSVs {
                     FileDownloadName = $_.FileDownloadName
                     PerformHashCheck = $_.PerformHashCheck
                     Hash = $_.Hash
+                    RequiredArchiveEntries = $_.RequiredArchiveEntries
                     FilestoInstall = $_.FilestoInstall
                     UseUAEFSDB = $_.UseUAEFSDB
                     DrivetoInstall = $_.DrivetoInstall
@@ -281,6 +296,7 @@ function Get-InputCSVs {
                     CopyRecursive = $_.CopyRecursive
                     UncompressZFiles = $_.UncompressZFiles
                     CreateFolderInfoFile = $_.CreateFolderInfoFile
+                    CreateToolInfoFiles = $_.CreateToolInfoFiles
                     NewFileName = $_.NewFileName
                     ScriptBeingModified = $_.ScriptBeingModified
                     ModifyScript  = $_.ModifyScript 
@@ -307,18 +323,14 @@ function Get-InputCSVs {
         if ($Script:GUIActions.UnicamEnabled -ne $true) {
             $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -notmatch '^FrameThrower'}
         }
+        elseif ([string]::IsNullOrWhiteSpace($Script:GUIActions.PiStormModel)) {
+            throw 'FrameThrower requires a selected PiStorm model.'
+        }
         elseif ($Script:GUIActions.PiStormModel -eq 'Classic PiStorm') {
             $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -ne 'FrameThrowerPiStorm'}
         }
         elseif ($Script:GUIActions.PiStormModel) {
             $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -ne 'FrameThrowerClassic'}
-        }
-        else {
-            $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -notin @('FrameThrowerPiStorm', 'FrameThrowerClassic')}
-        }
-
-        if ($Script:GUIActions.AutomaticTimeSyncEnabled -ne $true) {
-            $CSVtoReturn = $CSVtoReturn | Where-Object {$_.InstallCondition -ne 'TimeSync'}
         }
     }
     
@@ -379,4 +391,3 @@ function Get-InputCSVs {
 
     return $CSVtoReturn
 }
-

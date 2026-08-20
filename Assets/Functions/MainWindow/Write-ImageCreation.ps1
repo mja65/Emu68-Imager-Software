@@ -37,11 +37,11 @@ function Write-ImageCreation {
         $OutputTypetoUse = "Physical Disk"
      }
      
-     if ($Script:GUIActions.InstallOSFiles -eq $false){
-        Write-AmigaFilestoInterimDrive -DownloadFilesFromInternet -CopyRemainingFiles  # 15 tasks
-     }
-     elseif ($Script:GUIActions.InstallOSFiles -eq $true){
-        Write-AmigaFilestoInterimDrive -DownloadFilesFromInternet -DownloadLocalFiles -ExtractADFFilesandIconFiles -AdjustingScriptsandInfoFiles -ProcessDownloadedFiles -CopyRemainingFiles -wifiprefs -AdjustWBStartup
+    if ($Script:GUIActions.InstallOSFiles -eq $false){
+        $InterimDriveResult = @(Write-AmigaFilestoInterimDrive -DownloadFilesFromInternet -CopyRemainingFiles)  # 15 tasks
+    }
+    elseif ($Script:GUIActions.InstallOSFiles -eq $true){
+        $InterimDriveResult = @(Write-AmigaFilestoInterimDrive -DownloadFilesFromInternet -DownloadLocalFiles -ExtractADFFilesandIconFiles -AdjustingScriptsandInfoFiles -ProcessDownloadedFiles -CopyRemainingFiles -wifiprefs -AdjustWBStartup)
         If ($Script:GUIActions.NetworkStack -eq "Miami"){
            $CommandstoAddNetworkStack = (Get-MiamiUserFiles -MiamiFilesPath $Script:Settings.MiamiFilesLocation -DestinationPath $([System.IO.Path]::GetFullPath("$($Script:Settings.InterimAmigaDrives)\System"))) 
          }
@@ -53,6 +53,11 @@ function Write-ImageCreation {
             $Script:GUICurrentStatus.HSTCommandstoProcess.WriteDirectFilestoDisk += $CommandstoAddNetworkStack      
          }
       }
+
+     if ($InterimDriveResult -contains $false) {
+        Write-ErrorMessage -Message 'Image preparation stopped because a required package could not be retrieved or validated.'
+        return $false
+     }
       
      if ($Script:GUIActions.InstallOSFiles -eq $true){
         

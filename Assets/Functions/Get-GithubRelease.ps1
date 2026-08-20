@@ -5,7 +5,8 @@ function Get-GithubRelease {
         $Tag_Name,
         $Name,
         $LocationforDownload,
-        $FileNameforDownload
+        $FileNameforDownload,
+        [ref]$ResolvedDigest
     )
   
     #Write-host "GithubRepository: $GithubRepository GithubReleaseType: $GithubReleaseType Tag_Name: $Tag_Name Name:$Name LocationforDownload: $LocationforDownload FileNameforDownload: $FileNameforDownload"
@@ -104,6 +105,9 @@ function Get-GithubRelease {
     }
 
     $GithubDownloadURL = $GithubDetails_ForDownload[0].browser_download_url 
+    if ($null -ne $ResolvedDigest) {
+        $ResolvedDigest.Value = $GithubDetails_ForDownload[0].digest
+    }
     Write-InformationMessage -Message ('Downloading Files for URL: '+$GithubDownloadURL)
     # Write-debug "GithubDownload: $GithubDownloadURL LocationforDownload: $PathforDownload"
     if ((Get-DownloadFile -DownloadURL $GithubDownloadURL -OutputLocation $PathforDownload -NumberofAttempts 3) -eq $true){
@@ -116,4 +120,3 @@ function Get-GithubRelease {
 
     return $true   
 }
-

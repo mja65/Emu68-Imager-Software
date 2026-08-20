@@ -57,13 +57,13 @@ gpio=0-27=pu
 
 ##If keyboard reset is kept hold, then put pistorm32 into stealth mode, boots stock A1200
 [gpio4=0]
-kernel=Emu68-pistorm32lite
+[KERNEL_PISTORM32LITE]
 initramfs ps32lite-stealth-firmware.gz
 
 [all]
 ##PiStorm32lite Boot
 [gpio24=0]
-kernel=Emu68-pistorm32lite
+[KERNEL_PISTORM32LITE]
 [ROMPATH]
 
 [all]
@@ -77,4 +77,3 @@ kernel=Emu68-pistorm32lite
 [gpio17=0]
 [KERNEL_PISTORM]
 [ROMPATH]
-

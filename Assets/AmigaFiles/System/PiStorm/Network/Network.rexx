@@ -1,11 +1,11 @@
-/* $VER: Network.rexx 1.1 (2026-08-17)                                        */
-/* Script to take Amiga online and offline including sync of clock            */
+/* $VER: Network.rexx 1.2 (2026-08-19)                                        */
+/* Script to take Amiga online and offline                                    */
 /*                                                                            */
 
 /******************************************************************************
  *                                                                            *
  * REQUIREMENTS:                                                              *
- * - IP Stack:            AmiNetXDuo, Miami or Roadshow                       *
+ * - IP Stack:            AmiTCP_NG, AmiNetXDuo, Miami or Roadshow            *
  * - Devices:             genet.device or wifipi.device or                    *
  *                        uaenet.device(for UAE, built-in)                    *
  *                        or v2expeth.device (Apollo V2)                      *
@@ -50,8 +50,8 @@ SAY "**********************************************"
 
 /* Check IPStack */
 IF action = "CONNECT" then DO
-   IF FIND("AMINETXDUO ROADSHOW MIAMI",ipstack) = 0 THEN DO
-      SAY "Error: Invalid IPSTACK '"ipstack"'. Must be AmiNetXDuo, Roadshow or Miami."
+   IF FIND("AMITCP_NG AMINETXDUO ROADSHOW MIAMI",ipstack) = 0 THEN DO
+      SAY "Error: Invalid IPSTACK '"ipstack"'. Must be AmiTCP_NG, AmiNetXDuo, Roadshow or Miami."
       CALL CloseWindowMessage()
       EXIT 10
    END
@@ -72,14 +72,12 @@ If ipstack = "ROADSHOW" then DO
 END
 
 SwitchNoCloseWirelessManager = "FALSE"
-SwitchNoSyncTime = "FALSE"
 SwitchNoCloseMiami = "FALSE"
 SwitchNoReStartMiami = "FALSE"
 SwitchNoReStartWirelessManager = "FALSE"
 SwitchNoShutDownRoadshow = "FALSE"
 
 IF POS('NOCLOSEWIRELESSMANAGER', input) > 0 THEN SwitchNoCloseWirelessManager = "TRUE"
-IF POS('NOSYNCTIME', input) > 0 THEN SwitchNoSyncTime = "TRUE"
 IF POS('NOCLOSEMIAMI', input) > 0 THEN SwitchNoCloseMiami = "TRUE"
 IF POS('NORESTARTMIAMI', input) > 0 THEN SwitchNoReStartMiami = "TRUE"
 IF POS('NORESTARTWIRELESSMANAGER', input) > 0 THEN SwitchNoReStartWirelessManager = "TRUE"
@@ -121,11 +119,16 @@ If IPStack = "AMINETXDUO" then DO
       EXIT 10
    END
 END
+If IPStack = "AMITCP_NG" then DO
+   IF ~IsAmiTCPNGInstalled() THEN DO
+      CALL CloseWindowMessage()
+      EXIT 10
+   END
+END
 
 WirelessprefsPath = "SYS:Prefs/Env-Archive/sys/wireless.prefs"
 WifiPiDevicePath   = "Sys:Devs/Networks/wifipi.device"
 WirelesslogFilePath   = "RAM:wirelessmanagerlog.txt"
-sntpLog = "RAM:sntplog.txt"
 RoadshowParametersFile = "Sys:Pistorm/RoadshowParameters"
 
 IF DEBUG = "TRUE" then DO
@@ -137,14 +140,12 @@ IF DEBUG = "TRUE" then DO
    SAY "SwitchNoRestartMiami: "SwitchNoRestartMiami 
    SAY "SwitchNoReStartWirelessManager: "SwitchNoReStartWirelessManager
    SAY "SwitchNoCloseMiami: "SwitchNoCloseMiami 
-   SAY "SwitchNoSyncTime: "SwitchNoSyncTime 
    SAY "SwitchNoCloseWirelessManager: "SwitchNoCloseWirelessManager
    SAY "SwitchWaitatEnd: "SwitchWaitatEnd
    SAY "SwitchNoShutDownRoadshow "SwitchNoShutDownRoadshow
    SAY "WirelessprefsPath: "WirelessprefsPath
    SAY "WifiPiDevicePath: "WifiPiDevicePath
    SAY "WirelesslogFilePath: "WirelesslogFilePath
-   SAY "sntpLog: "sntplog
    SAY "RoadshowParametersFile: "RoadshowParametersFile
 END
 
@@ -278,7 +279,7 @@ IF action = "CONNECT" then DO
          EXIT 10
       END
    END
-   IF ipstack = "ROADSHOW" | ipstack = "AMINETXDUO" THEN DO
+   IF ipstack = "ROADSHOW" | ipstack = "AMINETXDUO" | ipstack = "AMITCP_NG" THEN DO
       IF ipstack = "ROADSHOW" THEN CALL LoadRoadshowParams(DevicebaseName)
       'setenv InProgressBar Connecting to Network'
       'run >T:Progressbar.txt rx S:ProgressBar.rexx'
@@ -373,31 +374,7 @@ IF action = "CONNECT" then DO
       END
       ADDRESS COMMAND 
    END
-   if SwitchNoSyncTime = "FALSE" then DO
-      SAY "Updating system time"
-      If ~SyncTime() THEN DO
-         CALL CloseWindowMessage()
-         EXIT 5
-      End
-      ELSE DO
-         TZONE = GETENV('TZONE')
-         if TZONE="" THEN DO
-            TimeZoneOverride = GETENV('TZONEOVERRIDE')
-            if TimeZoneOverride~="" then DO
-               say TimeZoneOverride 
-               say "Using Timezone override"
-               'C:SetDST ZONE='TimeZoneOverride' NOASK NOREQ QUIET >NIL:'
-            END
-            ELSE 'C:SetDST NOASK NOREQ QUIET >NIL:'
-            If ~SyncTime() THEN DO
-               CALL CloseWindowMessage()
-               EXIT 5
-            End
-         END         
-      END 
-      SAY "Time set and DST applied if applicable"
-   END
-   IF ipstack = "ROADSHOW" | ipstack = "AMINETXDUO" THEN DO
+   IF ipstack = "ROADSHOW" | ipstack = "AMINETXDUO" | ipstack = "AMITCP_NG" THEN DO
       SAY ""
       say "Successfully connected to Network!" 
       SAY ""
@@ -413,6 +390,7 @@ IF action = "DISCONNECT" then DO
    CALL KillNetworkShares()
    If ipstack = "ROADSHOW" THEN CALL KillRoadshow()
    If ipstack = "AMINETXDUO" THEN CALL KillAmiNetXDuo()
+   If ipstack = "AMITCP_NG" THEN CALL KillAmiTCPNG()
    IF ipstack = "MIAMI" THEN DO
       IF ~SHOW('P', 'MIAMI.1') THEN DO
          SAY ""
@@ -466,24 +444,6 @@ EXIT 0
 
 /* ================= FUNCTIONS ================= */
 
-SyncTime:
- /* AddNetInterface can return before DHCP and DNS are fully ready,
-    especially with AmiNetXDuo. SNTP itself is the readiness test because
-    AreWeOnline depends on an unrelated HTTP host. */
- DO FOREVER
-    IF ~EXISTS('C:sntp') THEN DO
-       SAY "Waiting for C:sntp"
-       'Wait 5'
-       ITERATE
-    END
-    'C:sntp pool.ntp.org >'sntpLog
-    'Search' sntpLog '"Correction applied to system time" >NIL:'
-    IF RC = 0 THEN DO
-       RETURN 1
-    END
-    SAY "Time synchronisation failed; retrying"
-    'Wait 10'
- END
 IsMiamiInstalled:
    'assign exists Miami: >NIL:'
    IF RC >= 5 then DO
@@ -547,13 +507,39 @@ IsAmiNetXDuoInstalled:
       SAY "AmiNetXDuo is not installed!"
       RETURN 0
    END
+IsAmiTCPNGInstalled:
+   IF EXISTS('Libs:bsdsocket.library') & EXISTS('SYS:Programs/AmiTCP_NG/COPYING') THEN DO
+      IF DEBUG = "TRUE" then SAY "AmiTCP_NG installed"
+      RETURN 1
+   END
+   ELSE DO
+      SAY "AmiTCP_NG is not installed!"
+      RETURN 0
+   END
 KillRoadshow:
    'c:Netshutdown >NIL:'
    Return
 KillAmiNetXDuo:
    /* AmiNetXDuo is designed to stay loaded until reboot. Offline only the
-      selected interface instead of racing NetShutdown against socket users. */
+      configured interfaces instead of racing NetShutdown against socket users. */
    IF device ~= "" THEN 'C:Offline 'DevicebaseName' 0 >NIL:'
+   ELSE DO
+      'C:Offline wifipi 0 >NIL:'
+      'C:Offline genet 0 >NIL:'
+      'C:Offline uaenet 0 >NIL:'
+      'C:Offline v2expeth 0 >NIL:'
+   END
+   Return
+KillAmiTCPNG:
+   /* The self-starting library remains loaded until reboot. Take configured
+      interfaces offline without calling NetShutdown. */
+   IF device ~= "" THEN 'C:Offline 'DevicebaseName' 0 >NIL:'
+   ELSE DO
+      'C:Offline wifipi 0 >NIL:'
+      'C:Offline genet 0 >NIL:'
+      'C:Offline uaenet 0 >NIL:'
+      'C:Offline v2expeth 0 >NIL:'
+   END
    Return
 KillMiami:
    IF SHOW('P', 'MIAMI.1') THEN DO
@@ -654,13 +640,13 @@ CloseWindowMessage:
 
 ShowUsage:
    SAY ""
-   SAY "Arexx program to connect to network via AmiNetXDuo, Miami or Roadshow and to synchronise time"
+   SAY "Arexx program to connect to network via AmiTCP_NG, AmiNetXDuo, Miami or Roadshow"
    SAY ""
    SAY "Usage: Rx Network.rexx ACTION=<Action Type> DEVICE=<Selected Device> IPSTACK=<IP Stack> <Options>"
    SAY "<Action Type>: Connect, Disconnect"
    SAY "<Selected Device>: WifiPi, Genet, Uaenet, V2expeth (applicable for Connect action type)"
-   SAY "<IP Stack>: AmiNetXDuo, Miami, Roadshow"
-   SAY "<Options>: NoSyncTime, NoRestartMiami, NoRestartWirelessManager, NoShutdownRoadshow (applicable for connect action type)"
+   SAY "<IP Stack>: AmiTCP_NG, AmiNetXDuo, Miami, Roadshow"
+   SAY "<Options>: NoRestartMiami, NoRestartWirelessManager, NoShutdownRoadshow (applicable for connect action type)"
    SAY "<Options>: NoCloseWirelessManager, NoCloseMiami (applicable for disconnect action type)"
    SAY "<Options>: Debug, WaitatEnd"
    SAY ""

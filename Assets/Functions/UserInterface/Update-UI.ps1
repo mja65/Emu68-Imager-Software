@@ -90,7 +90,6 @@ function Update-UI {
 
         if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
             $WPF_StartPage_Unicam_button.Visibility = "Hidden"
-            $WPF_StartPage_NetworkStack_RadioButtonNone.Visibility = "Hidden"            
         }
 
         if ($Script:GUIActions.InstallOSFiles -eq $true){
@@ -160,17 +159,8 @@ function Update-UI {
             $WPF_StartPage_Password_Textbox.Text = $Script:GUIActions.WifiPassword 
         }
         
-        if ($Script:GUIActions.NetworkStack -eq "Miami"){
-            $WPF_StartPage_NetworkStack_RadioButtonMiami.IsChecked = 1
-        }
-        if ($Script:GUIActions.NetworkStack -eq "Roadshow"){
-            $WPF_StartPage_NetworkStack_RadioButtonRoadshow.IsChecked = 1
-        }
-        if ($Script:GUIActions.NetworkStack -eq "AmiNetXDuo"){
-            $WPF_StartPage_NetworkStack_RadioButtonAmiNetXDuo.IsChecked = 1
-        }
-        if (Get-Variable -Name 'WPF_StartPage_TimeSync_CheckBox' -ErrorAction SilentlyContinue) {
-            $WPF_StartPage_TimeSync_CheckBox.IsChecked = ($Script:GUIActions.AutomaticTimeSyncEnabled -eq $true)
+        if (Get-Variable -Name 'WPF_StartPage_NetworkStack_Dropdown' -ErrorAction SilentlyContinue) {
+            $WPF_StartPage_NetworkStack_Dropdown.SelectedItem = $Script:GUIActions.NetworkStack
         }
         if (($Script:GUIActions.ScreenModetoUseFriendlyName) -and (-not ($WPF_StartPage_ScreenMode_Dropdown.SelectedItem))) {
            $WPF_StartPage_ScreenMode_Dropdown.SelectedItem = $Script:GUIActions.ScreenModetoUseFriendlyName
@@ -195,6 +185,8 @@ function Update-UI {
             $WPF_StartPage_CustomScreenMode_button.Visibility = "Hidden"
             $WPF_StartPage_CustomScreenMode_button.IsEnabled = 0             
         }
+        $FrameThrowerModelSelected = -not [string]::IsNullOrWhiteSpace($Script:GUIActions.PiStormModel)
+
         if ($Script:GUIActions.ScreenModetoUseWB){
             if ($Script:GUIActions.ScreenModeType -eq "Native"){
                 $WPF_StartPage_WorkbenchColour_Slider.IsEnabled = 1
@@ -203,10 +195,18 @@ function Update-UI {
                 $WPF_StartPage_Unicam_CheckBox.IsChecked = 0                    
             }                
             elseif ($Script:GUIActions.ScreenModeType -eq "RTG"){
-                $WPF_StartPage_Unicam_CheckBox.IsEnabled = 1                                                              
+                $WPF_StartPage_Unicam_CheckBox.IsEnabled = $FrameThrowerModelSelected
                 $WPF_StartPage_WorkbenchColour_Slider.IsEnabled = 0
                 $WPF_StartPage_WorkbenchColour_Slider.Maximum = 24                
             }
+        }
+
+        if (-not $FrameThrowerModelSelected) {
+            $Script:GUIActions.UnicamEnabled = $false
+            $Script:GUIActions.UnicamStartonBoot = [bool]$null
+            $Script:GUIActions.UnicamScalingType = $null
+            $Script:GUIActions.UnicamBParameter = $null
+            $Script:GUIActions.UnicamCParameter = $null
         }
 
         if ($Script:GUIActions.UnicamEnabled -eq $false){
@@ -794,8 +794,5 @@ function Update-UI {
         
         
                       
-
-
-
 
 

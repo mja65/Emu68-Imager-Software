@@ -37,9 +37,6 @@
 # Local state for the Codex documentation hook
 /.codex/.docs-hook-state.json
 
-# Local state for the Codex documentation hook
-/.codex/.docs-hook-state.json
-
 # Common PowerShell/editor artifacts
 *.tmp
 *.bak

@@ -2,7 +2,7 @@ function Get-RemovableMedia {
     param (
     )
     $RemovableMediaList = [System.Collections.Generic.List[PSCustomObject]]::New()
-    Get-WmiObject Win32_DiskDrive | Where-Object {$_.MediaType -eq "Removable Media"} | ForEach-Object {
+    Get-CimInstance -ClassName Win32_DiskDrive | Where-Object {$_.MediaType -eq "Removable Media"} | ForEach-Object {
         $DriveStartpoint = $_.DeviceID.IndexOf('DRIVE')+5 # 5 is length of 'Drive'
         $DriveEndpoint = $_.DeviceID.Length
         $DriveLength = $DriveEndpoint- $DriveStartpoint

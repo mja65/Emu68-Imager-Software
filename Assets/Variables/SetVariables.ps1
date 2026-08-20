@@ -1,7 +1,17 @@
 $Script:DP_Settings = [PSCustomObject]@{
     PartitionPrefix = 'WPF_DP_Partition_'
 }
-$osInfo = Get-WmiObject -Class Win32_OperatingSystem
+try {
+    $osInfo = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop
+}
+catch {
+    # Starting the WPF UI can cause the legacy WMI COM call to be cancelled.
+    # These two settings are informational, so a COM-free fallback is enough.
+    $osInfo = [PSCustomObject]@{
+        Caption        = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
+        OSArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+    }
+}
 
 $Script:Settings = [PSCustomObject]@{
     Emu68BootCmdline = "sd.unit0=rw emmc.unit0=rw"
@@ -77,7 +87,11 @@ $Script:Settings = [PSCustomObject]@{
         GID = '550697464'
     }
     SupplementalPackagesCSV = [PSCustomObject]@{
-        Path = '.\Assets\PackageManifests\AmiNetXDuo.CSV'
+        Path = @(
+            '.\Assets\PackageManifests\AmiNetXDuo.CSV'
+            '.\Assets\PackageManifests\AmiTCP_NG.CSV'
+            '.\Assets\PackageManifests\Emu68FrameThrower.CSV'
+        )
     }
     ScreenModesCSV = [PSCustomObject]@{
         Path = '.\InputFiles\ScreenModes.CSV'
@@ -271,7 +285,6 @@ $Script:GUIActions = [PSCustomObject]@{
     OSInstallMediaType = $null
     #UseGlowIcons = $null
     NetworkStack = $null
-    AutomaticTimeSyncEnabled = $true
     SSID = $null
     WifiPassword = $null
     FoundInstallMediatoUse = $null

@@ -46,16 +46,18 @@ $ListofFiles = @"
     \System\PiStorm\Install Packages
     \System\PiStorm\Install Packages.info
     \System\PiStorm\Network\Network.rexx
-    \System\PiStorm\Network\SyncTime.rexx
     \System\PiStorm\Network\OfflineScriptMenutools_Roadshow
     \System\PiStorm\Network\OfflineScriptMenutools_Miami
     \System\PiStorm\Network\OfflineScriptMenutools_AmiNetXDuo
+    \System\PiStorm\Network\OfflineScriptMenutools_AmiTCP_NG
     \System\PiStorm\Network\OnlineGENetScriptMenutools_Roadshow
     \System\PiStorm\Network\OnlineGENetScriptMenutools_Miami
     \System\PiStorm\Network\OnlineGENetScriptMenutools_AmiNetXDuo
+    \System\PiStorm\Network\OnlineGENetScriptMenutools_AmiTCP_NG
     \System\PiStorm\Network\OnlineWifiScriptMenuTools_Roadshow
     \System\PiStorm\Network\OnlineWifiScriptMenuTools_Miami
     \System\PiStorm\Network\OnlineWifiScriptMenuTools_AmiNetXDuo
+    \System\PiStorm\Network\OnlineWifiScriptMenuTools_AmiTCP_NG
     \System\PiStorm\Network\Onlinev2expethScriptMenutools_Roadshow
     \System\PiStorm\Network\Onlinev2expethScriptMenutools_Miami
     \System\PiStorm\Network\_UAEFSDB.___
@@ -107,7 +109,6 @@ $ListofFiles = @"
     \System\S\User-Startup_Picasso96
     \System\S\User-Startup_Roadshow
     \System\S\User-Startup_Miami
-    \System\S\User-Startup_AmiNetXDuo
     \System\S\_UAEFSDB.___
     \System\Storage\DosDrivers\SMB0
     \System\Storage\DosDrivers\SMB0.info.txt

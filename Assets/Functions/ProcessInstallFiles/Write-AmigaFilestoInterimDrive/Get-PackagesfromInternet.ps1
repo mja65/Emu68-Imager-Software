@@ -22,11 +22,29 @@ function Get-PackagesfromInternet {
         Write-StartSubTaskMessage 
         if ($Line.Source -eq "Github"){
             $GithubDownloadLocation = $Settings.WebPackagesDownloadLocation
+            $GithubDownloadPath = Join-Path $GithubDownloadLocation $Line.FileDownloadName
+            $ResolvedGithubDigest = $null
             #Write-debug "GithubRepository: $($line.SourceLocation) GithubReleaseType: $($Line.GithubReleaseType) Tag_Name: $($line.GithubRelease) Name: $($line.GithubName) LocationforDownload: $("$GithubDownloadLocation\") FileNameforDownload: $($line.FileDownloadName)"
-            if (-not(Get-GithubRelease -GithubRepository $line.SourceLocation -GithubReleaseType $Line.GithubReleaseType -Tag_Name $line.GithubRelease -Name $line.GithubName -LocationforDownload "$GithubDownloadLocation\" -FileNameforDownload "$($line.FileDownloadName)")){
+            $GithubDownloadSucceeded = Get-GithubRelease -GithubRepository $line.SourceLocation -GithubReleaseType $Line.GithubReleaseType -Tag_Name $line.GithubRelease -Name $line.GithubName -LocationforDownload "$GithubDownloadLocation\" -FileNameforDownload "$($line.FileDownloadName)" -ResolvedDigest ([ref]$ResolvedGithubDigest)
+
+            if ("$($Line.PerformHashCheck)" -eq 'TRUE' -and [string]::IsNullOrWhiteSpace($ResolvedGithubDigest)) {
+                Write-InformationMessage -Message "GitHub did not publish a digest for $($line.GithubName); the online asset cannot be verified"
+                $GithubDownloadSucceeded = $false
+            }
+
+            if (-not $GithubDownloadSucceeded -and (Test-Path -LiteralPath $GithubDownloadPath -PathType Leaf)) {
+                Remove-Item -LiteralPath $GithubDownloadPath -Force
+            }
+
+            if (-not (Confirm-GithubPackageDownload `
+                -DownloadPath $GithubDownloadPath `
+                -ExpectedHash $ResolvedGithubDigest `
+                -BackupSourceLocation $Line.BackupSourceLocation `
+                -FallbackExpectedHash $Line.Hash)) {
                 Write-ErrorMessage -Message "Error downloading the official GitHub release asset $($line.GithubName)! Cannot continue!"
                 return $false
             }
+
         }
         elseif (($Line.Source -eq "Web") -or ($Line.Source -eq "Web - SearchforPackageAminet") -or ($Line.Source -eq "Web - SearchforPackageWHDLoadWrapper")) {
             $SourceLocation = $null
@@ -80,7 +98,26 @@ function Get-PackagesfromInternet {
                 Write-InformationMessage -Message "No Download Required"
             }
         }
+
+        if ($Line.Source -in @(
+                'Github',
+                'Web',
+                'Web - SearchforPackageAminet',
+                'Web - SearchforPackageWHDLoadWrapper'
+            ) -and
+            -not (Test-PackageArchiveStructure `
+                -ArchivePath (Join-Path $Settings.WebPackagesDownloadLocation $Line.FileDownloadName) `
+                -RequiredArchiveEntries $Line.RequiredArchiveEntries)) {
+            $RejectedArchivePath = Join-Path $Settings.WebPackagesDownloadLocation $Line.FileDownloadName
+            if (Test-Path -LiteralPath $RejectedArchivePath -PathType Leaf) {
+                Remove-Item -LiteralPath $RejectedArchivePath -Force
+            }
+            Write-ErrorMessage -Message "The downloaded package $($line.FileDownloadName) does not contain the required files! Cannot continue!"
+            return $false
+        }
+
         $Script:Settings.CurrentSubTaskNumber ++
     }
 
+    return $true
 }

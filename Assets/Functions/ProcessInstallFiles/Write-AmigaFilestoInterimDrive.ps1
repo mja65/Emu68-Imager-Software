@@ -74,11 +74,14 @@ function Write-AmigaFilestoInterimDrive {
         
         Write-StartTaskMessage
         
-        $ListofPackagestoDownloadfromInternetandExpand = $ListofPackagestoInstall | Where-Object {(($_.Source -eq "Github") -or  ($_.Source -eq "Web") -or ($_.Source -eq "Web - SearchforPackageAminet") -or ($_.Source -eq "Web - SearchforPackageWHDLoadWrapper"))} | Sort-Object 'FileDownloadName' | Select-Object 'Source','GithubName','GithubRelease','GithubReleaseType','SourceLocation','ArchiveinArchiveName','BackupSourceLocation','FileDownloadName','PerformHashCheck','Hash','UpdatePackageSearchTerm','UpdatePackageSearchResultLimit', 'UpdatePackageSearchExclusionTerm','UpdatePackageSearchMinimumDate' -Unique 
+        $ListofPackagestoDownloadfromInternetandExpand = $ListofPackagestoInstall | Where-Object {(($_.Source -eq "Github") -or  ($_.Source -eq "Web") -or ($_.Source -eq "Web - SearchforPackageAminet") -or ($_.Source -eq "Web - SearchforPackageWHDLoadWrapper"))} | Sort-Object 'FileDownloadName' | Select-Object 'Source','GithubName','GithubRelease','GithubReleaseType','SourceLocation','ArchiveinArchiveName','BackupSourceLocation','FileDownloadName','PerformHashCheck','Hash','RequiredArchiveEntries','UpdatePackageSearchTerm','UpdatePackageSearchResultLimit', 'UpdatePackageSearchExclusionTerm','UpdatePackageSearchMinimumDate' -Unique
         
-        $ListofPackagestoDownloadfromInternet = $ListofPackagestoDownloadfromInternetandExpand |  Select-Object 'Source','GithubName','GithubRelease','GithubReleaseType','SourceLocation','BackupSourceLocation','FileDownloadName','PerformHashCheck','Hash','UpdatePackageSearchTerm','UpdatePackageSearchResultLimit', 'UpdatePackageSearchExclusionTerm','UpdatePackageSearchMinimumDate' -Unique 
+        $ListofPackagestoDownloadfromInternet = $ListofPackagestoDownloadfromInternetandExpand |  Select-Object 'Source','GithubName','GithubRelease','GithubReleaseType','SourceLocation','BackupSourceLocation','FileDownloadName','PerformHashCheck','Hash','RequiredArchiveEntries','UpdatePackageSearchTerm','UpdatePackageSearchResultLimit', 'UpdatePackageSearchExclusionTerm','UpdatePackageSearchMinimumDate' -Unique
 
-        Get-PackagesfromInternet -ListofPackagestoDownload $ListofPackagestoDownloadfromInternet
+        if (-not (Get-PackagesfromInternet -ListofPackagestoDownload $ListofPackagestoDownloadfromInternet)) {
+            Write-ErrorMessage -Message 'Unable to retrieve and validate the required package archives.'
+            return $false
+        }
         
         Write-TaskCompleteMessage 
     
@@ -337,7 +340,7 @@ function Write-AmigaFilestoInterimDrive {
             }   
             # Peform Copying
             if ($_.Source -eq 'Github' -or $_.Source -eq 'Web' -or $_.Source -eq 'Web - SearchforPackageAminet' -or $_.Source -eq 'Web - SearchforPackageWHDLoadWrapper' ){
-               if ($_.GithubReleaseType -eq "Release-NoArchive") {
+              if ($_.GithubReleaseType -eq "Release-NoArchive") {
                    $ArchiveNameExtractedFilePath = $null             
                    $SourcePath = "$($Script:Settings.WebPackagesDownloadLocation)\$($_.FilestoInstall)"     
                 }
@@ -544,10 +547,6 @@ function Write-AmigaFilestoInterimDrive {
         }
     }
 
-    Set-AutomaticTimeSyncStartup `
-        -UserStartupPath "$($Script:Settings.InterimAmigaDrives)\System\S\User-Startup" `
-        -Enabled ($Script:GUIActions.AutomaticTimeSyncEnabled -eq $true)
-
     $Script:Settings.CurrentSubTaskNumber ++
     $Script:Settings.CurrentSubTaskName = "Modifying tooltypes"
     Write-StartSubTaskMessage
@@ -670,7 +669,7 @@ function Write-AmigaFilestoInterimDrive {
         $null = Copy-Item "$($Script:Settings.TempFolder)\IconFiles\NewFolder\NewFolder.info" "$DestinationFolder.info" 
         
     }
-    
+
     $Script:Settings.CurrentSubTaskNumber ++
     $Script:Settings.CurrentSubTaskName = "Modifying icon positions"
     Write-StartSubTaskMessage
@@ -715,4 +714,6 @@ function Write-AmigaFilestoInterimDrive {
     if ($AmigaTextFiles.Count -gt 0) {
         ConvertTo-AmigaLineEndings -Path $AmigaTextFiles
     }
+
+    return $true
 }
