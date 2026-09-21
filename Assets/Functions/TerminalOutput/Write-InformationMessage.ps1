@@ -2,6 +2,8 @@ function Write-InformationMessage {
     param (
         $Message,
         [switch]$NoLog,
+        [Switch]$NewLineBefore,
+        [Switch]$NewLineAfter,
         $LogLocation
     )
 
@@ -12,7 +14,16 @@ function Write-InformationMessage {
         $LogLocationtoUse = $Script:Settings.LogLocation
     }
     
-    Write-Host " `t $Message" -ForegroundColor Yellow
+    $Message = "`t$Message"
+    
+    If ($NewLineBefore){
+        $Message = "`n$Message"
+    }
+    if ($NewLineAfter){
+        $Message = "$Message`n"
+    }
+    
+    Write-Host $Message -ForegroundColor Yellow
     if (-not $NoLog){
         $Message | Out-File $LogLocationtoUse -Append -Encoding utf8
     }

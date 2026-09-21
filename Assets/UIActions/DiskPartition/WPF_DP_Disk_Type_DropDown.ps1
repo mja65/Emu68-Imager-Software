@@ -1,15 +1,15 @@
-$DropDownOptions = @()
+$WPF_DP_Disk_Type_DropDown.Items.Clear()
 
-$DropDownOptions += New-Object -TypeName pscustomobject -Property @{Option='PiStorm - MBR'}
-# $DropDownOptions += New-Object -TypeName pscustomobject -Property @{Option='PiStorm - GPT'}
-# $DropDownOptions += New-Object -TypeName pscustomobject -Property @{Option='Amiga - RDB'}
-
-foreach ($Option in $DropDownOptions){
-    $WPF_DP_Disk_Type_DropDown.AddChild($Option.Option)
+Get-InputFileCSV -CSV "DiskTypes" | ForEach-Object {
+    $WPF_DP_Disk_Type_DropDown.AddChild($_.DiskTypeFriendlyName)
+    if ($_.Default -eq $true){
+        $Script:GUIActions.DiskType = $_.DiskType
+    }
+        
 }
 
-$WPF_DP_Disk_Type_DropDown.SelectedItem = 'PiStorm - MBR'
-
 $WPF_DP_Disk_Type_DropDown.add_selectionChanged({
-    
+    if ($Script:GUICurrentStatus.LoadingSettings) {
+        return
+    }    
 })

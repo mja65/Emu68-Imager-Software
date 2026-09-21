@@ -5,6 +5,8 @@ $WPF_Window_Button_StartPage.Add_Click({
     }
 
 
+    Confirm-ValidPackageInstallDrives 
+
     $Script:GUICurrentStatus.CurrentWindow = 'StartPage'
     for ($i = 0; $i -lt $WPF_Window_Main.Children.Count; $i++) {        
         if ($WPF_Window_Main.Children[$i].Name -eq $WPF_PackageSelection.Name){

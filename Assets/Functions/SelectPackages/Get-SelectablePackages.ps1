@@ -1,53 +1,91 @@
 function Get-SelectablePackages {
     param (
-        [Switch]$PackagesOnly
+        [Switch]$PackagesOnly,
+        [Switch]$KeepInstallStatus
     )
 
+    $ExistingPackageDetails = @{}
+
+    If ($KeepInstallStatus){    
+        $Script:GUIActions.AvailablePackages.Where({ ($_.PackageNameUserSelected -ne $_.PackageNameDefaultInstall) -or 
+            ($_.UserDefinableInstallPath -eq $true -and ($_.PackageUserDrive -ne $_.PackageDefaultDrive -or $_.PackageUserPath -ne $_.PackageDefaultPath))
+        }) | ForEach-Object {
+            $ExistingPackageDetails[$_.PackageName] = @{
+                PackageNameUserSelected = $_.PackageNameUserSelected
+                PackageDefaultPath = $_.PackageDefaultPath
+                PackageDefaultDrive= $_.PackageDefaultDrive
+                PackageUserDrive   = $_.PackageUserDrive
+                PackageUserPath    = $_.PackageUserPath
+            }
+        }                        
+    }
+     
     $Script:GUIActions.AvailablePackages.Clear()
 
-    $UserSelectablePackageswithSourceLocation = Get-InputCSVs -PackagestoInstall | Where-Object {$_.PackageType -eq 'Selectable' -and (($_.NetworkStack -eq "Any") -or ($_.NetworkStack -eq  $Script:GUIActions.NetworkStack))} | Select-Object 'Source','SourceLocation',@{Name='PackageNameUserSelected';Expression = 'PackageNameDefaultInstall'},'PackageNameDefaultInstall','PackageNameFriendlyName','PackageNameGroup','PackageNameDescription' -Unique    
-    
-    $HashTableforInstallMedia = @{} # Clear Hash
+    $NetworkPackages = Get-ConfigurablePackages -NetworkStackPackages
+    $USBPackages = Get-ConfigurablePackages -USBStackPackages
 
-    $UserSelectablePackageswithSourceLocation | ForEach-Object {
-        if ($_.Source -eq 'ADF'){
-            $HashTableforInstallMedia[$_.PackageNameFriendlyName] = @('ADF') 
-            
+    $basePackageTypes    = 'Selectable OS', 'Selectable OS - DefaultInstall', 'Selectable Package', 'Selectable Package - DefaultInstall'
+    $networkPackageTypes = 'Selectable Package - Network - DefaultInstall', 'Selectable Package - Network'
+    $usbPackageTypes     = 'Selectable Package - USB - DefaultInstall', 'Selectable Package - USB'
+
+    $Packages = Get-InputFileCSV -CSV 'Packages' | ForEach-Object {
+        $type = $_.PackageType
+        $isBase    = $type -in $basePackageTypes
+        $isNetwork = $type -in $networkPackageTypes
+        $isUsb     = $type -in $usbPackageTypes
+        if ($isBase -or $isNetwork -or $isUsb) {
+            $inScope = $isBase -or ($isNetwork -and $_.PackageName -in $NetworkPackages) -or ($isUsb -and $_.PackageName -in $USBPackages)
+            $_ | Add-Member -NotePropertyName 'PackageinScope' -NotePropertyValue $inScope -PassThru
         }
+    } | Sort-Object -Property PackageNameFriendlyName
+            
+    foreach ($line in $Packages) {
+        $PackageNameDefaultInstall = $Line.PackageType -in  @('Selectable OS - DefaultInstall', 'Selectable Package - DefaultInstall', "Selectable Package - Network - DefaultInstall", "Selectable Package - USB - DefaultInstall")
+        If ($ExistingPackageDetails.ContainsKey($Line.PackageName)){
+            $PackageDetailstoUse = $ExistingPackageDetails[$Line.PackageName]
+            $PackageNameUserSelected = $PackageDetailstoUse.PackageNameUserSelected 
+            $PackageDefaultPath = $PackageDetailstoUse.PackageDefaultPath
+            $PackageDefaultDrive = $PackageDetailstoUse.PackageDefaultDrive
+            $PackageUserDrive = $PackageDetailstoUse.PackageUserDrive
+            $PackageUserPath = $PackageDetailstoUse.PackageUserPath
+        }
+        else {
+            $PackageNameUserSelected = $PackageNameDefaultInstall
+            $PackageDefaultPath = $line.PackageDefaultPath
+            $PackageDefaultDrive = $line.PackageDefaultDrive
+            $PackageUserDrive = $line.PackageDefaultDrive
+            $PackageUserPath =  $line.PackageDefaultPath
+        }
+
+        $RowData = @(
+            $PackageNameUserSelected
+            $PackageNameDefaultInstall
+            $line.PackageName
+            $line.PackageType           
+            $line.PackageNameFriendlyName
+            $line.PackageNameGroup
+            $line.PackageNameDescription
+            $line.PackageURL
+            $line.PackageAuthor
+            $line.UserDefinableInstallPath
+            $PackageDefaultDrive
+            $PackageUserDrive 
+            $PackageDefaultPath
+            $PackageUserPath
+            [bool]$line.PackageinScope 
+        )
+        [void]$Script:GUIActions.AvailablePackages.Rows.Add($RowData)
     }
-    
-    $DatatoPopulate = $UserSelectablePackageswithSourceLocation | Select-Object 'PackageNameUserSelected','PackageNameDefaultInstall','PackageNameFriendlyName','PackageNameGroup','PackageNameDescription' -Unique 
-    
-    $DatatoPopulate | Add-Member -NotePropertyName 'InstallMediaFlag' -NotePropertyValue $null
-    
-    $DatatoPopulate | ForEach-Object {
-         if ($HashTableforInstallMedia.ContainsKey($_.PackageNameFriendlyName)){
-            $_.InstallMediaFlag = $true
-         }
-         else {
-            $_.InstallMediaFlag = $false
-         }
-    }
-  
-    foreach ($line in $DatatoPopulate){
-        $Array = @()
-        $array += $line.PackageNameUserSelected
-        $array += $line.PackageNameDefaultInstall
-        $array += $line.PackageNameFriendlyName
-        $array += $line.PackageNameGroup
-        $array += $line.PackageNameDescription
-        $array +=$line.InstallMediaFlag
-        [void]$Script:GUIActions.AvailablePackages.Rows.Add($array)
-    }
+
+    $Script:GUIActions.AvailablePackages.DefaultView.RowFilter = "PackageinScope = true"
 
     If (-not ($PackagesOnly)){ 
         Write-AvailableIconsets
 
     }
 
-    $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $false
-
-    $Script:GUICurrentStatus.InstallMediaRequiredFromUserSelectablePackages = Confirm-RequiredSources | Where-Object {$_.Source -eq 'ADF' -and $_.RequiredFlagUserSelectable -eq 'True'} | Select-Object 'SourceLocation','Source' -Unique
-
+    $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
+   
 }
 

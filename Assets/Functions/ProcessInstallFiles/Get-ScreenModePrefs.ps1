@@ -2,6 +2,7 @@ function Get-ScreenModePrefs {
     param (
         $SourcePath,
         $ScreenMode,
+        $ModeID,
         $ColourDepth
         )
         
@@ -13,7 +14,13 @@ function Get-ScreenModePrefs {
        #$ScreenMode = "PAL:High Res. Laced (640*512)"
        #$ColourDepth = "3"
 
-       $ScreenModeToUse = (($Script:GUIActions.AvailableScreenModesWB |  Where-Object {$_.FriendlyName -eq $ScreenMode}).ModeID) -replace '\$'
+        If ($ModeID){
+            $ScreenModeToUse = $ModeID -replace '\$'
+        }
+        else {
+            $ScreenModeToUse = (($Script:GUIActions.AvailableScreenModesWB |  Where-Object {$_.FriendlyName -eq $ScreenMode}).ModeID) -replace '\$'
+        }
+    
        $ColourDepthToUse = [Convert]::ToString($ColourDepth, 16)
        $ColourDepthToUse = ([string]$ColourDepthtoUse).PadLeft(2, "0")
 

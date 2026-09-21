@@ -6,7 +6,7 @@ function Find-LatestAminetPackage {
         $Architecture
     )
     
-    $AminetMirrors =  Import-Csv $Script:Settings.AminetMirrorsCSV.Path -Delimiter ';'
+    $AminetMirrors =  Get-InputFileCSV -CSV 'AminetMirrors'
     $AminetURL='http://aminet.net'
     Write-InformationMessage -Message "Searching for: $PackagetoFind"
     foreach ($Mirror in $AminetMirrors){
@@ -25,7 +25,7 @@ function Find-LatestAminetPackage {
     }
   
     if ($IsSuccess -ne $true){
-        Write-ErrorMessage -Message "Could not access Aminet to find package! Unrrecoverable error!"
+        Write-ErrorMessage -Message "Could not access Aminet to find package! Unrecoverable error!"
         return   
     }
 
@@ -43,6 +43,6 @@ function Find-LatestAminetPackage {
             return ($AminetURL+$line.href)
        }       
     }
-    Write-ErrorMessage -Message "Could not find package! Unrrecoverable error!"
+    Write-ErrorMessage -Message "Could not find package! Unrecoverable error!"
     return                 
 }

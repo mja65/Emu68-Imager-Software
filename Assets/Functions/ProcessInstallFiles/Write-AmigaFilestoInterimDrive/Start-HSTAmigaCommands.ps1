@@ -1,13 +1,26 @@
 function Start-HSTAmigaCommands {
     param (
-        $HSTScript
+        $HSTScript,
+        [switch]$DebugFlag
 
     )
-         
+
+    If ($DebugFlag){
+        $LogNameDateTime = (Get-Date -Format yyyyMMddHHmmss).tostring()
+        $DetailedLogLocation = join-pathMulti $Script:Settings.LogFolder "$LogNameDateTime`_HSTAmigaDebugLog.txt" -UseFullPath
+    }
+    elseif ($Script:Settings.HSTDetailedLogEnabled -eq $true){
+        $DetailedLogLocation = $Script:Settings.HSTDetailedLogLocation
+    }
+
+    #$HSTScript = ($Script:GUICurrentStatus.HSTAmigaCommandstoProcess.UpdateDefaultIcons + $Script:GUICurrentStatus.HSTAmigaCommandstoProcess.AdjustIcons + $Script:GUICurrentStatus.HSTAmigaCommandstoProcess.ModifyToolTypes)
+
+    $HSTScript = ($HSTScript | sort-object Sequence).Command 
+
     $TotalSteps = $HSTScript.Count
     $ActivityDescription = "Running HST Amiga"
     
-    $HSTAmigaCommandScriptPath = "$($Script:Settings.TempFolder)\HSTAmigaCommandstoRun.txt"
+    $HSTAmigaCommandScriptPath = join-pathMulti $Script:Settings.TempFolder "HSTAmigaCommandstoRun.txt" -UseFullPath
     $Arguments = "script `"$HSTAmigaCommandScriptPath`""
     
     if (Test-Path $HSTAmigaCommandScriptPath){
@@ -28,8 +41,8 @@ function Start-HSTAmigaCommands {
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $startInfo
     
-    if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
-        $streamWriter = [System.IO.StreamWriter]::new($Script:Settings.HSTDetailedLogLocation, $true)  # Open StreamWriter to file
+    if (($Script:Settings.HSTDetailedLogEnabled -eq $true) -or ($DebugFlag)){
+        $streamWriter = [System.IO.StreamWriter]::new($DetailedLogLocation, $true)  # Open StreamWriter to file
         $line = "Log entries for: HST Amiga ran with the following arguments [$Arguments] - START"
         $streamWriter.WriteLine($line)
         $streamWriter.WriteLine()
@@ -40,13 +53,13 @@ function Start-HSTAmigaCommands {
     $currentStep = 0
     
     while (($line = $process.StandardOutput.ReadLine()) -ne $null) {
-        if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
+        if (($Script:Settings.HSTDetailedLogEnabled -eq $true) -or ($DebugFlag)){
             $streamWriter.WriteLine($line) 
         }
         if ($line -match '\[.*?ERR\]') {
             Write-ErrorMessage -Message "Error running HST Amiga! Error was: $line"
             Write-Progress -Activity $ActivityDescription -Completed
-            if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
+            if (($Script:Settings.HSTDetailedLogEnabled -eq $true) -or ($DebugFlag)){
                 $streamWriter.Close()   # Close the StreamWriter so file is saved properly
             }
             exit            
@@ -63,7 +76,7 @@ function Start-HSTAmigaCommands {
       
     $process.WaitForExit()
         
-    if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
+    if (($Script:Settings.HSTDetailedLogEnabled -eq $true) -or ($DebugFlag)){
         $line = "Log entries for: HST Amiga ran with the following arguments [$Arguments] - FINISH"
         $streamWriter.WriteLine($line)
         $streamWriter.WriteLine()

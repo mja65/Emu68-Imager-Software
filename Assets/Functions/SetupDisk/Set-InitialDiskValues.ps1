@@ -5,7 +5,7 @@ function Set-InitialDiskValues {
        [Switch]$LoadSettings
     )
 
-    $Emu68BootVolumeNametouse = (Get-InputCSVs -Diskdefaults | Where-Object {$_.Type -eq "Non-Amiga"} | Select-Object 'VolumeName').VolumeName
+    $Emu68BootVolumeNametouse = ((Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Type -eq "Non-Amiga"} | Select-Object 'VolumeName').VolumeName
 
     $Script:GUIActions.DiskSizeSelected = $true
     $Script:GUIActions.DiskTypeSelected = $DiskType

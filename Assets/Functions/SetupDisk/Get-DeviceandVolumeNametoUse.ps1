@@ -8,11 +8,11 @@ function Get-DeviceandVolumeNametoUse {
         VolumeName = $null
     }
     
-    $VolumeNameSystem = "$((Get-InputCSVs -Diskdefaults | Where-Object {$_.Disk -eq "System"}).VolumeName)"
-    $VolumeNameWork = "$((Get-InputCSVs -Diskdefaults | Where-Object {$_.Disk -eq "Work"}).VolumeName)"
+    $VolumeNameSystem = "$(((Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Disk -eq "System"}).VolumeName)"
+    $VolumeNameWork = "$(((Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Disk -eq "Work"}).VolumeName)"
 
     $VolumeNameWorkPrefix = "$($VolumeNameWork)_"
-    $DeviceNamePrefix = (Get-InputCSVs -Diskdefaults | Where-Object {$_.Disk -eq "Work"}).devicename -replace "\d", "" 
+    $DeviceNamePrefix = ((Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Disk -eq "Work"}).devicename -replace "\d", "" 
 
     
     $DeviceNumbertoUse = 0

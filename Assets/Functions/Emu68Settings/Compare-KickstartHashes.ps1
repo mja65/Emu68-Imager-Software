@@ -1,7 +1,6 @@
 function Compare-KickstartHashes {
     param (
         $PathtoKickstartFiles,
-        $KickstartVersion,
         $MaximumFilestoCheck
     )
     
@@ -33,14 +32,13 @@ and select this path to scan.
 
     $null = Show-WarningorError -BoxTypeNone -ButtonType_OK -Msg_Header $Msg_Header -Msg_Body $Msg_Body
 
-    #  $PathtoKickstartFiles = 'E:\Emulators\Amiga Files\Shared\rom\'
-    #  $KickstartVersion = 3.2
+    #  $PathtoKickstartFiles = 'C:\Users\Matt\OneDrive\Documents\DiskPartitioner\UserFiles\Kickstarts'
     #  $MaximumFilestoCheck = 40
           
-    $ListofKickstartFilestoCheck = Get-ChildItem $PathtoKickstartFiles -force -Recurse
+    $ListofKickstartFilestoCheck = Get-ChildItem $PathtoKickstartFiles -file -force -Recurse | Where-Object {($_.Length -eq 524288 -or $_.Length -eq  524299 -or $_.Length -eq 262144)}
 
-    $TotalNumberFilesParent = ($ListofKickstartFilestoCheck | Where-Object {$_.PSIsContainer -eq $false -and $_.DirectoryName -eq $PathtoKickstartFiles.TrimEnd('\') } | Measure-Object).count
-    $TotalNumberFiles = ($ListofKickstartFilestoCheck | Where-Object {$_.PSIsContainer -eq $false} | Measure-Object).count
+    $TotalNumberFilesParent = ($ListofKickstartFilestoCheck | Where-Object { $_.DirectoryName -eq $PathtoKickstartFiles.TrimEnd('\') } | Measure-Object).count
+    $TotalNumberFiles = ($ListofKickstartFilestoCheck | Measure-Object).count
 
 
     if ($TotalNumberFilesParent -gt $MaximumFilestoCheck){
@@ -52,39 +50,119 @@ and select this path to scan.
         $ListofKickstartFilestoCheck = ($ListofKickstartFilestoCheck | Where-Object {$_.DirectoryName -eq $PathtoKickstartFiles.TrimEnd('\')})
     }
 
-    $KickstartHashestoFind = Get-InputCSVs -ROMHashes | Where-Object {$_.Kickstart_version -eq $KickstartVersion}
+    # $Script:GUIActions.KickstartVersiontoUse = 3.1
+
+    $AllROMHashes = Get-InputFileCSV -CSV 'ROMHashes'
+
+    $KickstartHashestoFind = @{}
+    $WHDLoadKickstartHashestoFind = @{}
     
-    $ListofKickstartFilestoCheck  = $ListofKickstartFilestoCheck  | Where-Object { $_.PSIsContainer -eq $false -and ($_.Length -eq 524288 -or $_.Length -eq  524299)}
-   
+    foreach ($Row in $AllROMHashes) {
+        $Versions = $Row.KickstartVersion.Split(',').Trim()
+        if ($Script:GUIActions.KickstartVersiontoUse -in $Versions) {
+            $KickstartHashestoFind[$Row.Hash] = $Row
+        }
+        if ($Row.WHDLoadName) {
+            $WHDLoadKickstartHashestoFind[$Row.Hash] = $Row
+        }
+    }
+
     $FoundKickstarts = [System.Collections.Generic.List[PSCustomObject]]::New()
-    $HashTableforKickstartFilestoCheck = @{} # Clear Hash
-   
-    foreach ($KickstartDetailLine in $ListofKickstartFilestoCheck){
-        $KickstartHash=Get-FileHash -LiteralPath $KickstartDetailLine.FullName -Algorithm MD5
-        if (-not ($HashTableforKickstartFilestoCheck[$KickstartHash.Hash])){
-            $HashTableforKickstartFilestoCheck.Add(($KickstartHash.Hash),$KickstartDetailLine.FullName)
+    $FoundKickstartROM = $false
+    $FoundEncryptedKickstartROM = $false
+    $WHDLoadKickstartROMCounter = 0
+    $TotalWHDLoadRomstoFind = $WHDLoadKickstartHashestoFind.Count
+    $FoundWHDLoadHashes = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+
+    foreach ($File in $ListofKickstartFilestoCheck) {
+        if ($FoundKickstartROM -and ($WHDLoadKickstartROMCounter -eq $TotalWHDLoadRomstoFind)) {
+            break
         }
-    }
-      
-    foreach ($KickstartRomandHash in $KickstartHashestoFind){
-        if ($HashTableforKickstartFilestoCheck[$KickstartRomandHash.Hash]){
-            $FoundKickstarts += [PSCustomObject]@{
-                Kickstart_Version = $KickstartRomandHash.Kickstart_Version
-                FriendlyName= $KickstartRomandHash.FriendlyName
-                Sequence = $KickstartRomandHash.Sequence 
-                IncludeorExclude = $KickstartRomandHash.IncludeorExclude
-                ExcludeMessage = $KickstartRomandHash.ExcludeMessage
-                Fat32Name = $KickstartRomandHash.Fat32Name
-                KickstartPath = ($HashTableforKickstartFilestoCheck[$KickstartRomandHash.Hash])
-            }        
-        }
-    }
+        $FileHash = (Get-FileHash -LiteralPath $File.FullName -Algorithm MD5).Hash
     
-    if ($FoundKickstarts){
-        $KickstarttoUse = $FoundKickstarts | Sort-Object -Property 'Sequence' | Select-Object -first 1
-        return $KickstarttoUse 
+        $MatchedObject = $null
+        $IsKickstartMatch = (-not $FoundKickstartROM) -and $KickstartHashestoFind.ContainsKey($FileHash) -and $KickstartHashestoFind[$FileHash].IncludeorExclude -eq "Include"
+        $IsEncryptedKickstartMatch = (-not $FoundEncryptedKickstartROM) -and $KickstartHashestoFind.ContainsKey($FileHash) -and $KickstartHashestoFind[$FileHash].IncludeorExclude -eq "Exclude"
+        $IsWHDLoadMatch   = ($WHDLoadKickstartROMCounter -lt $TotalWHDLoadRomstoFind) -and $WHDLoadKickstartHashestoFind.ContainsKey($FileHash) -and $FoundWHDLoadHashes.Add($FileHash) 
+        if ($IsKickstartMatch) {
+            $FoundKickstartROM = $true
+            $MatchData = $KickstartHashestoFind[$FileHash]
+            $MatchedObject = [PSCustomObject]@{
+                KickstartVersion = $Script:GUIActions.KickstartVersiontoUse
+                FriendlyName      = $MatchData.FriendlyName
+                Sequence          = $MatchData.Sequence 
+                IncludeorExclude  = $MatchData.IncludeorExclude
+                ExcludeMessage    = $MatchData.ExcludeMessage
+                Fat32Name         = $MatchData.Fat32Name
+                KickstartPath     = $File.FullName
+                WHDLoadName       = $MatchData.WHDLoadName
+                Status            = "Found"
+            }
+        }
+        if ($IsEncryptedKickstartMatch) {
+            $FoundEncryptedKickstartROM = $true
+            $MatchData = $KickstartHashestoFind[$FileHash]
+            $MatchedObject = [PSCustomObject]@{
+                KickstartVersion = $Script:GUIActions.KickstartVersiontoUse
+                FriendlyName      = $MatchData.FriendlyName
+                Sequence          = $MatchData.Sequence 
+                IncludeorExclude  = $MatchData.IncludeorExclude
+                ExcludeMessage    = $MatchData.ExcludeMessage
+                Fat32Name         = $MatchData.Fat32Name
+                KickstartPath     = $File.FullName
+                WHDLoadName       = $MatchData.WHDLoadName
+                Status            = "Found"
+            }
+        }
+        if ($IsWHDLoadMatch) {
+            $WHDLoadKickstartROMCounter++
+            $MatchData = $WHDLoadKickstartHashestoFind[$FileHash]
+            if ($MatchedObject) {
+                $MatchedObject.WHDLoadName = $MatchData.WHDLoadName
+            } 
+            else {
+                $MatchedObject = [PSCustomObject]@{
+                    KickstartVersion = $null
+                    FriendlyName      = $MatchData.FriendlyName
+                    Sequence          = $MatchData.Sequence 
+                    IncludeorExclude  = $MatchData.IncludeorExclude
+                    ExcludeMessage    = $MatchData.ExcludeMessage
+                    Fat32Name         = $MatchData.Fat32Name
+                    KickstartPath     = $File.FullName
+                    WHDLoadName       = $MatchData.WHDLoadName
+                    Status            = "Found"
+                }
+            }
+        }
+        if ($null -ne $MatchedObject) {
+            $FoundKickstarts.Add($MatchedObject)
+        }
     }
-    else{
-        return
+   
+foreach ($Hash in $WHDLoadKickstartHashestoFind.Keys) {
+    if (-not $FoundWHDLoadHashes.Contains($Hash)) {
+        $MissingData = $WHDLoadKickstartHashestoFind[$Hash]
+        
+        $FoundKickstarts.Add([PSCustomObject]@{
+            KickstartVersion = $null
+            FriendlyName      = $MissingData.FriendlyName
+            Sequence          = $MissingData.Sequence 
+            IncludeorExclude  = $MissingData.IncludeorExclude
+            ExcludeMessage    = $MissingData.ExcludeMessage
+            Fat32Name         = $MissingData.Fat32Name
+            KickstartPath     = $null          
+            WHDLoadName       = $MissingData.WHDLoadName
+            Status            = "Not Found"     
+        })
     }
 }
+
+    If ($FoundKickstartROM){
+        return $FoundKickstarts.where({$_.IncludeorExclude -ne "Exclude"})
+
+    }
+    else {
+        return $FoundKickstarts
+    }
+    
+}   

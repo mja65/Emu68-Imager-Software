@@ -4,83 +4,169 @@ function Get-PackagesfromInternet {
         $ListofPackagestoDownload
 
     )
-     
-    #$ListofPackagestoInstall = Get-InputCSVs -PackagestoInstall | Where-Object {(($_.KickstartVersion -eq $Script:GUIActions.KickstartVersiontoUse) -and ($_.IconsetName -eq "" -or $_.IconsetName -eq $Script:GUIActions.SelectedIconSet))} 
-    #$ListofPackagestoDownload = $ListofPackagestoInstall | Where-Object {(($_.Source -eq "Github") -or  ($_.Source -eq "Web") -or ($_.Source -eq "Web - SearchforPackageAminet") -or ($_.Source -eq "Web - SearchforPackageWHDLoadWrapper"))} | Select-Object 'Source','GithubName','GithubReleaseType','SourceLocation','BackupSourceLocation','FileDownloadName','PerformHashCheck','Hash','UpdatePackageSearchTerm','UpdatePackageSearchResultLimit', 'UpdatePackageSearchExclusionTerm','UpdatePackageSearchMinimumDate' -Unique 
-    #$ListofPackagestoDownload = $ListofPackagestoDownloadfromInternet | Where-Object {$_.FileDownloadName -eq 'IBrowse-OS3.lha'}
+  
+    # $ListofPackagestoDownload = $CombinedOSandPackages
     
-    if (-not (Test-Path -Path $Settings.WebPackagesDownloadLocation)){
-        $null = New-Item -Path $Settings.WebPackagesDownloadLocation -ItemType Directory
+    $LogTempFolder = [System.IO.Path]::GetFullPath((join-path $Script:Settings.TempFolder "Logs"))
+     if (-not(Test-Path $LogTempFolder -PathType Container)){
+        $null = New-Item $LogTempFolder -ItemType Directory
     }
-     
-    $Script:Settings.TotalNumberofSubTasks = $ListofPackagestoDownload.Count 
-    $Script:Settings.CurrentSubTaskNumber = 1
-    
-    foreach ($Line in $ListofPackagestoDownload){
-        $Script:Settings.CurrentSubTaskName = "Processing $($line.FileDownloadName)"
-        $UseBackupServerImmediately =$false
-        Write-StartSubTaskMessage 
-        if ($Line.Source -eq "Github"){
-            $GithubDownloadLocation = $Settings.WebPackagesDownloadLocation
-            #Write-debug "GithubRepository: $($line.SourceLocation) GithubReleaseType: $($Line.GithubReleaseType) Tag_Name: $($line.GithubRelease) Name: $($line.GithubName) LocationforDownload: $("$GithubDownloadLocation\") FileNameforDownload: $($line.FileDownloadName)"
-            if (-not(Get-GithubRelease -GithubRepository $line.SourceLocation -GithubReleaseType $Line.GithubReleaseType -Tag_Name $line.GithubRelease -Name $line.GithubName -LocationforDownload "$GithubDownloadLocation\" -FileNameforDownload "$($line.FileDownloadName)")){
-                Write-ErrorMessage -Message "Error downloading $($line.GithubName)! Cannot continue!"
-                return $false
+
+    $ListofPackagestoDownload = $ListofPackagestoDownload.where{($_.SourceType -notin @("UserFiles Local - Files", "Local - Files", "Local - Files - Config.txt", "Local - Files - Cmdline.txt"))} 
+
+    $TotalDownloads = $ListofPackagestoDownload.count
+
+    $UnADFFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnADFFilePath) 
+    $SevenZipFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.SevenZipFilePath) 
+    $UnLHAFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLHAFilePath)
+    $UnLZXFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLZXFilePath)
+       
+    $SourceTypesforDownload = @('Web - Aminet','Web - Github','Web - AminetSearch','Web','Web - Github Emu68 Documentation','Web - WHDLoadWrapper')
+    #$SourceTypesforDownload = $null
+    $FileExtensionsforExtract = @('.lha','.zip','.lzx','.adf')
+   # $FileExtensionsforExtract = $null
+    $DownloadNumber = 0
+
+
+   # foreach ($Line in ($ListofPackagestoDownload | where-object {$_.SourceLocation -eq "Roadshow - Demo.lha"})   ){
+
+    foreach ( $Line in $ListofPackagestoDownload ){
+        $DownloadNumber ++
+        $DownloadFileExtension = [System.IO.Path]::GetExtension($line.OutputLocation)
+        $NameofDLNoExtension  = [System.IO.Path]::GetFileNameWithoutExtension($line.OutputLocation)      
+        Write-InformationMessage -Message  "Processing $($line.OutputLocation) `($DownloadNumber/$TotalDownloads`)" -NewLineBefore
+        If (($Line.SourceType -in $SourceTypesforDownload) -and ($Line.DownloadFileFlag -eq $true)) {
+            $DownloadSuccess = $false
+            If ($Line.SourceType -match "Github"){
+                $DownloadSuccess =  (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -LocationforDL $line.OutputLocation -NumberofAttempts 1)                
+            } 
+            else {
+                $DownloadSuccess =  (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -AminetMirrors (Get-InputFileCSV -CSV 'AminetMirrors') -LocationforDL $line.OutputLocation -BackupURL $Line.BackupURL -NumberofAttempts 1)
             }
-        }
-        elseif (($Line.Source -eq "Web") -or ($Line.Source -eq "Web - SearchforPackageAminet") -or ($Line.Source -eq "Web - SearchforPackageWHDLoadWrapper")) {
-            $SourceLocation = $null
-            $PerformHashCheckFlag = $false
-            $DownloadFileFlag = $true
-            if ($Line.Source -eq "Web"){
-                $SourceLocation = $line.SourceLocation
-                if ($line.PerformHashCheck -eq $true){
-                    $PerformHashCheckFlag = $true
+            if ($DownloadSuccess -eq $false){
+                Write-ErrorMessage -Message "Error in downloaded packages! Unable to continue!"
+                Write-InformationMessage -Message "Deleting package $($line.OutputLocation)"
+                if (Test-path -Path $($line.OutputLocation)){
+                    Remove-Item -Path $($line.OutputLocation) -Force -ErrorAction SilentlyContinue
                 }
-            }
-            elseif ($Line.Source -eq "Web - SearchforPackageAminet"){
-                $SourceLocation = Find-LatestAminetPackage -PackagetoFind $Line.UpdatePackageSearchTerm -Exclusion $line.UpdatePackageSearchExclusionTerm -DateNewerthan $line.UpdatePackageSearchMinimumDate -Architecture 'm68k-amigaos' 
-            }
-            elseif ($Line.Source -eq "Web - SearchforPackageWHDLoadWrapper") {
-                $SourceLocation = (Find-WHDLoadWrapperURL -SearchCriteria 'WHDLoadWrapper' -ResultLimit '10') 
-            }
-            if (-not ($SourceLocation)){
-                $UseBackupServerImmediately = $true
-            }
-            if (test-path "$($Settings.WebPackagesDownloadLocation)\$($line.FileDownloadName)"){
-                Write-InformationMessage -Message "Download of $($line.FileDownloadName) already completed"
-                if ($PerformHashCheckFlag -eq $true){
-                    if (-not (Compare-FileHash -FiletoCheck "$($Settings.WebPackagesDownloadLocation)\$($line.FileDownloadName)" -HashtoCheck $line.Hash)){
-                        Write-InformationMessage -Message "Error in previously downloaded file $($line.FileDownloadName). File will be removed and re-downloaded"
-                        $null=Remove-Item -Path "$($Settings.WebPackagesDownloadLocation)\$($line.FileDownloadName)" -Force 
+                exit                                    
+            }  
+            If ($Line.PerformHashCheck -eq $true){
+                if ((Compare-FileHash -FiletoCheck $line.OutputLocation -HashtoCheck $Line.Hash -RunParallel $false) -eq $false){
+                    Write-ErrorMessage -Message "Error in downloaded packages! Unable to continue!"
+                    Write-InformationMessage -Message "Deleting package $($line.OutputLocation)"
+                    if (Test-path -Path $($line.OutputLocation)){
+                       Remove-Item -Path $($line.OutputLocation) -Force -ErrorAction SilentlyContinue
                     }
-                    else {
-                        $DownloadFileFlag = $false
-                    }
-                }
-                else {
-                    $DownloadFileFlag = $false
-                }
-            }
-            if ($DownloadFileFlag -eq $true){
-                if (-not (Get-AmigaFileWeb -URL $SourceLocation -BackupURL $line.BackupSourceLocation -NameofDL $line.FileDownloadName -LocationforDL $Script:Settings.WebPackagesDownloadLocation -UseBackupServerImmediately $UseBackupServerImmediately)){
-                    Write-ErrorMessage -Message 'Unrecoverable error with download(s)!'
                     exit
                 }
-                if ($PerformHashCheckFlag -eq $true){
-                    if (-not (Compare-FileHash -FiletoCheck "$($Settings.WebPackagesDownloadLocation)\$($line.FileDownloadName)" -HashtoCheck $line.Hash)){
-                        Write-ErrorMessage -Message 'Error in downloaded packages! Unable to continue!'
-                        Write-InformationMessage -Message ("Deleting package $PackageDownloadsLocation\$($line.FileDownloadName)")
-                        $null=Remove-Item -Path "$($Settings.WebPackagesDownloadLocation)\$($line.FileDownloadName)" -Force 
+            }              
+        }
+        else {
+            Write-InformationMessage -Message  "No Download required for $($line.OutputLocation)"
+        }
+        
+        if ($DownloadFileExtension -in $FileExtensionsforExtract){
+            If ($DownloadFileExtension -in @('.lha','.zip','.lzx')){
+                $ExtractionFolder = Join-PathMulti $Script:Settings.WebPackagesDownloadLocation $NameofDLNoExtension -UseFullPath
+            }
+            elseif ($DownloadFileExtension -eq '.adf'){
+                $ExtractionFolder = join-pathMulti $Script:Settings.ADFTemporaryFiles $Line.SourceLocation -UseFullPath
+            }
+            If (-not (Test-Path $ExtractionFolder -PathType Container)){
+                $null = New-Item $ExtractionFolder -ItemType Directory
+            }
+            $FileNametoUse = if ($Line.SourceType -eq "UserFiles - Local - Archive" -or $Line.SourceType -eq "Local - Archive") { $Line.SourceLocation } else { $Line.OutputLocation }
+            $DownloadstoProcess = @(
+                [PSCustomObject]@{
+                    ArchiveFileName = $FileNametoUse
+                    ArchiveFileNameNoExtension = [System.IO.Path]::GetFileNameWithoutExtension($FileNametoUse)
+                    ArchiveFileExtension = [System.IO.Path]::GetExtension($FileNametoUse)
+                    ExtractionFolder = $ExtractionFolder
+                    CDParent = $Line.CDParent
+                    UseLHASAFlag = $Line.UseLHASA
+                    ArchivePassword = $null
+                } 
+
+            )
+            if ($Line.ArchiveinArchiveName){
+                $ExtractionFolderAiA =  join-path $ExtractionFolder "AiA"
+                $ArchiveFileName = join-path $ExtractionFolder $Line.ArchiveinArchiveName
+                If (-not (Test-Path $ExtractionFolderAiA -PathType Container)){
+                    $null = New-Item $ExtractionFolderAiA -ItemType Directory
+                }
+             
+                $DownloadstoProcess += @(
+                    [PSCustomObject]@{
+                        ArchiveFileName = $ArchiveFileName
+                        ArchiveFileNameNoExtension = [System.IO.Path]::GetFileNameWithoutExtension($ArchiveFileName)
+                        ArchiveFileExtension = [System.IO.Path]::GetExtension($ArchiveFileName)
+                        ExtractionFolder = $ExtractionFolderAiA
+                        CDParent = $null
+                        UseLHASAFlag = $Line.UseLHASA
+                        ArchivePassword = $Line.ArchiveinArchivePassword
+                    } 
+                )
+            
+            }
+            foreach ($DownloadtoProcess in $DownloadstoProcess) {
+                 Write-InformationMessage -Message "Extracting files from: $($DownloadtoProcess.ArchiveFileName)"
+                if ($DownloadtoProcess.ArchiveFileExtension -eq '.adf'){
+                    $LogPathStandardOutput = Join-Path  $LogTempFolder "$($DownloadtoProcess.ArchiveFileNameNoExtension)LogStd.txt"
+                    Write-informationMessage -Message "Extracting ADF $ArchiveFileName"
+                    $OutputMessage = & $UnADFFilePath -d $ExtractionFolder $($DownloadtoProcess.ArchiveFileName) 2>&1 
+                    If ($LASTEXITCODE -ne 0) {
+                        Write-ErrorMessage -Message "Unable to extract ADF for $($DownloadtoProcess.ArchiveFileName)!"
+                        $OutputMessage | Out-File -FilePath $LogPathStandardOutput -Encoding UTF8
                         exit
                     }
-                }     
-            }
-            else {
-                Write-InformationMessage -Message "No Download Required"
+                }                   
+                elseif ($DownloadtoProcess.ArchiveFileExtension -eq '.lzx'){
+                    $LogPathStandardOutput = Join-Path  $LogTempFolder "$($DownloadtoProcess.ArchiveFileNameNoExtension)LogStd.txt"
+                    Push-location -Path $DownloadtoProcess.ExtractionFolder
+                    try {
+                        & $UnlzxFilePath "$($DownloadtoProcess.ArchiveFileName)" 2>&1 | Out-File -FilePath $LogPathStandardOutput -Encoding UTF8
+                        if ($LASTEXITCODE -ne 0) {
+                            Write-ErrorMessage -Message "Error extracting $($DownloadtoProcess.ArchiveFileName)! Exiting"
+                            exit
+
+                        }
+                    }
+                    finally {
+                        Pop-location
+                    }
+                }                    
+                  
+                elseif ($DownloadtoProcess.ArchiveFileExtension -eq '.lha' -and $DownloadtoProcess.UseLHASAFlag -match "TRUE"){
+                    $LogPathStandardOutput = Join-Path  $LogTempFolder "$($DownloadtoProcess.ArchiveFileNameNoExtension)LogStd.txt"
+                    try {
+                        & $UnLHAFilePath "xfw=$($DownloadtoProcess.ExtractionFolder)" "$($DownloadtoProcess.ArchiveFileName)" 2>&1 | Out-File -FilePath $LogPathStandardOutput -Encoding UTF8
+                        if (($DownloadtoProcess.UseLHASAFlag -ne "TRUE - NOCHECK") -and ($LASTEXITCODE -ne 0)) {
+                            Write-ErrorMessage -Message "Error extracting $($DownloadtoProcess.ArchiveFileName)! Exiting"
+                            exit
+                        }
+                    }
+                    catch {
+                        Write-ErrorMessage -Message "A critical scripting error occurred while running UnLHA: $_"
+                        exit
+                    }             
+                 }
+                else{
+                    $LogPathStandardOutput = Join-Path  $LogTempFolder "$($DownloadtoProcess.ArchiveFileNameNoExtension)LogStd.txt"
+                    if ($DownloadtoProcess.ArchivePassword){
+                        & $SevenZipFilePath "x" "-o$($DownloadtoProcess.ExtractionFolder)" "-p$($DownloadtoProcess.ArchivePassword)" "$($DownloadtoProcess.ArchiveFileName)" "-y" 2>&1 | Out-File -FilePath $LogPathStandardOutput -Encoding UTF8                     
+                    }
+                    else {
+                        & $SevenZipFilePath "x" "-o$($DownloadtoProcess.ExtractionFolder)" "$($DownloadtoProcess.ArchiveFileName)" "-y" 2>&1 | Out-File -FilePath $LogPathStandardOutput -Encoding UTF8                        
+                    } 
+                    if ($LASTEXITCODE -ne 0) {
+                        Write-ErrorMessage -Message "Error extracting $($DownloadtoProcess.ArchiveFileName)! Exiting"
+                        exit
+                    }                       
+                }   
+
             }
         }
-        $Script:Settings.CurrentSubTaskNumber ++
-    }
+    }         
 
 }

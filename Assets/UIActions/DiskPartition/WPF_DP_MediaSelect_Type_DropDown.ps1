@@ -10,6 +10,9 @@ foreach ($Option in $DropDownOptions){
 $WPF_DP_MediaSelect_Type_DropDown.SelectedItem = ''
 
 $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
+        if ($Script:GUICurrentStatus.LoadingSettings) {
+        return
+    }
     if ($WPF_DP_MediaSelect_Type_DropDown.SelectedItem -eq 'Image'){
         if ($Script:GUIActions.OutputType -eq "Disk"){
             $Msg_Header = "Changing Output Device"
@@ -25,7 +28,7 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUIActions.ImageSizeSelected = $null
                 $Script:GUIActions.DiskSizeSelected = $null
                 $Script:GUIActions.OutputType = "Image" 
-                $Script:GUIActions.NetworkStack = "Roadshow"         
+                $Script:GUIActions.NetworkStack = ((Get-InputFileCSV -CSV "NetworkStackVersions").where({ $_.Default -eq $true })).NetworkStackFriendlyName    
                 #$Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
              
                 Remove-Variable -Scope Script -Name 'WPF_DP_Partition*'
@@ -60,7 +63,7 @@ $WPF_DP_MediaSelect_Type_DropDown.add_selectionChanged({
                 $Script:GUIActions.ImageSizeSelected = $null
                 $Script:GUIActions.DiskSizeSelected = $null
                 $Script:GUIActions.OutputType = "Disk"        
-            $Script:GUIActions.NetworkStack = "Roadshow"
+            $Script:GUIActions.NetworkStack = ((Get-InputFileCSV -CSV "NetworkStackVersions").where({ $_.Default -eq $true })).NetworkStackFriendlyName 
                 #$Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
                 $WPF_DP_MediaSelect_DropDown.SelectedItem = $null
             

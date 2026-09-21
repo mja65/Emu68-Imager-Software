@@ -1,6 +1,6 @@
 # $AvailableScreenModes = Import-Csv ($InputFolder+'ScreenModes.csv') -delimiter ';' | Where-Object 'Include' -eq 'TRUE'
 
-$Script:GUIActions.AvailableScreenModes = Get-InputCSVs -ScreenModes
+$Script:GUIActions.AvailableScreenModes = (Get-InputFileCSV -CSV 'ScreenModes')
 
 foreach ($ScreenMode in $Script:GUIActions.AvailableScreenModes) {
     $WPF_StartPage_ScreenMode_Dropdown.AddChild($ScreenMode.FriendlyName)

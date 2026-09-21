@@ -3,7 +3,7 @@ Function Get-IconPaths {
 
     )
    
-    $IconLocationDetailsCSV = Get-InputCSVs -IconSets | Where-Object {$_.IconsetName -eq $Script:GUIActions.SelectedIconSet} 
+    $IconLocationDetails = (@(Get-InputFileCSV -CSV 'IconSets')).where({$_.IconSet -eq $Script:GUIActions.SelectedIconSet})  
     
     $IconTypes = @(
         "NewFolder", 
@@ -20,11 +20,11 @@ Function Get-IconPaths {
         # Define the custom properties dynamically
         [PSCustomObject]@{
             IconType       = $IconType
-            Source         = $IconLocationDetailsCSV."$($IconType)IconSource"
-            SourceLocation = $IconLocationDetailsCSV."$($IconType)IconSourceLocation"
-            InstallMedia   = $IconLocationDetailsCSV."$($IconType)IconInstallMedia"
-            FilestoInstall = ($IconLocationDetailsCSV."$($IconType)IconFilestoInstall").Replace('/','\')
-            ModifyInfoFileType = ($IconLocationDetailsCSV."$($IconType)IconModifyInfoFileType")
+            Source         = $IconLocationDetails."$($IconType)IconSource"
+            SourceLocation = $IconLocationDetails."$($IconType)IconSourceLocation"
+            InstallMedia   = $IconLocationDetails."$($IconType)IconInstallMedia"
+            FilestoInstall = ($IconLocationDetails."$($IconType)IconFilestoInstall").Replace('/','\')
+            ModifyInfoFileType = ($IconLocationDetails."$($IconType)IconModifyInfoFileType")
             NewFileNameFlag = [bool]$null
             InstallMediaPath = $null
             NewFileName = $null

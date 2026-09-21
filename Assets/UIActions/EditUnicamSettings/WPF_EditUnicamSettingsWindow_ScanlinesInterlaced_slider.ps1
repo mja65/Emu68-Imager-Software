@@ -1,0 +1,3 @@
+$WPF_EditUnicamSettingsWindow_ScanlinesInterlaced_slider.add_ValueChanged({
+    $WPF_EditUnicamSettingsWindow_ScanlinesInterlaced_value.Text = $WPF_EditUnicamSettingsWindow_ScanlinesInterlaced_slider.Value
+})

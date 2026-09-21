@@ -34,28 +34,35 @@ function Test-AccesstoServers {
         ServerName = "ibrowse-dev.net"
         FatalError = 0
     }
-    
-    $ServerList += [PSCustomObject]@{
-    ServerName = "mja65.github.io"
-    FatalError = 0
-}
-
+   
     $ErrorCount = 0
     $FatalErrorCount = 0
 
-    Write-InformationMessage -Message "Testing accessability of servers. Note, this is an indication only"
-    Write-InformationMessage -Message ""
+    Write-InformationMessage -Message "Testing accessibility of servers. Note, this is an indication only" -NewLineAfter
 
     foreach ($Server in $ServerList) {
-        Write-InformationMessage "Testing connection to $($server.Servername)" 
-        if (Test-Connection $server.Servername -count 1 -Quiet){
-            Write-InformationMessage "Connection to $($server.Servername) successful"
+        write-informationMessage -Message "Testing connection to $($server.Servername)"
+        if ($Server.ServerName -eq "ftp2.grandis.nu") {
+            $webPage = Invoke-WebRequest -Uri "https://grandis.nu:444/quick.php" -UseBasicParsing
+            if ($webPage.Content -eq "false"){
+                write-informationMessage -Message "Connection to $($server.Servername) successful"
+            }
+            else {
+                Write-WarningMessage -Message "Connection to $($server.Servername) unsuccessful! Possible connection issues with site."
+                $ErrorCount ++
+                $FatalErrorCount += $server.FatalError
+            }
         }
         else {
-            Write-WarningMessage -Message "Connection to $($server.Servername) unsuccessful! Possible connection issues with site."
-            $ErrorCount ++
-            $FatalErrorCount += $server.FatalError
-        }
+            if (Test-Connection $server.Servername -count 1 -Quiet){
+                write-informationMessage -Message "Connection to $($server.Servername) successful"
+            }
+            else {
+                Write-WarningMessage -Message "Connection to $($server.Servername) unsuccessful! Possible connection issues with site."
+                $ErrorCount ++
+                $FatalErrorCount += $server.FatalError
+            }
+        } 
     }
 
     if ($FatalErrorCount -ge 1){

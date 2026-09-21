@@ -34,7 +34,7 @@ function Get-XAML {
     }
 
     if ($ActionsPath){
-        Get-ChildItem -Path $ActionsPath | Where-Object { $_.PSIsContainer -eq $false } | ForEach-Object {
+        Get-ChildItem -Path $ActionsPath -File | ForEach-Object {
             . ($_).fullname
         }
     }

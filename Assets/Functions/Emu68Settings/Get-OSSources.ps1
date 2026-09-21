@@ -5,9 +5,13 @@ function Get-OSSources {
     $InstallMediaDescriptions = @{}
     $PackageStatus = @{}
 
-     if ($Script:GUICurrentStatus.AvailablePackagesNeedingGeneration -eq $true){
+    if ($Script:GUICurrentStatus.AvailablePackagesNeedingGeneration -eq "TRUE"){
         Get-SelectablePackages
-        $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $false
+        $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
+    }
+    elseif ($Script:GUICurrentStatus.AvailablePackagesNeedingGeneration -eq "KeepInstallPaths"){
+        Get-SelectablePackages -KeepInstallStatus
+        $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
     }
       
     Get-InputFileCSV -CSV 'InstallMediaHashes' | Select-Object ADF_Name, FriendlyName -Unique | ForEach-Object {
@@ -15,11 +19,11 @@ function Get-OSSources {
     }
     
     
-    $PackagesList = (Get-InputFileCSV -CSV 'Packages').where({ $_.Type -eq "OS" })
+    $PackagesList = (Get-InputFileCSV -CSV 'Packages').where({ $_.PackageType -in @("OS","Selectable OS","Selectable OS - DefaultInstall") })
     
     $PackagesList.foreach({
         $Status = $false
-        If ($_.PackageType -eq "Mandatory") {
+        If ($_.PackageType -eq "OS") {
             $Status = $true
         }
         $PackageStatus[$_.PackageName] = [PSCustomObject]@{       
@@ -28,7 +32,7 @@ function Get-OSSources {
         }                
     }) 
 
-   $Script:GUIActions.AvailablePackages | ForEach-Object {
+   $Script:GUIActions.AvailablePackages.DefaultView | ForEach-Object {
         if ($PackageStatus[$_.PackageName] -and $_.PackageNameUserSelected -eq $true) {
             $PackageStatus[$_.PackageName].PackageSelected = $_.PackageNameUserSelected       
         }
