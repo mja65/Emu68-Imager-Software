@@ -1,4 +1,0 @@
-OldValue;NewValue
-SCSI_DEVICE_NAME=scsi.device;SCSI_DEVICE_NAME=brcm-sdhc.device
-;(SCSI_DEVICE_NAME=scsi.device)
-;(SCSI_DEVICE_NAME=brcm-emmc.device)

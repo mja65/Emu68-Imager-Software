@@ -1,3 +1,0 @@
-MENU ADD NAME MenuOnlineWireless TITLE '"Go Online - Wireless"' CMD "'address command ''execute sys:Pistorm/Network/OnlineWifiScriptMenuTools'''"
-MENU ADD NAME MenuOnlineWired TITLE '"Go Online - Ethernet"' CMD "'address command ''execute sys:Pistorm/Network/OnlineGENetScriptMenutools'''"
-MENU ADD NAME MenuOffline TITLE '"Go Offline"' CMD "'address command ''execute sys:Pistorm/Network/OfflineScriptMenuTools'''"

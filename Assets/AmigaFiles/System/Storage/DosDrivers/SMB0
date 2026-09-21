@@ -1,7 +1,0 @@
-Handler = L:smb2-handler
-Priority = 5
-StackSize = 262144
-GlobVec = -1
-/* DO NOT ALTER ANYTHING ABOVE THIS LINE! */
-/* Edit the line below for your Samba Share ! */
-Startup = "smb://Machine/Drive USER=user PASSWORD=pass VOLUME=Samba"

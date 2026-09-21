@@ -1,4 +1,0 @@
-IF $KickstartVersion EQ 3.9
-	rename Sys:Storage/DosDrivers/_AUX Sys:Storage/DosDrivers/AUX >NIL:
-	rename Sys:Storage/DosDrivers/_AUX.info Sys:Storage/DosDrivers/AUX.info >NIL:
-ENDIF
