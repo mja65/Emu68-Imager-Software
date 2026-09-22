@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 2.1.4
+.VERSION 2.2
 .GUID 73d9401c-ab81-4be5-a2e5-9fc0834be0fc
 .AUTHOR SupremeTurnip
 .COMPANYNAME
@@ -29,19 +29,22 @@ Add-Type -AssemblyName System.Net.Http
 Set-Location -Path (Split-Path -Path $PSScriptRoot -Parent)
 [System.IO.Directory]::SetCurrentDirectory((Split-Path -Path $PSScriptRoot -Parent)) # Needed for Powershell 5 Compatibility
 
-Get-ChildItem -Path '.\Assets\Variables\' -Recurse | Where-Object { $_.PSIsContainer -eq $false } | ForEach-Object {
+
+Get-ChildItem -Path '.\Assets\Variables\' -File -Recurse | ForEach-Object {
     . ($_).fullname
 }
 
-Get-ChildItem -Path '.\Assets\Functions\' -Recurse | Where-Object { $_.PSIsContainer -eq $false } | ForEach-Object {
+Get-ChildItem -Path '.\Assets\Functions\' -File -Recurse | ForEach-Object {
     . ($_).fullname
 }
+
 
 if ((Get-Location).Path -match '[^a-zA-Z0-9\s\.\-_:\\]'){
     Write-ErrorMessage -Message "The path to the Emu68 Imager contains special characters which may cause issues with some of the tools used in the image creation process. Please move Emu68 Imager to a location that does not contain any special characters and try again." -Title "Invalid Path" -ShowPopup
     exit
 }
 
+$ErrorActionPreference = "Stop"
 #$DebugPreference = 'SilentlyContinue'
 
 #$DebugPreference = 'Continue'
@@ -53,7 +56,7 @@ else {
     $Script:GUICurrentStatus.RunMode = "CommandLine"
 }
 
-$Script:Settings.Version = [system.version]'2.1.4'
+$Script:Settings.Version = [system.version]'2.2'
 
 $Script:GUIActions.ScriptPath = (Split-Path -Path $PSScriptRoot -Parent)
 
@@ -61,14 +64,27 @@ Write-Emu68ImagerLog -start
 
 Show-Disclaimer
 
-$Script:Settings.TotalNumberofTasks = 2
+$Script:Settings.TotalNumberofTasks = 4
+
 $Script:Settings.CurrentTaskNumber = 1
+$Script:Settings.CurrentTaskName = "Reading Emu68 Imager Configuration file"
+Write-StartTaskMessage
+
+Read-ConfigFile
+
+Write-TaskCompleteMessage
 
 $Script:Settings.CurrentTaskName = "Checking Prerequisites for Using Emu68 Imager"
 Write-StartTaskMessage
 
 Confirm-Prerequisites
-Confirm-NoExtraAmigaFiles
+
+Write-TaskCompleteMessage
+
+$Script:Settings.CurrentTaskName = "Checking for any unrequired files and removing"
+Write-StartTaskMessage
+
+#Confirm-NoExtraAmigaFiles
 
 Write-TaskCompleteMessage
 
@@ -82,23 +98,26 @@ Write-StartSubTaskMessage
 
 Confirm-DefaultPaths 
 
+Remove-TempFolderFiles
+
 $Script:Settings.CurrentSubTaskName = "Creating Input Files"
 $Script:Settings.CurrentSubTaskNumber = 2
 Write-StartSubTaskMessage
 
-Get-InputFiles
-
+If (-not (Get-InputFiles)){
+    exit
+}
+    
 $Script:Settings.CurrentSubTaskName = "Getting Startup Files"
 $Script:Settings.CurrentSubTaskNumber = 3
 Write-StartSubTaskMessage
 
+
 if (-not (Get-StartupFiles)){
-     exit
+    exit
 }
 
 Write-TaskCompleteMessage
-
-$Script:Settings.TotalNumberofTasks = 11
 
 if ($Script:GUICurrentStatus.RunMode -eq 'CommandLine'){
     get-process -id $Pid | set-windowstate -State MINIMIZE -SuppressErrors
@@ -162,7 +181,6 @@ update-ui -MainWindowButtons -Emu68Settings
 $WPF_MainWindow.ShowDialog() | out-null
 
 if ($Script:GUICurrentStatus.ProcessImageConfirmedbyUser -eq $true){    
-    $Script:Settings.CurrentTaskNumber = 1
     Write-ImageCreation
 }
 else {
@@ -170,5 +188,9 @@ else {
     exit
 }
 
+# Copy-Emu68Imager -NewLocation "E:\Emu 68 Imager Test Files" -compress -UserFiles
+
 # # $WPF_MainWindow.Close()
-# # [System.Windows.Controls.Button].GetEvents() | Select-Object Name, *Method, EventHandlerType >test.txt
+# # [System.Windows.Controls.DataGrid].GetEvents() | Select-Object Name, *Method, EventHandlerType >test.txt
+
+#$Script:GUIActions.AvailablePackages
