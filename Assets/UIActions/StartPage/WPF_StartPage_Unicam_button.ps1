@@ -1,22 +1,22 @@
 $WPF_StartPage_Unicam_button.Add_Click({
     
-    Remove-Variable -Name 'WPF_EditUnicamSettingsWindow_*'
+    Remove-Variable -Name 'WPF_EditUnicamSettingsWindow_*' 
     
     $WPF_EditUnicamSettingsWindow = Get-XAML -WPFPrefix 'WPF_EditUnicamSettingsWindow_' -XMLFile '.\Assets\WPF\Window_EditUnicamSettings.xaml'  -ActionsPath '.\Assets\UIActions\EditUnicamSettings\' -AddWPFVariables
 
     if ($Script:GUIActions.UnicamStartonBoot) {
         $WPF_EditUnicamSettingsWindow_Unicam_StartBoot_checkBox.IsChecked = 1
     }
-    if ($Script:GUIActions.Emu68VersionType -ne "Release"){
-       $WPF_EditUnicamSettingsWindow_Unicam_Type_Groupbox.Visibility="Visible" 
-    } 
-    else {
-       $WPF_EditUnicamSettingsWindow_Unicam_Type_Groupbox.Visibility="Hidden" 
-    }
+    # if ($Script:GUIActions.Emu68VersionType -ne "Release"){
+    #    $WPF_EditUnicamSettingsWindow_Unicam_Type_Groupbox.Visibility="Visible" 
+    # } 
+    # else {
+    #    $WPF_EditUnicamSettingsWindow_Unicam_Type_Groupbox.Visibility="Hidden" 
+    # }
     if ($Script:GUIActions.UnicamDeviceType -eq "ft"){
         $WPF_EditUnicamSettingsWindow_Unicam_Type_FT_radioButton.IsChecked = 1         
     }
-    elseif ($Script:GUIActions.UnicamDeviceType -eq "C790"){
+    elseif ($Script:GUIActions.UnicamDeviceType -eq "c790"){
         $WPF_EditUnicamSettingsWindow_Unicam_Type_C790_radioButton.IsChecked = 1 
     }
     if ($Script:GUIActions.UnicamScalingType -eq "Smooth"){

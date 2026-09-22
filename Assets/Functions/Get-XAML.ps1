@@ -35,6 +35,7 @@ function Get-XAML {
 
     if ($ActionsPath){
         Get-ChildItem -Path $ActionsPath -File | ForEach-Object {
+           # Write-host "$($_)"
             . ($_).fullname
         }
     }

@@ -9,16 +9,15 @@
     <Grid x:Name ="Main" Background="#FFE5E5E5">
         <Button x:Name="OK_Button" Content="OK" HorizontalAlignment="Right" Margin="0,0,5,5" VerticalAlignment="Bottom" Width="50" Height="20"/>
         <Button x:Name="Cancel_Button" Content="Cancel" HorizontalAlignment="Left" Margin="5,0,0,5" VerticalAlignment="Bottom" Width="50" Height="20"/>
-        <TextBox x:Name="ErrorMessage_Label" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="Red" VerticalAlignment="Top" Width="230" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" Text="" Margin="0,10,0,0"/>
-        <GroupBox  x:Name="Unicam_Type_Groupbox" Header="Device Type" Margin="10,50,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="65" Width="190" >
+           <GroupBox  x:Name="Unicam_Type_Groupbox" Header="Device Type" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="65" Width="190" >
             <Grid>
-                <RadioButton x:Name="Unicam_Type_FT" Content="Framethrower" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
-                <RadioButton x:Name="Unicam_Type_C790" Content="C790" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="Unicam_Type_FT_radiobutton" Content="Framethrower" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="Unicam_Type_C790_radiobutton" Content="C790" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top"/>
             </Grid>
         </GroupBox>
-        <CheckBox x:Name="Unicam_StartBoot_checkBox" Content="Start on Boot" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="Unicam_EnableScanLines_checkBox" Content="Enable Scanlines" HorizontalAlignment="Left" Margin="220,120,0,0" VerticalAlignment="Top"/>
-        <GroupBox  x:Name="Unicam_Scaling_Groupbox" Header="Scaling" Margin="10,140,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="65" Width="190" >
+        <CheckBox x:Name="Unicam_StartBoot_checkBox" Content="Start on Boot" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="Unicam_EnableScanLines_checkBox" Content="Enable Scanlines" HorizontalAlignment="Left" Margin="220,80,0,0" VerticalAlignment="Top"/>
+        <GroupBox  x:Name="Unicam_Scaling_Groupbox" Header="Scaling" Margin="10,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="65" Width="190" >
             <Grid>
                 <RadioButton x:Name="Unicam_IntegerScaling_radioButton" Content="Integer only Scaling" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
                 <RadioButton x:Name="Unicam_SmoothScaling_radioButton" Content="Smooth Scaling" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top"/>
@@ -26,7 +25,7 @@
 
         </GroupBox>
 
-        <GroupBox x:Name="Unicam_Scanlines_Groupbox" Visibility="Visible" Header="Scanlines" Margin="0,140,10,0" Height="100" Width="190" HorizontalAlignment="Right" VerticalAlignment="Top"  >
+        <GroupBox x:Name="Unicam_Scanlines_Groupbox" Visibility="Visible" Header="Scanlines" Margin="0,100,10,0" Height="100" Width="190" HorizontalAlignment="Right" VerticalAlignment="Top"  >
             <Grid>
                 <TextBox x:Name="Scanlines_Label" HorizontalAlignment="Center" Margin="0,0,0,0" TextWrapping="Wrap" Text="Nonlaced" VerticalAlignment="Top" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" FontWeight="Bold" FontSize="10" Width="55"/>
                 <Slider x:Name="Scanlines_slider" Margin="10,15,58,0" VerticalAlignment="Top" Maximum="4" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True"/>
@@ -39,13 +38,13 @@
 
         </GroupBox>
 
-        <GroupBox x:Name="Unicam_B_Parameter_Groupbox" Header="B Parameter" Margin="10,210,0,0" Height="40" Width="190" HorizontalAlignment="Left" VerticalAlignment="Top"  >
+        <GroupBox x:Name="Unicam_B_Parameter_Groupbox" Header="B Parameter" Margin="10,170,0,0" Height="40" Width="190" HorizontalAlignment="Left" VerticalAlignment="Top"  >
             <Grid>
                 <Slider x:Name="B_Parameter_slider" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="120" Maximum="1000" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True"/>
                 <TextBox x:Name="B_Parameter_Input" HorizontalAlignment="Left" Margin="130,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="Unicam_C_Parameter_Groupbox" Header="C Parameter" Margin="10,255,0,0" Height="40" Width="190" HorizontalAlignment="Left" VerticalAlignment="Top"  >
+        <GroupBox x:Name="Unicam_C_Parameter_Groupbox" Header="C Parameter" Margin="10,215,0,0" Height="40" Width="190" HorizontalAlignment="Left" VerticalAlignment="Top"  >
             <Grid>
                 <Slider x:Name="C_Parameter_slider" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="120" Maximum="1000" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True"/>
                 <TextBox x:Name="C_Parameter_Input" HorizontalAlignment="Left" Margin="130,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" Height="20"/>

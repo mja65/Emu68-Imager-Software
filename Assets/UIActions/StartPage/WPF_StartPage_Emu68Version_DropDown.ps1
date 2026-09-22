@@ -24,6 +24,24 @@ $WPF_StartPage_Emu68Version_Dropdown.Add_SelectionChanged({
     Get-InputFileCSV -CSV "Emu68Versions" | ForEach-Object {
         if ($WPF_StartPage_Emu68Version_Dropdown.SelectedItem -eq $_.Emu68VersionTypeFriendlyName){
             $Script:GUIActions.Emu68VersionType = $_.Emu68VersionType
+            $AllowC790 = ((Get-InputFileCSV -CSV "Emu68Versions").where({ $_.Emu68VersionType -eq $Script:GUIActions.Emu68VersionType })).AllowC790
+            If (($AllowC790 -ne $true) -and ($Script:GUIActions.UnicamDeviceType -eq "c790")){
+                $Script:GUIActions.UnicamEnabled = $false    
+                $Script:GUIActions.UnicamDeviceType = $null   
+                $Script:GUIActions.UnicamStartonBoot = [bool]$null
+                $Script:GUIActions.UnicamScalingType = $null
+                $Script:GUIActions.UnicamBParameter = $null
+                $Script:GUIActions.UnicamCParameter = $null
+                $Script:GUIActions.UnicamPhase = $null
+                $Script:GUIActions.UnicamAspectRatio = $null
+                $Script:GUIActions.UnicamScanLinesNonLaced = $null
+                $Script:GUIActions.UnicamScanLinesLaced = $null    
+                $Script:GUIActions.UnicamSizeX = $null
+                $Script:GUIActions.UnicamSizeY = $null
+                $Script:GUIActions.UnicamOffsetX = $null
+                $Script:GUIActions.UnicamOffsetY = $null   
+            } 
+
             If ($_.EnableBupTest -eq $false){
                 $Script:GUIActions.EnableBupTest = $false
             }
