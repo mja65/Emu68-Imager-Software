@@ -3,10 +3,8 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
         
     )
 
-    
-    $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures = [System.Collections.Generic.List[PSCustomObject]]::New()
-    $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk = [System.Collections.Generic.List[PSCustomObject]]::New() 
-
+    $HSTOutputPath = if ($Script:GUIActions.OutputType -eq "Image") { "`"$($Script:GUIActions.OutputPath)`""} else { $Script:GUIActions.OutputPath }
+   
     if ($Script:GUIActions.DiskTypeSelected -eq 'PiStorm - MBR'){
         $MBRPartitionstoAddtoDisk = @($Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries)
         if (-not ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries)){
@@ -46,14 +44,14 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
 
         $MBRPartitionStartSector = $MBRPartition.Partition.StartingPositionSector + $StartingSector
      
-        $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-            Command = "mbr part add `"$($Script:GUIActions.OutputPath)`" $PartitionTypetoUse $([int64]($MBRPartition.Partition.partitionsizebytes)) --start-sector $([int64]$MBRPartitionStartSector)"
+        $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+            Command = "mbr part add $HSTOutputPath $PartitionTypetoUse $([int64]($MBRPartition.Partition.partitionsizebytes)) --start-sector $([int64]$MBRPartitionStartSector)"
             Sequence = 1      
         }  
         if ($MBRPartition.Partition.PartitionSubType -eq 'FAT32'){
             Write-InformationMessage -Message "Adding command to format FAT32 partition for partition #$MBRPartitionCounter"
-            $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-                Command = "mbr part format `"$($Script:GUIActions.OutputPath)`" $MBRPartitionCounter $($MBRPartition.Partition.VolumeName)"
+            $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                Command = "mbr part format $HSTOutputPath $MBRPartitionCounter $($MBRPartition.Partition.VolumeName)"
                 Sequence = 1      
             }  
         }
@@ -105,18 +103,34 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
            $RDBPartitionCounter = 1       
            Write-InformationMessage -Message "Preparing commands to set up Amiga Disk for $($MBRPartition.PartitionName) - MBR Partition Number: $MBRPartitionCounter"
            if ($MBRPartition.Partition.ImportedPartition -ne $true){
-               $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-                   Command = "rdb init `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`""
-                   Sequence = 3    
-               }  
+               If ($Script:GUIActions.OutputType -eq "Image"){
+                   $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                       Command = "rdb init `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`""
+                       Sequence = 3    
+                   } 
+               }
+               else {
+                   $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                       Command = "rdb init $($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter"
+                       Sequence = 3    
+                   }                  
+               }
                foreach ($FileSystem in $FileSystemstoAdd){
                    if ($FileSystem.GPTMBRPartition -eq $MBRPartition.PartitionName){
-                    $DosTypetoUse = $FileSystem.DosType.Replace("\","")
-                    Write-InformationMessage -Message "Adding filesystem `"$($FileSystem.FileSystemName)`" to Disk"
-                       $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-                           Command = "rdb filesystem add `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`" `"$($FileSystem.FileSystemPath)`" $DosTypetoUse"    
-                           Sequence = 3      
-                       }            
+                       $DosTypetoUse = $FileSystem.DosType.Replace("\","")
+                       Write-InformationMessage -Message "Adding filesystem `"$($FileSystem.FileSystemName)`" to Disk"
+                       If ($Script:GUIActions.OutputType -eq "Image"){
+                           $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                               Command = "rdb filesystem add `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`" `"$($FileSystem.FileSystemPath)`" $DosTypetoUse"    
+                               Sequence = 3      
+                            }            
+                        }
+                       else{
+                           $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                               Command = "rdb filesystem add $($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter `"$($FileSystem.FileSystemPath)`" $DosTypetoUse"    
+                               Sequence = 3      
+                            }            
+                        }                    
                    }               
                }
                foreach ($RDBPartition in $RDBPartitionstoAddtoDisk) {
@@ -126,6 +140,7 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
                             RDBPartitionNumber = $RDBPartitionCounter
                             DeviceName = $($RDBPartition.Partition.DeviceName)
                             VolumeName = $($RDBPartition.Partition.VolumeName)
+                            DefaultWorkbenchPartition = $($RDBPartition.Partition.DefaultAmigaWorkbenchPartition)
                         }               
                            $DosTypetoUse = $RDBPartition.Partition.DosType.replace('\','')
                            $MasktoUse = $RDBPartition.Partition.mask
@@ -150,23 +165,45 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
                                        if (test-path "$($Script:Settings.TempFolder)\ImportedFiles.info"){
                                            $null = Remove-Item "$($Script:Settings.TempFolder)\ImportedFiles.info"                                   
                                        }                                                                  
-                                       $null = Copy-Item "$($Script:Settings.TempFolder)\IconFiles\NewFolder\NewFolder.info" "$($Script:Settings.TempFolder)\ImportedFiles.info"   
+                                       $null = Copy-Item "$($Script:Settings.TempFolder)\IconFiles\NewFolder.info" "$($Script:Settings.TempFolder)\ImportedFiles.info"   
                                    }                                   
                                    Write-InformationMessage -Message "Adding command to import files from $($RDBPartition.Partition.ImportedFilesPath) to RDB Partition $($RDBPartition.Partition.DeviceName)"
-                                   $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-                                       Command = "fs mkdir `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)\ImportedFiles`""
-                                       Sequence = 5                                            
-                                   }  
-                                   $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-                                       Command = "fs copy `"$($RDBPartition.Partition.ImportedFilesPath)\`*`" `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)\ImportedFiles`" --makedir --recursive TRUE --force TRUE"
-                                       Sequence = 5      
-                                   }  
+                                   If ($Script:GUIActions.OutputType -eq "Image"){
+                                       $Script:GUICurrentStatus.HSTImagerCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
+                                           Command = "fs mkdir `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)\ImportedFiles`""
+                                           Sequence = 5                                            
+                                       }  
+                                       $Script:GUICurrentStatus.HSTImagerCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
+                                           Command = "fs copy `"$($RDBPartition.Partition.ImportedFilesPath)\`*`" `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)\ImportedFiles`" --makedir --recursive TRUE --force TRUE"
+                                           Sequence = 5      
+                                       }  
+                                   }
+                                   else {
+                                       $Script:GUICurrentStatus.HSTImagerCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
+                                           Command = "fs mkdir $($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)\ImportedFiles"
+                                           Sequence = 5                                            
+                                       }  
+                                       $Script:GUICurrentStatus.HSTImagerCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
+                                           Command = "fs copy `"$($RDBPartition.Partition.ImportedFilesPath)\`*`" $($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)\ImportedFiles --makedir --recursive TRUE --force TRUE"
+                                           Sequence = 5      
+                                       }                                      
+                                   }
+
                                    if ($Script:GUIActions.InstallOSFiles -eq $true){
                                        Write-InformationMessage -Message "Adding command to create .info file for imported files folder"
-                                       $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
-                                           Command = "fs copy `"$([System.IO.Path]::GetFullPath("$($Script:Settings.TempFolder)\ImportedFiles.info"))`" `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)`" --makedir --recursive TRUE --force TRUE"
-                                           Sequence = 5      
-                                       }                                     
+                                       If ($Script:GUIActions.OutputType -eq "Image"){
+                                           $Script:GUICurrentStatus.HSTImagerCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
+                                               Command = "fs copy `"$([System.IO.Path]::GetFullPath("$($Script:Settings.TempFolder)\ImportedFiles.info"))`" `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName)`" --makedir --recursive TRUE --force TRUE"
+                                               Sequence = 5      
+                                           }                                     
+                                       }
+                                       else {
+                                           $Script:GUICurrentStatus.HSTImagerCommandstoProcess.WriteFilestoDisk += [PSCustomObject]@{
+                                               Command = "fs copy `"$([System.IO.Path]::GetFullPath("$($Script:Settings.TempFolder)\ImportedFiles.info"))`" $($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter\rdb\$($RDBPartition.Partition.DeviceName) --makedir --recursive TRUE --force TRUE"
+                                               Sequence = 5      
+                                           }                                           
+                                       }
+
                                    }
                                    else {
                                     Write-WarningMessage -Message "Not creating .info file for imported files folder as icons not available (you haven't installed an OS)"
@@ -177,15 +214,27 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
                                }
                            }
                            Write-InformationMessage -Message "Adding command to create partition for Device:$($RDBPartition.Partition.DeviceName) of size(bytes):$($RDBPartition.Partition.PartitionSizeBytes)"
-                           $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-                               Command = "rdb part add `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`" $($RDBPartition.Partition.DeviceName) $DosTypetoUse $($RDBPartition.Partition.PartitionSizeBytes) --buffers $bufferstouse --max-transfer $maxtransfertouse --mask $masktouse $nomountflagtouse$bootableflagtouse--boot-priority $BootPrioritytouse"
-                               Sequence = 4      
-                            }
-                            Write-InformationMessage -Message "Adding command to format Device:$($RDBPartition.Partition.DeviceName) with volume name:$($RDBPartition.Partition.VolumeName)"
-                            $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures += [PSCustomObject]@{
-                                Command = "rdb part format `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`" $RDBPartitionCounter $($RDBPartition.Partition.VolumeName)"
-                                Sequence = 4      
-                            }
+                           Write-InformationMessage -Message "Adding command to format Device:$($RDBPartition.Partition.DeviceName) with volume name:$($RDBPartition.Partition.VolumeName)"
+                           If ($Script:GUIActions.OutputType -eq "Image"){
+                               $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                                   Command = "rdb part add `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`" $($RDBPartition.Partition.DeviceName) $DosTypetoUse $($RDBPartition.Partition.PartitionSizeBytes) --buffers $bufferstouse --max-transfer $maxtransfertouse --mask $masktouse $nomountflagtouse$bootableflagtouse--boot-priority $BootPrioritytouse"
+                                   Sequence = 4      
+                                }
+                                $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                                    Command = "rdb part format `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`" $RDBPartitionCounter $($RDBPartition.Partition.VolumeName)"
+                                    Sequence = 4      
+                                }
+                           }
+                           else {
+                               $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                                   Command = "rdb part add $($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter $($RDBPartition.Partition.DeviceName) $DosTypetoUse $($RDBPartition.Partition.PartitionSizeBytes) --buffers $bufferstouse --max-transfer $maxtransfertouse --mask $masktouse $nomountflagtouse$bootableflagtouse--boot-priority $BootPrioritytouse"
+                                   Sequence = 4      
+                                }
+                                $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
+                                    Command = "rdb part format $($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter $RDBPartitionCounter $($RDBPartition.Partition.VolumeName)"
+                                    Sequence = 4      
+                                }                            
+                           }
                            $RDBPartitionCounter++   
                     }   
                 }

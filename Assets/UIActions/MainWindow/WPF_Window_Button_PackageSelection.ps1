@@ -14,11 +14,15 @@ $WPF_Window_Button_PackageSelection.Add_Click({
 
         $Script:GUICurrentStatus.CurrentWindow = 'PackageSelection' 
     
-        if ($Script:GUICurrentStatus.AvailablePackagesNeedingGeneration -eq $true){
-            # Write-debug "Populating Available Packages"
-            Get-SelectablePackages 
-            $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $false
-        }
+    if ($Script:GUICurrentStatus.AvailablePackagesNeedingGeneration -eq "TRUE"){
+        Get-SelectablePackages
+        $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
+    }
+    elseif ($Script:GUICurrentStatus.AvailablePackagesNeedingGeneration -eq "KeepInstallPaths"){
+        Get-SelectablePackages -KeepInstallStatus
+        $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
+    }
+      
        
         # if (-not ($Script:WPF_PackageSelection)){
         #     $Script:WPF_PackageSelection = Get-XAML -WPFPrefix 'WPF_PackageSelection_' -XMLFile '.\Assets\WPF\Grid_PackageSelection.xaml' -ActionsPath '.\Assets\UIActions\PackageSelection\' -AddWPFVariables
@@ -39,27 +43,55 @@ $WPF_Window_Button_PackageSelection.Add_Click({
                 break
             }
         }
+
+        $Script:GUICurrentStatus.CurrentlySelectedPackage = $null
+        $Script:GUICurrentStatus.LastSelectedPackage = $null
+        $WPF_PackageSelection_PackageDetails_GroupBox.Visibility = "Hidden"
+        Confirm-ValidPackageInstallDrives 
+        $WPF_PackageSelection_InstallDrive_Dropdown.Items.Clear()
         
+        $WPF_PackageSelection_InstallDrive_Dropdown.AddChild("Workbench")
+        if (-not ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries)){
+            $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -Amiga)
+        }      
+
+        Foreach ($Partition in $Script:GUICurrentStatus.AmigaPartitionsandBoundaries){
+            If ($Partition.Partition.VolumeName -ne "Workbench"){
+                $WPF_PackageSelection_InstallDrive_Dropdown.AddChild($Partition.Partition.VolumeName)
+            }
+        }
+
         if ($IsChild -ne $true){
             $WPF_Window_Main.AddChild($WPF_PackageSelection)
         }
         
-        $WPF_PackageSelection_Datagrid_Packages.ItemsSource = $Script:GUIActions.AvailablePackages.DefaultView  
+        Update-AvailablePackagesInScope
+
+        $WPF_PackageSelection_Datagrid_Packages.ItemsSource = $Script:GUIActions.AvailablePackages.DefaultView 
         $WPF_PackageSelection_Datagrid_IconSets.ItemsSource = $Script:GUIActions.AvailableIconSets.DefaultView
         
          if (-not ($WPF_PackageSelection_Datagrid_IconSets.SelectedItem)){
+             If ($Script:GUIActions.SelectedIconSet){
+                 for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.DefaultView.Count; $i++) {
+                     if ($Script:GUIActions.SelectedIconSet -eq $Script:GUIActions.AvailableIconSets.DefaultView[$i].IconSet){
+                         $RowNumbertoUse = $i
+                     }
+                 }  
+             }
+             else {
+                 for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.DefaultView.Count; $i++) {
+                     if ($Script:GUIActions.AvailableIconSets.DefaultView[$i].IconSetDefaultInstall -eq $true){
+                         $RowNumbertoUse = $i
+                     }
+                 }  
+             }
     
-             for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.DefaultView.Count; $i++) {
-                 if ($Script:GUIActions.AvailableIconSets.DefaultView[$i].IconSetDefaultInstall -eq $true){
-                     $DefaultRowNumber = $i
-                 }
-             }  
-             
-    
-             $WPF_PackageSelection_Datagrid_IconSets.SelectedItem = $Script:GUIActions.AvailableIconSets.DefaultView[$DefaultRowNumber]
+             $WPF_PackageSelection_Datagrid_IconSets.SelectedItem = $Script:GUIActions.AvailableIconSets.DefaultView[$RowNumbertoUse]
     
          }
         
+        $WPF_PackageSelection_Datagrid_Packages.SelectedItem = $null
+
         update-ui -MainWindowButtons -PackageSelectionWindow
 
 })

@@ -76,7 +76,7 @@ $WPF_DP_Button_AddNewAmigaPartition.add_click({
 
         $SpacetoUse = Get-NewPartitionSize -DefaultScale 'MiB' -MaximumSizeBytes $AvailableFreeSpace -MinimumSizeBytes $MinimumFreeSpace
         if ($SpacetoUse){
-            $WorkDefaultValues = Get-InputCSVs -Diskdefaults | Where-Object {$_.Type -eq "Amiga" -and $_.Disk -eq 'Work'}
+            $WorkDefaultValues = (Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Type -eq "Amiga" -and $_.Disk -eq 'Work'}
             
             $DeviceandVolumeNametoUse = (Get-DeviceandVolumeNametoUse)
     

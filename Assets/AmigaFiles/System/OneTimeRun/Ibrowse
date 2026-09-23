@@ -1,7 +1,0 @@
-c:spatch -oSYS:Programs/Ibrowse/codecs/gif.codec -pSYS:Programs/Ibrowse/codecs040fpu/gif.codec.spatch SYS:Programs/Ibrowse/codecs/gif.codec
-c:spatch -oSYS:Programs/Ibrowse/codecs/jpeg.codec -pSYS:Programs/Ibrowse/codecs040fpu/jpeg.codec.spatch SYS:Programs/Ibrowse/codecs/jpeg.codec
-c:spatch -oSYS:Programs/Ibrowse/codecs/png.codec -pSYS:Programs/Ibrowse/codecs040fpu/png.codec.spatch SYS:Programs/Ibrowse/codecs/png.codec
-c:spatch -oSYS:Programs/Ibrowse/codecs/xbm.codec -pSYS:Programs/Ibrowse/codecs040fpu/xbm.codec.spatch SYS:Programs/Ibrowse/codecs/xbm.codec
-c:spatch -oSYS:Programs/Ibrowse/codecs/imagedecode.module -pSYS:Programs/Ibrowse/codecs040fpu/imagedecode.module.spatch SYS:Programs/Ibrowse/codecs/imagedecode.module
-delete SYS:Programs/Ibrowse/codecs040fpu/#?  SYS:Programs/Ibrowse/codecs040fpu ALL FORCE QUIET
-makedir SYS:Programs/Ibrowse/cache

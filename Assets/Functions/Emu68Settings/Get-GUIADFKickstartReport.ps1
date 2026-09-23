@@ -36,14 +36,11 @@ function Get-GUIADFKickstartReport {
 
     $Datatable = New-Object System.Data.DataTable
     [void]$Datatable.Columns.AddRange($Fields)
-    foreach ($line in $DatatoPopulate)
-    {
-        $Array = @()
-        Foreach ($Field in $Fields)
-        {
-            $array += $line.$Field
+    foreach ($line in $DatatoPopulate){
+        $RowData = foreach ($Field in $Fields) {
+            $line.$Field
         }
-        [void]$Datatable.Rows.Add($array)
+        [void]$Datatable.Rows.Add($RowData)
     }
     
     $WPF_ADFKickstartReporting_TextBox.Text = $Text

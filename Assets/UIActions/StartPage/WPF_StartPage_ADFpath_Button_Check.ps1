@@ -1,14 +1,15 @@
 $WPF_StartPage_ADFpath_Button_Check.Add_Click({
     if ($Script:GUIActions.KickstartVersiontoUse){
-        if ($Script:GUIActions.InstallMediaLocation){
-            $ADFPathtoUse = $Script:GUIActions.InstallMediaLocation
-        } 
-        else{
-            $ADFPathtoUse = $Script:Settings.DefaultInstallMediaLocation
+        $ADFPathtoUse = if ($Script:GUIActions.InstallMediaLocation) { $Script:GUIActions.InstallMediaLocation } else { $Script:Settings.DefaultInstallMediaLocation }
+        if ($Script:GUIActions.OSInstallMediaType -eq 'CD'){
+            $Script:GUIActions.FoundInstallMediatoUse = Compare-CDHashes -MaximumFilestoCheck 500 -PathtoADFFiles $ADFPathtoUse -KickstartVersion $Script:GUIActions.KickstartVersiontoUse 
         }
-        $Script:GUIActions.FoundInstallMediatoUse = Compare-ADFHashes -MaximumFilestoCheck 500 -PathtoADFFiles $ADFPathtoUse -KickstartVersion $Script:GUIActions.KickstartVersiontoUse 
+        else {
+            $Script:GUIActions.FoundInstallMediatoUse = Compare-ADFHashes -MaximumFilestoCheck 500 -PathtoADFFiles $ADFPathtoUse
+        }
         
-        if ((($Script:GUIActions.FoundInstallMediatoUse | Select-Object 'IsMatched' -unique).IsMatched -eq 'FALSE') -or (($Script:GUIActions.FoundInstallMediatoUse | Select-Object 'IsMatched' -unique).count -eq 2)) {
+        $MissingFlag = $false
+        if ($Script:GUIActions.FoundInstallMediatoUse.Where({ $_.IsMatched -eq $false }, 'First')) {
             $MissingFlag = $true
         }
 

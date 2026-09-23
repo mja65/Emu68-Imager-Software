@@ -5,19 +5,19 @@ function Start-HSTCommands {
         $ActivityDescription,
         $TotalSteps,
         [switch]$ReportActualSteps,
-        [switch]$ReportTime
+        [switch]$ReportTime,
+        [switch]$DebugFlag
     )
     
-    # $HSTScript = $Script:GUICurrentStatus.HSTCommandstoProcess.ExtractOSFiles
-    # $Section = "ExtractOSFiles"
-    # $ActivityDescription = "Running HST Imager to extract OS files"
-    # $ReportActualSteps = $true
-    # $ReportTime = $true
-    # $Section = "DiskStructures;WriteFilestoDisk" 
-    # $Section = "DiskStructures"
-    
-# [System.IO.File]::Open($Script:Settings.HSTDetailedLogLocation, 'Open', 'Read', 'ReadWrite'))
-
+    If ($DebugFlag){
+        $LogNameDateTime = (Get-Date -Format yyyyMMddHHmmss).tostring()
+        $DetailedLogLocation = join-pathMulti $Script:Settings.LogFolder "$LogNameDateTime`_HSTAmigaDebugLog.txt" -UseFullPath
+    }
+    elseif ($Script:Settings.HSTDetailedLogEnabled -eq $true){
+        $DetailedLogLocation = $Script:Settings.HSTDetailedLogLocation
+    }
+     
+    $loggingEnabled = ($Script:Settings.HSTDetailedLogEnabled -eq $true) -or ($DebugFlag)
 
     if (-not ($TotalSteps) -and ($Section)){
         
@@ -58,8 +58,8 @@ function Start-HSTCommands {
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $startInfo
     
-    if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
-        $streamWriter = [System.IO.StreamWriter]::new($Script:Settings.HSTDetailedLogLocation, $true)  # Open StreamWriter to file
+    if ($loggingEnabled){
+        $streamWriter = [System.IO.StreamWriter]::new($DetailedLogLocation, $true)  # Open StreamWriter to file
         $line = "Log entries for: HST Imager ran with the following arguments [$Arguments] - START"
         $streamWriter.WriteLine($line)
         $streamWriter.WriteLine()
@@ -75,14 +75,14 @@ function Start-HSTCommands {
     $currentStep = 0
     
     while (($line = $process.StandardOutput.ReadLine()) -ne $null) {
-        if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
+        if ($loggingEnabled){
             $streamWriter.WriteLine($line) 
         }
         if ($line -match '\[.*?ERR\]') {
             Write-ErrorMessage -Message "Error running HST Imager! Error was: $line"
 
             Write-Progress -Activity $ActivityDescription -Completed
-            if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
+            if ($loggingEnabled){
                 $streamWriter.Close()   # Close the StreamWriter so file is saved properly
             }
             Write-HSTCommandstoLog
@@ -111,7 +111,7 @@ function Start-HSTCommands {
         Write-InformationMessage -Message "Total time to run section $Section was: $formatted" 
     }
     
-    if ($Script:Settings.HSTDetailedLogEnabled -eq $true){
+    if ($loggingEnabled){
         $line = "Log entries for: HST Imager ran with the following arguments [$Arguments] - FINISH"
         $streamWriter.WriteLine($line)
         $streamWriter.WriteLine()

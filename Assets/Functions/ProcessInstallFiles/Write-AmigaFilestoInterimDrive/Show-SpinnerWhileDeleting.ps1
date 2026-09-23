@@ -17,9 +17,9 @@ function Show-SpinnerWhileDeleting {
 
     try {
         Receive-Job $job -ErrorAction Stop | Out-Null
-        Write-Host "`r$Message complete.       "
+        Write-InformationMessage -Message "$Message complete." -NewLineBefore
     } catch {
-        Write-Host "`r$Message failed: $_      "
+        Write-InformationMessage -Message "$Message failed: $_" -NewLineBefore
     } finally {
         Remove-Job $job
     }

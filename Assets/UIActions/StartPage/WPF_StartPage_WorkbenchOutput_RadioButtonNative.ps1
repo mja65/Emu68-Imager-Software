@@ -1,6 +1,6 @@
 
 if (-not ($Script:GUIActions.AvailableScreenModesWB)){
-    $Script:GUIActions.AvailableScreenModesWB = Get-InputCSVs -ScreenModesWB
+    $Script:GUIActions.AvailableScreenModesWB = (Get-InputFileCSV -CSV 'ScreenModesWB')
 }
 
 $WPF_StartPage_WorkbenchOutput_RadioButtonNative.add_Checked({

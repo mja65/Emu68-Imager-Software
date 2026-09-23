@@ -7,18 +7,16 @@ function Get-AvailableAmigaFileSystems {
      
     $ListofFileSystemstoCheck = @()
     
-    (Get-ChildItem $Script:Settings.DownloadedFileSystems -force -Recurse | Where-Object { $_.PSIsContainer -eq $false }).FullName | ForEach-Object {
+    (Get-ChildItem $Script:Settings.DownloadedFileSystems -file -Recurse -force).FullName | ForEach-Object {
         $ListofFileSystemstoCheck += $_
     }
 
-    (Get-ChildItem $Script:Settings.DefaultAmigaFileSystemLocation -force -Recurse | Where-Object { $_.PSIsContainer -eq $false }).FullName | ForEach-Object {
+    (Get-ChildItem $Script:Settings.DefaultAmigaFileSystemLocation -file -Recurse -force).FullName | ForEach-Object {
         $ListofFileSystemstoCheck += $_
     }
 
     $FoundFileSystems = [System.Collections.Generic.List[PSCustomObject]]::New()
-   
-    $FileSystemstoFind = Get-InputCSVs -FileSystems
-    
+       
     $HashTableforFileSystemstoCheck = @{} # Clear Hash
 
     #Identify Unique FileSystems Available
@@ -32,7 +30,7 @@ function Get-AvailableAmigaFileSystems {
         }
     }
 
-    foreach ($FileSystemtoFind in $FileSystemstoFind){
+    foreach ($FileSystemtoFind in (Get-InputFileCSV -CSV 'FileSystems')){
         if ($HashTableforFileSystemstoCheck[$FileSystemtoFind.Hash]){
             $FoundFileSystems += [PSCustomObject]@{
                 FileSystemName = $FileSystemtoFind.FilesystemName

@@ -2,93 +2,107 @@ function Get-StartupFiles {
     param (
         
     )
-
-    $StartupFiles = @()
     
-    Import-Csv -Path $Script:Settings.StartupFilesCSV.Path -Delimiter ';' | ForEach-Object {
-        if ($_.MinimumInstallerVersion -ne "" -and $_.InstallerVersionLessThan -ne ""){
-            if (($Script:Settings.Version -ge [system.version]$_.MinimumInstallerVersion) -and ($Script:Settings.Version -lt [system.version]$_.InstallerVersionLessThan)){
-                $StartupFiles += $_
+    if (-not (Test-path $Script:ExternalProgramSettings.SevenZipFilePath)){
+        Write-ErrorMessage -Message "7z is missing! Either redownload and/or re-extract Emu68 Imager"
+        return $false
+    }
+
+    $AminetMirrors = (Get-InputFileCSV -CSV 'AminetMirrors')
+
+    $DownloadLocation = join-path $Script:Settings.TempFolder "StartupFiles"
+   
+    if (Test-Path -Path $DownloadLocation -pathType Container){
+        Remove-Item -Path $DownloadLocation -Force -Recurse -ErrorAction SilentlyContinue
+    }
+
+    $null = New-Item -Path $DownloadLocation -ItemType Directory
+
+    $PackageName = $null
+    $PackagesNeedUpdating = $false
+    $LogPathStandardOutput = join-path $Script:Settings.TempFolder "LogStd.txt"
+   
+    foreach ($Line in (Get-InputFileCSV -CSV 'StartupFiles')){
+    
+        If ($PackageName -ne $Line.PackageName){
+            $PackageUptoDate = $true
+            $PackageUpdated = $false
+            Write-InformationMessage -Message "Starting check of Package: $($Line.PackageName)" -NewLineBefore
+        }
+        $PackageName = $Line.PackageName
+        if ($PackageUpdated -eq $true){continue}
+        write-informationMessage -Message "Checking file: $($Line.FilestoCheck)"
+        $PathtoExtract = join-pathmulti "." $Line.LocationtoInstall
+        $PathtoFiletoCheck = join-pathmulti $PathtoExtract $Line.FilestoCheck
+        if (-not (Test-Path $PathtoFiletoCheck)){
+            $PackageUptoDate = $false
+            $PackagesNeedUpdating = $true
+            Write-InformationMessage -Message "$($Line.PackageName) does not exist! Package will be installed." -NewLineBefore
+        }
+        If ($PackageUptoDate -eq $true){
+            $HashtoCheck = (Get-FileHash -Path $PathtoFiletoCheck -Algorithm MD5).hash
+            if ($HashtoCheck -ne $Line.FileHash){
+                $PackageUptoDate = $false
+                $PackagesNeedUpdating = $true
+                Write-InformationMessage -message "$($Line.PackageName) is out of date! Package will be reinstalled." -NewLineBefore
             }
+        }
+        If ($PackageUptoDate -eq $false){
+            write-informationMessage -Message "Downloading required files"
+            if (-not (Test-Path $DownloadLocation)){
+                $null = New-Item -Path $DownloadLocation -ItemType Directory
+            }  
+            $DownloadLocation = join-pathMulti $Script:Settings.TempFolder "StartupFiles" $Line.FileDownloadName
+            if ($Line.Source -eq 'Web'){
+                #Write-host "URL: $($Line.SourceLocation) LocationforDL: $DownloadLocation"
+                if (-not (Get-AmigaFileWeb -AminetMirrors $AminetMirrors -URL $Line.SourceLocation -LocationforDL $DownloadLocation)){
+                    Write-ErrorMessage -Message "Error downloading $($Line.PackageName)! Cannot continue!"
+                    return $false
+                }
+            }
+            elseif ($Line.Source -eq 'Github'){
+                $DownloadURL = Get-GithubRelease -GithubRepository $Line.SourceLocation -GithubReleaseType $Line.GithubReleaseType -Tag_Name $Line.GithubRelease -Name $Line.GithubName -GithubNameExclude $Line.GithubNameExclude -GithubSortTagPrefix $Line.GithubSortTagPrefix -GithubSortSemanticVersion $Line.GithubSortSemanticVersion -MinimumPublishedDate $Line.GithubMinimumPublishedDate
+                if (-not($DownloadURL)){
+                    Write-ErrorMessage -Message "Error finding Github release for $($Line.PackageName)! Cannot continue!"
+                    return $false
+                }           
+                if (-not(Get-AmigaFileWeb -URL $DownloadURL -LocationforDL $DownloadLocation -NumberofAttempts 3 -RunParallel $false)){
+                    Write-ErrorMessage -Message "Error downloading $($Line.PackageName)! Cannot continue!"
+                    return $false
+                }
+            }
+            if ((Get-FileHash -Path $DownloadLocation  -Algorithm MD5).hash -ne $Line.Hash){
+                Write-ErrorMessage -Message "File hashes do not match. Cannot continue!"
+                $null = Remove-Item -Path $DownloadLocation 
+                return $false 
+            }
+            else {
+                Write-InformationMessage -Message "Extracting $($Line.PackageName)"
+                $OutputMessage = & $Script:ExternalProgramSettings.SevenZipFilePath "x" "-o$PathtoExtract" "$DownloadLocation" "-y" 2>&1                       
+                if ($LASTEXITCODE -ne 0) {
+                    Write-ErrorMessage -Message "Error extracting $DownloadLocation! Exiting" 
+                    $OutputMessage | Out-File -FilePath (join-path $Script:Settings.LogFolder "SevenZipError.txt") -Encoding UTF8 
+                    return $false
+                }
+                $PackageUpdated = $true
+            }            
         }
     }
       
-    $PackagestoInstall = Get-PackagestoInstall -ListofFilestoCheck $StartupFiles
-    $PackageName = $null
-
-    if (-not ($PackagestoInstall)){
-        Write-InformationMessage "All packages installed. Nothing to do."
+    if ($PackagesNeedUpdating -eq $false){
+        write-informationMessage -Message "All packages installed. Nothing to do." -NewLineBefore
         return $true
     } 
-
-    Write-InformationMessage "Downloading required files"
-
-    $DownloadLocation = "$($Script:Settings.TempFolder)\StartupFiles"
-    if (-not (Test-Path $DownloadLocation)){
-        $null = New-Item -Path $DownloadLocation -ItemType Directory
-    }  
-
-    $StartupFiles | Select-Object 'PackageName','FileDownloadName','SourceLocation','GithubRelease','GithubReleaseType','GithubName','Hash','Source' -Unique | ForEach-Object {
-        if ($PackagestoInstall.Contains($_.PackageName)){
-            $HashtoCheck = $_.Hash
-            $PathtoCheck = "$DownloadLocation\$($_.FileDownloadName)"
-            if ((Confirm-FileExists -Pathtocheck $Pathtocheck -HashtoCheck $HashtoCheck) -eq $false){
-                Write-InformationMessage "Downloading $($_.PackageName)"
-                if ($_.Source -eq 'Web'){
-                    if (-not (Get-AmigaFileWeb -URL $_.SourceLocation -LocationforDL "$($Script:Settings.TempFolder)\StartupFiles" -NameofDL $_.FileDownloadName)){
-                        Write-ErrorMessage "Error downloading $($_.PackageName)! Cannot continue!"
-                        return $false
-                    }
-                }
-                elseif ($_.Source -eq 'Github'){
-                    if (-not(Get-GithubRelease -GithubRepository $_.SourceLocation -GithubReleaseType $_.GithubReleaseType -Tag_Name $_.GithubRelease -Name $_.GithubName -LocationforDownload "$($Script:Settings.TempFolder)\StartupFiles\" -FileNameforDownload "$($_.FileDownloadName)")){
-                        Write-ErrorMessage -Message "Error downloading $($_.PackageName)! Cannot continue!"
-                        return $false
-                    }
-                }
-            }   
+    else {
+        if (Test-Path ".\Programs\UnAdf\include"){
+            remove-item ".\Programs\UnAdf\include" -recurse -force -ErrorAction SilentlyContinue
         }
-    }
-
-    Write-InformationMessage "Downloads complete"
-    
-    $PackageName = $null
-    
-    $StartupFiles | ForEach-Object {
-        if ($PackagestoInstall.Contains($_.PackageName)){
-            if ($PackageName -ne $_.PackageName){
-                Write-InformationMessage "Installing $($_.PackageName)"
-            }
-            $InputFile = "$($Script:Settings.TempFolder)\StartupFiles\$($_.FileDownloadName)"
-            $LocationtoInstall = ".\$($_.LocationtoInstall)"                     
-            if (-not (Test-Path $LocationtoInstall)){
-                Write-InformationMessage "Folder $LocationtoInstall does not exist. Creating folder"
-                $null = New-Item -Path $LocationtoInstall -ItemType Directory
-            }
-            # Write-InformationMessage "Extracting file $($_.FilestoInstall)"
-            if (-not (Expand-Archive -InputFile $InputFile -FiletoExtract $_.FilestoInstall -OutputDirectory $LocationtoInstall)){
-                Write-ErrorMessage "Error extracting $($_.FilestoInstall)! Exiting"
-                return $false
-            }
-            $PackageName = $_.PackageName
-        }
-    
+        if (Test-Path ".\Programs\UnAdf\doc"){
+            remove-item ".\Programs\UnAdf\doc" -recurse -force -ErrorAction SilentlyContinue
+            write-informationMessage -Message "All required packages updated." -NewLineBefore
+            return $true             
+        } 
     }
 
     return $true
 }
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-

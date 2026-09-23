@@ -1,41 +1,19 @@
-                  
-                                                  
-
-function Write-HSTCommandstoLog {
+function Get-HSTCommandstoLog {
     param (
         
-        )
-                                     
-    "HST imager commands ran:" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "ExtractOS Files" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    $Script:GUICurrentStatus.HSTCommandstoProcess.ExtractOSFiles.Command | Out-File $Script:Settings.LogLocation -Append -Encoding utf8 -Width 2000
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "Copy Icon Files" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    $Script:GUICurrentStatus.HSTCommandstoProcess.CopyIconFiles.Command | Out-File $Script:Settings.LogLocation -Append -Encoding utf8 -Width 2000
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "New Disk or Image" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    $Script:GUICurrentStatus.HSTCommandstoProcess.NewDiskorImage.Command | Out-File $Script:Settings.LogLocation -Append -Encoding utf8 -Width 2000
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "Disk Structures" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures.Command | Out-File $Script:Settings.LogLocation -Append -Encoding utf8 -Width 2000
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "Write Files to Disk" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8     
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8      
-    $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk.Command | Out-File $Script:Settings.LogLocation -Append -Encoding utf8 -Width 2000
-    "Write Direct Files to Disk" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8     
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8      
-    $Script:GUICurrentStatus.HSTCommandstoProcess.WriteDirectFilestoDisk.Command | Out-File $Script:Settings.LogLocation -Append -Encoding utf8 -Width 2000
-    "CD Extraction Commands" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8     
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8      
-    $Script:GUICurrentStatus.HSTCommandstoProcess.CDExtractionCommands.Command | Out-File $Script:Settings.LogLocation -Append -Encoding utf8 -Width 2000
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    "Adjust Parameters on Imported RDB Partitions" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8     
-    "" |Out-File $Script:Settings.LogLocation -Append -Encoding utf8
-    $Script:GUICurrentStatus.HSTCommandstoProcess.AdjustParametersonImportedRDBPartitions.Command | Out-File $Script:Settings.LogLocation -Append -Encoding utf8 -Width 2000      
+    )
+
+@"
+HST imager commands ran:
+
+New Disk or Image:
+$($Script:GUICurrentStatus.HSTImagerCommandstoProcess.NewDiskorImage.Command -join [Environment]::NewLine)
+
+Disk Structures:
+$($Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures.Command -join [Environment]::NewLine)
+
+Write Files to Disk:
+$($Script:GUICurrentStatus.HSTImagerCommandstoProcess.WriteFilestoDisk.Command -join [Environment]::NewLine)
+"@
     
-    }              
+}              

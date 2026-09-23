@@ -3,7 +3,7 @@ function Confirm-Prerequisites {
     )
     
 
-    $Script:Settings.TotalNumberofSubTasks = 2
+    $Script:Settings.TotalNumberofSubTasks = 3
     $Script:Settings.CurrentSubTaskNumber = 1
     $Script:Settings.CurrentSubTaskName = "Initial checks"    
     
@@ -53,6 +53,20 @@ function Confirm-Prerequisites {
           $null = $WPF_FailedPrerequisite.ShowDialog()
           exit        
       }  
-          
+      
+    $Script:Settings.CurrentSubTaskNumber = 3
+    $Script:Settings.CurrentSubTaskName = "Checking required files for parallel processing"
+
+    Write-StartSubTaskMessage
+
+    if (-not($Script:GUICurrentStatus.RunParallelInstalled -eq "Never")){
+        Write-InformationMessage -Message "Checking required files for parallel processing"
+        $Script:GUICurrentStatus.RunParallelInstalled = (Confirm-RunParallelFiles)
+        if ($Script:GUICurrentStatus.RunParallelInstalled -eq "Never"){
+            Write-ConfigFile -RunParallel
+        }
+    }     
+ 
+
 }
 

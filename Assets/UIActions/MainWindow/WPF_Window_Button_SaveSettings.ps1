@@ -3,6 +3,8 @@ $WPF_Window_Button_SaveSettings.Add_Click({
         return
     }
 
+    Confirm-ValidPackageInstallDrives 
+    
     $SavePath = Get-SettingsSavePath
     if ($SavePath){
         $DataToSave = Get-SettingsDataforSave
@@ -11,6 +13,7 @@ $WPF_Window_Button_SaveSettings.Add_Click({
             $null = Remove-Item $SavePath
         }
         $DataToSave | Out-File $SavePath
+        $null = Show-WarningorError -ButtonType_OK -Msg_Header "Settings Saved" -Msg_Body "The settings have been saved" -BoxTypeNone
 
     }
 })

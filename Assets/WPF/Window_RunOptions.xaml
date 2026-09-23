@@ -1,30 +1,48 @@
 <Window x:Name="Window" 
-            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:local="clr-namespace:WpfApp14"
-            mc:Ignorable="d"
-         Title="Run Options" Height="700" Width="1000" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" Topmost="True" WindowStartupLocation="CenterScreen" WindowStyle="None" >
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Run Options" Height="700" Width="1000" Left="130" HorizontalAlignment="Center" VerticalAlignment="Center" Topmost="True" WindowStartupLocation="CenterScreen" WindowStyle="None" >
 
-    <Grid x:Name ="Main" Background="#FFE5E5E5">
-     <TextBlock x:Name="ScreenMode_Label" Text="The imager will be run with the following options. If you do not wish to run press the cancel button." TextWrapping="Wrap" HorizontalAlignment="Center"  VerticalAlignment="Top" Margin="0,20,0,0" Height="35" TextAlignment="Center"/>
-    <TextBlock x:Name="RunOptions_Label" Text="The imager will be run with the following options. If you do not wish to run press the cancel button." TextWrapping="Wrap" HorizontalAlignment="Center"  VerticalAlignment="Top" Margin="0,50,0,0" Height="35" TextAlignment="Center"/>
-    <DataGrid Name="RunOptions_Datagrid" IsReadOnly="True"  AutoGenerateColumns="False" HorizontalAlignment="Center" Margin="0,80,0,0" VerticalAlignment="Top" HorizontalScrollBarVisibility="Auto" GridLinesVisibility="None" HorizontalGridLinesBrush="#FF505050" VerticalGridLinesBrush="#FF505050" AlternatingRowBackground="LightGray" 
-                    RowBackground="White" >
+    <Grid x:Name="Main" Background="#FFE5E5E5">
+        <TextBlock x:Name="RunOptions_Label" Text="Emu60 imager will be run with the following options. If you do not wish to run press the cancel button." TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,50,0,0" Height="35" TextAlignment="Center"/>
+
+        <DataGrid Name="RunOptions_Datagrid" Height="300" IsReadOnly="True" AutoGenerateColumns="False" CanUserSortColumns="False" HorizontalAlignment="Center" Margin="0,80,0,0" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" HorizontalScrollBarVisibility="Auto" GridLinesVisibility="None" HorizontalGridLinesBrush="#FF505050" VerticalGridLinesBrush="#FF505050" AlternatingRowBackground="LightGray" RowBackground="White">
+
+            <!-- Row styling that targets the DataTable row safely -->
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <!-- Checks the Value column (index 1) of the DataRow. If empty, apply header style -->
+                        <DataTrigger Binding="{Binding Row[1]}" Value="">
+                            <Setter Property="Background" Value="#FF505050"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="IsEnabled" Value="False"/>
+                            <!-- Makes it look like a section divider -->
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Setting" Binding="{Binding Setting}" Width="300"/>
                 <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="600">
                     <DataGridTextColumn.ElementStyle>
-                        <Style>
-                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
-                            <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                            <Setter Property="TextAlignment" Value="Left"/>
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <TextBox x:Name="RunOptionsNotes_Label" HorizontalAlignment="Center" Margin="0,400,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Notes for Image Generation:" VerticalAlignment="Top" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+
+        <TextBlock x:Name="RunOptionsNotes_Value" Text="The imager will be run with the following options. If you do not wish to run press the cancel button." TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,450,0,0" TextAlignment="Center" Width="902"/>
+
         <Button x:Name="OK_Button" Content="OK" HorizontalAlignment="Right" Margin="0,0,50,5" VerticalAlignment="Bottom" Width="100" Height="50"/>
         <Button x:Name="Cancel_Button" Content="Cancel" HorizontalAlignment="Left" Margin="50,0,0,5" VerticalAlignment="Bottom" Width="100" Height="50"/>
     </Grid>

@@ -26,13 +26,13 @@ function Find-WHDLoadWrapperURL {
                     $IsSuccess = $true  
                 }
                 else {
-                    Write-InformationMessage -message 'Site timed out!'
+                    Write-InformationMessage -message "Site timed out!"
                     $IsSuccess = $false
                     return
                 }
             }
             catch {
-                Write-InformationMessage -message 'Download failed! Retrying in 3 seconds'
+                Write-InformationMessage -message "Download failed! Retrying in 3 seconds"
                 Start-Sleep -Seconds 3
                 $IsSuccess = $false
             }
@@ -42,7 +42,7 @@ function Find-WHDLoadWrapperURL {
         )
 
         if ($IsSuccess -eq $false){
-            Write-ErrorMessage "Unable to access website!"
+            Write-ErrorMessage -Message "Unable to access website!"
             return
         }
         else{
@@ -60,7 +60,7 @@ function Find-WHDLoadWrapperURL {
                 return $DownloadLink
             }
             else {
-                Write-ErrorMessage "Unable to find WHDLoadWrapper file to download!"
+                Write-ErrorMessage -Message "Unable to find WHDLoadWrapper file to download!"
                 return
             }
         }

@@ -84,11 +84,73 @@ function Update-UI {
 
     if ($Emu68Settings){
 
-        if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
-            $WPF_StartPage_Unicam_button.Visibility = "Hidden"
-            $WPF_StartPage_NetworkStack_RadioButtonNone.Visibility = "Hidden"            
+        If ($Script:GUIActions.DeleteAllDownloadedFiles -eq $true){
+            $WPF_StartPage_DeleteFiles_CheckBox.IsChecked = 1
+       
+        }
+        elseif ($Script:GUIActions.DeleteAllDownloadedFiles -eq $false){
+            $WPF_StartPage_DeleteFiles_CheckBox.IsChecked = 0
+        }
+        
+        if ($Script:GUICurrentStatus.RunParallelInstalled -ne "Yes") {
+            $WPF_StartPage_RunParallel_CheckBox.IsChecked = 0
+            $WPF_StartPage_RunParallel_CheckBox.IsEnabled = 0
+        }
+        else {
+            If ($Script:GUIActions.RunParallel -eq $true){
+                $WPF_StartPage_RunParallel_CheckBox.IsChecked = 1
+    
+            }
+            elseif ($Script:GUIActions.RunParallel -eq $false){
+                $WPF_StartPage_RunParallel_CheckBox.IsChecked = 0
+            }
         }
 
+        if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
+            $WPF_StartPage_SettingsMUIVersion_GroupBox.Visibility = "Hidden"
+            $WPF_StartPage_SettingsEmu68Imager_GroupBox.Visibility = "Hidden"
+            $WPF_StartPage_Unicam_button.Visibility = "Hidden" 
+        }
+
+        Get-InputFileCSV -CSV "Emu68Versions" | ForEach-Object {
+            if ($Script:GUIActions.Emu68VersionType -eq $_.Emu68VersionType){
+                $WPF_StartPage_Emu68Version_Dropdown.SelectedItem = $_.Emu68VersionTypeFriendlyName
+            }
+        }
+               
+        if ($Script:GUIActions.Emu68VersionType -eq 'Release'){
+            $WPF_startpage_EnableBupTest_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_LowSpeed_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_DisableSCSI_CheckBox.Visibility = 'Hidden'
+            $WPF_startpage_ForceAgnus_CheckBox.Visibility = 'Hidden'
+            $WPF_startpage_ForceAgnus_RadioButtonNTSC.Visibility = 'Hidden'
+            $WPF_startpage_ForceAgnus_RadioButtonPAL.Visibility = 'Hidden'
+            $WPF_startpage_EnableDMA_CheckBox.Visibility = 'Hidden'
+            $WPF_startpage_EnableIRQ_CheckBox.Visibility = 'Hidden'
+            $WPF_startpage_OverclockSD_CheckBox.Visibility = 'Hidden'
+            $WPF_startpage_OverclockSD_Slider.Visibility = 'Hidden'
+            $WPF_startpage_OverclockSD_Value.Visibility = 'Hidden'
+            $WPF_startpage_OverclockSD_Value_Text.Visibility = 'Hidden'
+            $WPF_startpage_USBStackEnable_CheckBox.Visibility = 'Hidden'
+            $WPF_startpage_SettingsPoseidonVersion_GroupBox.Visibility = 'Hidden'
+
+        }
+        else {    
+            $WPF_startpage_EnableBupTest_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_LowSpeed_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_DisableSCSI_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_ForceAgnus_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_ForceAgnus_RadioButtonNTSC.Visibility = 'Visible'
+            $WPF_startpage_ForceAgnus_RadioButtonPAL.Visibility = 'Visible'
+            $WPF_startpage_EnableDMA_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_EnableIRQ_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_OverclockSD_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_OverclockSD_Slider.Visibility = 'Visible'
+            $WPF_startpage_OverclockSD_Value.Visibility = 'Visible'
+            $WPF_startpage_USBStackEnable_CheckBox.Visibility = 'Visible'
+            $WPF_startpage_SettingsPoseidonVersion_GroupBox.Visibility = 'Hidden'
+        }
+       
         if ($Script:GUIActions.InstallOSFiles -eq $true){
             $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_SourceFiles_GroupBox.Visibility = 'Visible'
@@ -97,7 +159,7 @@ function Update-UI {
             $WPF_StartPage_ADFPath_Label.Visibility = 'Visible'
             $WPF_StartPage_SettingsScreen_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_SettingsScreenWB_GroupBox.Visibility = 'Visible'
-            $WPF_StartPage_SettingsNetwork_GroupBox.Visibility = 'Visible'
+            $WPF_StartPage_SettingsNetworkUSB_GroupBox.Visibility = 'Visible'
         }
         elseif ($Script:GUIActions.InstallOSFiles -eq $false){
             $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Visible'
@@ -107,7 +169,7 @@ function Update-UI {
             $WPF_StartPage_ADFPath_Label.Visibility = 'Hidden'
             $WPF_StartPage_SettingsScreen_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_SettingsScreenWB_GroupBox.Visibility = 'Hidden'
-            $WPF_StartPage_SettingsNetwork_GroupBox.Visibility = 'Hidden'
+            $WPF_StartPage_SettingsNetworkUSB_GroupBox.Visibility = 'Hidden'
         }
         if ($Script:GUIActions.ROMLocation){
             $WPF_StartPage_RomPath_Label.Text = Get-FormattedPathforGUI -PathtoTruncate $Script:GUIActions.ROMLocation
@@ -156,11 +218,26 @@ function Update-UI {
             $WPF_StartPage_Password_Textbox.Text = $Script:GUIActions.WifiPassword 
         }
         
-        if ($Script:GUIActions.NetworkStack -eq "Miami"){
-            $WPF_StartPage_NetworkStack_RadioButtonMiami.IsChecked = 1
+        Get-InputFileCSV -CSV "NetworkStackVersions" | ForEach-Object {
+            If ($Script:GUIActions.NetworkStack -eq $_.NetworkStack){
+                $WPF_StartPage_NetworkStack_Dropdown.SelectedItem = $_.NetworkStackFriendlyName
+            }
+        }    
+        
+        If ($Script:GUIActions.MUIVersion -eq "3.8"){
+            $WPF_StartPage_MUIVersion_38.IsChecked = 1
+
         }
-        if ($Script:GUIActions.NetworkStack -eq "Roadshow"){
-            $WPF_StartPage_NetworkStack_RadioButtonRoadshow.IsChecked = 1
+        elseIf ($Script:GUIActions.MUIVersion -eq "5.0"){
+            $WPF_StartPage_MUIVersion_50.IsChecked = 1
+        }
+        
+        If ($Script:GUIActions.PoseidonVersion -eq "4.x") {
+            $WPF_StartPage_PoseidonVersion_RadioButton45.IsChecked = 1
+
+        }
+        elseif ($Script:GUIActions.PoseidonVersion -eq "6.x") {
+            $WPF_StartPage_PoseidonVersion_RadioButtonRondoval.IsChecked = 1
         }
 
         if (($Script:GUIActions.ScreenModetoUseFriendlyName) -and (-not ($WPF_StartPage_ScreenMode_Dropdown.SelectedItem))) {
@@ -200,6 +277,99 @@ function Update-UI {
             }
         }
 
+        If ($Script:GUIActions.Emu68VersionType){
+            $WPF_StartPage_Emu68Version_Dropdown.SelectedItem = $Script:GUIActions.Emu68VersionType
+        }
+
+        if ($Script:GUIActions.EnableBupTest -eq $true){
+            $WPF_StartPage_EnableBupTest_CheckBox.IsChecked = 1
+        }
+        else {
+            $WPF_StartPage_EnableBupTest_CheckBox.IsChecked = 0
+        }
+
+        if ($Script:GUIActions.SCSIDeviceDisabled -eq $true){
+            $WPF_StartPage_DisableSCSI_CheckBox.IsChecked = 1
+        }
+        else {
+            $WPF_StartPage_DisableSCSI_CheckBox.IsChecked = 0
+        }
+            
+        if ($Script:GUIActions.DMAEnabled -eq $true){
+            $WPF_StartPage_EnableDMA_CheckBox.IsChecked = 1
+            $WPF_StartPage_EnableIRQ_CheckBox.IsEnabled = 0
+        }
+        else {
+            $WPF_StartPage_EnableDMA_CheckBox.IsChecked = 0
+            $WPF_StartPage_EnableIRQ_CheckBox.IsEnabled = 1
+        }
+            
+        if ($Script:GUIActions.IRQEnabled -eq $true){
+            $WPF_StartPage_EnableIRQ_CheckBox.IsChecked = 1
+        }
+        else {
+            $WPF_StartPage_EnableIRQ_CheckBox.IsChecked = 0
+        }   
+
+        if ($Script:GUIActions.AgnusType -eq $null){
+            $WPF_StartPage_ForceAgnus_RadioButtonNTSC.Visibility = "Hidden"
+            $WPF_StartPage_ForceAgnus_RadioButtonPAL.Visibility = "Hidden"
+            $WPF_startpage_ForceAgnus_CheckBox.IsChecked = 0
+        }
+        else {
+            $WPF_startpage_ForceAgnus_CheckBox.IsChecked = 1
+            $WPF_StartPage_ForceAgnus_RadioButtonNTSC.Visibility = "Visible"
+            $WPF_StartPage_ForceAgnus_RadioButtonPAL.Visibility = "Visible"            
+            if ($Script:GUIActions.AgnusType -eq "PAL"){
+                $WPF_StartPage_ForceAgnus_RadioButtonPAL.IsChecked = 1
+
+            }
+            elseif ($Script:GUIActions.AgnusType -eq "NTSC"){
+                $WPF_StartPage_ForceAgnus_RadioButtonNTSC.IsChecked = 1                
+            }
+        }
+
+        if ($Script:GUIActions.SDLowSpeed -eq $false){
+            $WPF_StartPage_LowSpeed_CheckBox.IsChecked = 0
+        }
+
+        if ($Script:GUIActions.SDLowSpeed -eq $true){
+            $WPF_StartPage_LowSpeed_CheckBox.IsChecked = 1
+        }
+        
+        If (($Script:GUIActions.SDOverClock -eq $false) -or ($Script:GUIActions.SDOverClock -eq $null)) {
+            $WPF_StartPage_OverclockSD_CheckBox.IsChecked = 0
+            $WPF_StartPage_OverclockSD_Slider.Visibility = "Hidden"
+            $WPF_StartPage_OverclockSD_Value.Visibility = "Hidden"
+            $WPF_StartPage_OverclockSD_Value_Text.Visibility = "Hidden"
+        }
+
+        If ($Script:GUIActions.SDOverClock -eq $true) {
+            $WPF_StartPage_OverclockSD_CheckBox.IsChecked = 1
+            $WPF_StartPage_OverclockSD_Slider.Visibility = "Visible"
+            $WPF_StartPage_OverclockSD_Value.Visibility = "Visible"
+            if ($WPF_StartPage_OverclockSD_Slider.Value -gt 50) {
+                $WPF_StartPage_OverclockSD_Value.Background = "Red"
+                $WPF_StartPage_OverclockSD_Value.Foreground = "White"
+                $WPF_StartPage_OverclockSD_Value_Text.Visibility = "Visible"
+            }
+            else {
+                $WPF_StartPage_OverclockSD_Value.Background = "Transparent"
+                $WPF_StartPage_OverclockSD_Value.Foreground = "Black"
+                $WPF_StartPage_OverclockSD_Value_Text.Visibility = "Hidden"
+
+            }
+        }
+                 
+        If ($Script:GUIActions.EnableUSBStack -eq $true){
+            $WPF_startpage_USBStackEnable_CheckBox.IsChecked = 1
+            $WPF_startpage_SettingsPoseidonVersion_GroupBox.Visibility = 'Visible'
+        }
+        else {
+            $WPF_startpage_USBStackEnable_CheckBox.IsChecked = 0
+            $WPF_startpage_SettingsPoseidonVersion_GroupBox.Visibility = 'Hidden'
+        }
+
         if ($Script:GUIActions.UnicamEnabled -eq $false){
             $WPF_StartPage_Unicam_CheckBox.IsChecked = 0
             $WPF_StartPage_Unicam_button.IsEnabled = 0
@@ -224,7 +394,6 @@ function Update-UI {
         elseif ($Script:GUIActions.ScreenModeType -eq "Native"){
             $WPF_StartPage_WorkbenchOutput_RadioButtonNative.IsChecked = 1
         }
-
 
     }
 
@@ -357,7 +526,14 @@ function Update-UI {
         }
 
     }
-
+    if ($DiskPartitionWindow){
+        Get-InputFileCSV -CSV "DiskTypes" | ForEach-Object {
+            if ($Script:GUIActions.DiskType -eq $_.DiskType){
+                $WPF_DP_Disk_Type_DropDown.SelectedItem = $_.DiskTypeFriendlyName
+            }
+        }
+    } 
+              
     if (($DiskPartitionWindow) -or ($UpdateInputBoxes)){
         if ($Script:GUICurrentStatus.SelectedGPTMBRPartition){
             if (-not $WPF_DP_SelectedSize_Input.InputEntry -eq $true){
@@ -703,7 +879,8 @@ function Update-UI {
                 $WPF_StartPage_Unicam_CheckBox.Visibility = "Hidden"                
             }
             else {
-
+                
+                $WPF_StartPage_ScreenModeWorkbench_Dropdown.Items.Clear()
                 $WPF_StartPage_WorkbenchColour_Label.Visibility = "Visible"
                 $WPF_StartPage_WorkbenchColour_Value.Visibility = "Visible"
                 $WPF_StartPage_ColourDepth_groupBox.Visibility = "Visible"

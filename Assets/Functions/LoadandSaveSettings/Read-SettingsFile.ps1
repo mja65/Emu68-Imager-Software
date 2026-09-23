@@ -4,18 +4,15 @@ function Read-SettingsFile {
     )
     
     
-   # $SettingsFile = "C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Settings\test.e68"
+   # $SettingsFile = "C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Settings\3.2.e68"
 
-   $Script:GUICurrentStatus.LoadingSettings =$true
-
-   $Script:GUICurrentStatus.HSTCommandstoProcess.ExtractOSFiles = [System.Collections.Generic.List[PSCustomObject]]::New()
-   $Script:GUICurrentStatus.HSTCommandstoProcess.CopyIconFiles = [System.Collections.Generic.List[PSCustomObject]]::New()
-   $Script:GUICurrentStatus.HSTCommandstoProcess.NewDiskorImage = [System.Collections.Generic.List[PSCustomObject]]::New()
-   $Script:GUICurrentStatus.HSTCommandstoProcess.DiskStructures = [System.Collections.Generic.List[PSCustomObject]]::New()
-   $Script:GUICurrentStatus.HSTCommandstoProcess.CopyImportedFiles = [System.Collections.Generic.List[PSCustomObject]]::New()
-   $Script:GUICurrentStatus.HSTCommandstoProcess.WriteFilestoDisk = [System.Collections.Generic.List[PSCustomObject]]::New()
-   $Script:GUICurrentStatus.HSTCommandstoProcess.CopyImportedFiles = [System.Collections.Generic.List[PSCustomObject]]::New()
-   $Script:GUICurrentStatus.HSTCommandstoProcess.AdjustParametersonImportedRDBPartitions = [System.Collections.Generic.List[PSCustomObject]]::New()
+   $Script:GUICurrentStatus.LoadingSettings = $true
+   
+   $Script:GUICurrentStatus.LastSelectedPackage = $null
+   $Script:GUICurrentStatus.CurrentlySelectedPackage = $null
+   $Script:GUICurrentStatus.HSTImagerCommandstoProcess.NewDiskorImage = [System.Collections.Generic.List[PSCustomObject]]::New()
+   $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures = [System.Collections.Generic.List[PSCustomObject]]::New()
+   $Script:GUICurrentStatus.HSTImagerCommandstoProcess.WriteFilestoDisk = [System.Collections.Generic.List[PSCustomObject]]::New()
    $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = $null
    $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries = $null
    $Script:GUICurrentStatus.LastMouseMoveUpdateTime = [DateTime]::MinValue
@@ -28,13 +25,12 @@ function Read-SettingsFile {
    $Script:GUICurrentStatus.NewPartitionAcceptedNewValue = $false
    $Script:GUICurrentStatus.ImageSizeAcceptedValue = $null
    $Script:GUICurrentStatus.ImageSizeDefaultScale = $null
-   $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $true
+   $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "TRUE"
    $Script:GUICurrentStatus.RunOptionstoReport = New-Object System.Data.DataTable
    $Script:GUICurrentStatus.IssuesFoundBeforeProcessing = New-Object System.Data.DataTable
    $Script:GUICurrentStatus.ProcessImageStatus = $false
    $Script:GUICurrentStatus.ProcessImageConfirmedbyUser = $false
    $Script:GUICurrentStatus.PathstoRDBPartitions = [System.Collections.Generic.List[PSCustomObject]]::New()
-   $Script:GUICurrentStatus.InstallMediaRequiredFromUserSelectablePackages = @()
    $Script:GUICurrentStatus.StartTimeForRunningInstall = $null
    $Script:GUICurrentStatus.EndTimeForRunningInstall  = $null
    $Script:GUICurrentStatus.ImportedPartitionType = $null
@@ -72,6 +68,8 @@ function Read-SettingsFile {
        }
    }
    
+   $Script:GUIActions.DeleteAllDownloadedFiles = $null
+   $Script:GUIActions.RunParallel = $false
    $Script:GUIActions.InstallType = 'PiStorm'
    $Script:GUIActions.ScreenModetoUse = $null
    $Script:GUIActions.ScreenModetoUseFriendlyName =$null
@@ -81,12 +79,14 @@ function Read-SettingsFile {
    $Script:GUIActions.AvailableIconSets = New-Object System.Data.DataTable 
    $Script:GUIActions.SelectedIconSet = $null 
    $Script:GUIActions.KickstartVersiontoUse = $null
+   $Script:GUIActions.Emu68VersionType = $null
+   $Script:GUIActions.MUIVersion = $null
    $Script:GUIActions.KickstartVersiontoUseFriendlyName = $null
    $Script:GUIActions.OSInstallMediaType = $null
    $Script:GUIActions.SSID = $null
    $Script:GUIActions.WifiPassword = $null
    $Script:GUIActions.FoundInstallMediatoUse = $null
-   $Script:GUIActions.FoundKickstarttoUse = $null
+   $Script:GUIActions.FoundKickstarttoUse = $null 
    $Script:GUIActions.ListofRemovableMedia = $null
    $Script:GUIActions.ImportPartitionWindowStatus = $null
    $Script:GUIActions.SelectedPhysicalDiskforTransfer = $null
@@ -102,16 +102,31 @@ function Read-SettingsFile {
    $Script:GUIActions.ScreenModetoUseWB = $null
    $Script:GUIActions.WorkbenchBackDropEnabled = $null
    $Script:GUIActions.ScreenModeWBColourDepth = $null
+   $Script:GUIActions.EnableBupTest = $null
+   $Script:GUIActions.SCSIDeviceDisabled = $null
+   $Script:GUIActions.DMAEnabled = $null
+   $Script:GUIActions.IRQEnabled = $null
+   $Script:GUIActions.AgnusType = $null
+   $Script:GUIActions.SDLowSpeed = $null
+   $Script:GUIActions.SDOverClock = $null
+   $Script:GUIActions.SDOverClockSpeed = $null
+   $Script:GUIActions.EnableUSBStack = $null
+   $Script:GUIActions.PoseidonVersion = $null
    $Script:GUIActions.UnicamEnabled = $false    
+   $Script:GUIActions.UnicamDeviceType = $null   
    $Script:GUIActions.UnicamStartonBoot = [bool]$null
    $Script:GUIActions.UnicamScalingType = $null
    #$Script:GUIActions.UnicamPhase = $null
    $Script:GUIActions.UnicamBParameter = $null
    $Script:GUIActions.UnicamCParameter = $null
-   $Script:GUIActions.UnicamSizeXPosition = $null
-   $Script:GUIActions.UnicamSizeYPosition = $null
-   $Script:GUIActions.UnicamOffsetXPosition = $null
-   $Script:GUIActions.UnicamOffsetYPosition = $null
+   $Script:GUIActions.UnicamPhase = $null
+   $Script:GUIActions.UnicamAspectRatio = $null
+   $Script:GUIActions.UnicamScanLinesNonLaced = $null
+   $Script:GUIActions.UnicamScanLinesLaced = $null
+   $Script:GUIActions.UnicamSizeX = $null
+   $Script:GUIActions.UnicamSizeY = $null
+   $Script:GUIActions.UnicamOffsetX = $null
+   $Script:GUIActions.UnicamOffsetY = $null
    $Script:GUIActions.CustomScreenMode_Width = $null
    $Script:GUIActions.CustomScreenMode_Height = $null
    $Script:GUIActions.CustomScreenMode_Framerate = $null
@@ -123,7 +138,6 @@ function Read-SettingsFile {
    $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSet",([String])))
    $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDescription",([String])))
    $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDefaultInstall",([Bool])))
-   $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetUserSelected",([Bool])))
    for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.Columns.Count; $i++) {
        if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSet'){
            $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $true
@@ -131,35 +145,34 @@ function Read-SettingsFile {
        if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSetDescription'){
            $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $true
        }
-       if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSetUserSelected'){
-           $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $false
-       }
    }
-   
-$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameUserSelected",([bool])))
-$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameDefaultInstall",([bool])))
-$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameFriendlyName",([string])))
-$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameGroup",([string])))
-$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameDescription",([string])))
-$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "InstallMediaFlag",([bool])))
-for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'PackageNameFriendlyName'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $true
-    }
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'PackageNameGroup'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $true
-    }
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'PackageNameDescription'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $true
-    }
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'InstallMediaFlag'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $true
-    }    
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'PackageNameUserSelected'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $false
-    }
-}
 
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameUserSelected",([bool])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameDefaultInstall",([bool])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageName",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageType",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameFriendlyName",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameGroup",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameDescription",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageURL",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageAuthor",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "UserDefinableInstallPath",([bool])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageDefaultDrive",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageUserDrive",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageDefaultPath",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageUserPath",([string])))
+   $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageinScope",([bool])))
+   
+   $Script:GUIActions.AvailablePackages.Columns["PackageName"].ReadOnly = $true
+   $Script:GUIActions.AvailablePackages.Columns["PackageType"].ReadOnly = $true
+   $Script:GUIActions.AvailablePackages.Columns["PackageAuthor"].ReadOnly = $true
+   $Script:GUIActions.AvailablePackages.Columns["PackageURL"].ReadOnly = $true
+   $Script:GUIActions.AvailablePackages.Columns["PackageNameFriendlyName"].ReadOnly = $true
+   $Script:GUIActions.AvailablePackages.Columns["PackageNameGroup"].ReadOnly = $true
+   $Script:GUIActions.AvailablePackages.Columns["PackageNameDescription"].ReadOnly = $true
+   $Script:GUIActions.AvailablePackages.Columns["PackageDefaultDrive"].ReadOnly = $true
+   $Script:GUIActions.AvailablePackages.Columns["PackageDefaultPath"].ReadOnly = $true
+      
      if ($Script:GUICurrentStatus.FileBoxOpen -eq $true){
         return
     }
@@ -192,9 +205,9 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
         return $false #Invalid File
     }
 
-    $VersionCheck = (($ReadSettings[0] -split ":")[-1]).Trim()
+    $VersionCheck = [System.version](($ReadSettings[0] -split ":")[-1]).Trim()
 
-    if ($Script:Settings.Version -lt [System.version]$VersionCheck){
+    if ($Script:Settings.Version -lt $VersionCheck){
         Write-InformationMessage -Message "Settings File is for different version of Emu68 Imager!"
         return $false #File is for wrong version
     }
@@ -322,59 +335,95 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
     $LoadedSettings | ForEach-Object {
         if ($_.Setting -eq 'DiskTypeSelected'){
             $DiskTypetouse = $_.Value       
+        }
+        elseif ($_.Setting -in @('KickstartVersiontoUse')){
+            (Get-Variable -Scope Script -Name "GUIActions").Value.$($_.Setting) = [system.version]$_.Value
         }        
         else {
             (Get-Variable -Scope Script -Name "GUIActions").Value.$($_.Setting) = $_.Value
         }
     }  
    
-    if ($FoundKickstarttoUse.KickstartPath){
-        if (Test-Path $FoundKickstarttoUse.KickstartPath){
-            if ((get-filehash -path $FoundKickstarttoUse.KickstartPath -Algorithm MD5).hash -eq (Get-InputCSVs -ROMHashes | Where-Object {$_.Kickstart_version -eq $Script:GUIActions.KickstartVersiontoUse}).hash){
-                $Script:GUIActions.FoundKickstarttoUse = $FoundKickstarttoUse | Select-Object 'Kickstart_Version','FriendlyName','Sequence','IncludeorExclude','ExcludeMessage','Fat32Name','KickstartPath'            
-            }
-        }
+    If ($Script:GUICurrentStatus.RunParallelInstalled -ne "Yes"){
+        $Script:GUIActions.RunParallel = $false
     }
 
- 
-    foreach ($line in $AvailablePackages ){
-        $Array = @()
-        $array += $line.PackageNameUserSelected
-        $array += $line.PackageNameDefaultInstall
-        $array += $line.PackageNameFriendlyName
-        $array += $line.PackageNameGroup
-        $array += $line.PackageNameDescription
-        $array += $line.InstallMediaFlag
-        [void]$Script:GUIActions.AvailablePackages.Rows.Add($array)
+    $AllROMHashes = Get-InputFileCSV -CSV 'ROMHashes'
+    $KickstartHashestoFind = @{}
+
+    foreach ($Row in $AllROMHashes) {
+        $KickstartHashestoFind[$Row.Hash] = $Row
     }
-    
+
+    $Script:GUIActions.FoundKickstarttoUse = @(
+        Foreach ($Line in $FoundKickstarttoUse){
+            if (Test-Path $Line.KickstartPath){
+                $FileHash = get-filehash -path $Line.KickstartPath -Algorithm MD5
+                if ($KickstartHashestoFind.ContainsKey($FileHash.hash)){
+                    [PSCustomObject]@{
+                        ExcludeMessage   = $Line.ExcludeMessage 
+                        Fat32Name        = $Line.Fat32Name
+                        FriendlyName     = $Line.FriendlyName 
+                        IncludeorExclude = $Line.IncludeorExclude
+                        KickstartPath    = $Line.KickstartPath
+                        KickstartVersion = $Line.KickstartVersion 
+                        Sequence         = $Line.Sequence 
+                        Status           = $Line.Status
+                        WHDLoadName      = $Line.WHDLoadName
+                    }
+                }
+            }
+        }
+    )
+                        
+    foreach ($line in $AvailablePackages ){
+        $RowData = @(
+            $line.PackageNameUserSelected
+            $line.PackageNameDefaultInstall
+            $line.PackageName   
+            $line.Type 
+            $line.PackageNameFriendlyName
+            $line.PackageNameGroup
+            $line.PackageNameDescription
+            $line.PackageURL
+            $line.PackageAuthor
+            $line.UserDefinableInstallPath
+            $line.PackageDefaultDrive
+            $line.PackageUserDrive
+            $line.PackageDefaultPath
+            $line.PackageUserPath
+            [bool]$line.PackageinScope
+        )
+        [void]$Script:GUIActions.AvailablePackages.Rows.Add($RowData)
+    }
+            
     $IndexForSelectedIconSet = $null
     $Counter = 0
 
     foreach ($line in  $AvailableIconSets){
-       $Array = @()
-       $array += $line.IconSet
-       $array += $line.IconSetDescription
-       $array += $line.IconSetDefaultInstall
-       $array += $line.IconSetUserSelected
-       [void]$Script:GUIActions.AvailableIconSets.Rows.Add($array)
+       $RowData = @(
+           $line.IconSet
+           $line.IconSetDescription
+           $line.IconSetDefaultInstall
+       )
+       [void]$Script:GUIActions.AvailableIconSets.Rows.Add($RowData)
        if ($Script:GUIActions.SelectedIconSet -eq $line.IconSet){
         $IndexForSelectedIconSet = $Counter
        }
        $Counter ++
     }
-   
-        $WPF_PackageSelection_Datagrid_Packages.ItemsSource = $Script:GUIActions.AvailablePackages.DefaultView  
-        $WPF_PackageSelection_Datagrid_IconSets.ItemsSource = $Script:GUIActions.AvailableIconSets.DefaultView
+    
+    $Script:GUIActions.AvailablePackages.DefaultView.RowFilter = "PackageinScope = true"
+    
+    $WPF_PackageSelection_Datagrid_Packages.ItemsSource = $Script:GUIActions.AvailablePackages.DefaultView  
+    $WPF_PackageSelection_Datagrid_IconSets.ItemsSource = $Script:GUIActions.AvailableIconSets.DefaultView
 
-        if ($IndexForSelectedIconSet -ne $null){
-            $WPF_PackageSelection_Datagrid_IconSets.SelectedIndex  =  $IndexForSelectedIconSet
-            $WPF_PackageSelection_CurrentlySelectedIconSet_Value.text = $WPF_PackageSelection_Datagrid_IconSets.SelectedItem.IconSet
-
-        }
-
-        
-    $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = $false
+    if ($IndexForSelectedIconSet -ne $null){
+        $WPF_PackageSelection_Datagrid_IconSets.SelectedIndex  =  $IndexForSelectedIconSet
+        $WPF_PackageSelection_CurrentlySelectedIconSet_Value.text = $WPF_PackageSelection_Datagrid_IconSets.SelectedItem.IconSet
+    }
+    
+    $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
 
     $WPF_StartPage_ScreenMode_Dropdown.SelectedItem = $Script:GUIActions.ScreenModetoUseFriendlyName
     $WPF_StartPage_KickstartVersion_Dropdown.SelectedItem = $Script:GUIActions.KickstartVersiontoUseFriendlyName
@@ -384,23 +433,23 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
     $MissingFiles = $false
 
     $HashTableforInstallMedia = @{} # Clear Hash
-    Get-InputCSVs -InstallMediaHashes | ForEach-Object {
+    (Get-InputFileCSV -CSV 'InstallMediaHashes') | ForEach-Object {
         $HashTableforInstallMedia[$_.Hash] = $null
     }
 
-    $FoundInstallMedia | ForEach-Object {
-        If (Test-Path $_.Path){
-            $HashtoCheck = (Get-FileHash -path $_.path -Algorithm MD5).hash
-            if (-not ($HashTableforInstallMedia.ContainsKey($HashtoCheck))){
-                $MissingFiles = $true  
-                break              
-            }
-        }
-        else {
-            $MissingFiles = $true
-        } 
-    }
 
+    $FoundInstallMedia | ForEach-Object {
+       if (-not (Test-Path -LiteralPath $_.Path)){
+           $MissingFiles = $true  
+           break        
+        }
+       $HashtoCheck = (Get-FileHash -Literalpath $_.path -Algorithm MD5).hash
+       if (-not ($HashTableforInstallMedia.ContainsKey($HashtoCheck))){
+           $MissingFiles = $true  
+           break              
+        }
+    }
+    
     if ($MissingFiles -eq $false){        
         $Script:GUICurrentStatus.IconsChanged = $false
         $Script:GUICurrentStatus.PackagesChanged =$false
@@ -524,6 +573,14 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
     }
     
     $Script:GUICurrentStatus.ForceRecheckAmigaPartitionsandBoundaries = $true
+
+    $WPF_StartPage_NetworkStack_Dropdown.Items.Clear()    
+    
+    Get-InputFileCSV -CSV "NetworkStackVersions"| Where-Object { $_.IncludeforUserSelection -eq $true } | ForEach-Object {
+        If ($Script:GUIActions.Emu68VersionType -in @($_.Emu68VersionType -split ',')){
+            $WPF_StartPage_NetworkStack_Dropdown.AddChild($_.NetworkStackFriendlyName)
+        }
+    }
     
     if ($ImportDisk -eq $true){
         Update-UI -MainWindowButtons -Emu68Settings -DiskPartitionWindow -UpdateInputBoxes -Buttons -PhysicalvsImage -CheckforRunningImage -freespacealert -WBScreenModeUpdate

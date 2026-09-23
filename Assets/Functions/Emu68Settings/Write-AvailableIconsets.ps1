@@ -1,18 +1,24 @@
 function Write-AvailableIconsets {
     param (
     )
+
     $Script:GUIActions.AvailableIconSets.Clear()
-    # $UserSelectableIconSets  = Get-InputCSVs -IconSets | Select-Object @{Name='IconSet';Expression = 'IconSetName'},'IconSetDescription',@{Name='IconSetUserSelected';Expression = 'IconsDefaultInstall'},@{Name='IconSetDefaultInstall';Expression = 'IconsDefaultInstall'}
-    
-    $UserSelectableIconSets  = Get-InputCSVs -IconSets | Select-Object @{Name='IconSet';Expression = 'IconSetName'},'IconSetDescription',@{Name='IconSetDefaultInstall';Expression = 'IconsDefaultInstall'}
-    
+     
+    $UserSelectableIconSets = @(Get-InputFileCSV -CSV 'IconSets').ForEach({
+        [PSCustomObject]@{
+            IconSet               = $_.IconSet
+            IconSetDescription    = $_.IconSetDescription
+            IconSetDefaultInstall = [System.Convert]::ToBoolean($_.IconsDefaultInstall)
+        }
+    })
+
     foreach ($line in  $UserSelectableIconSets){
-       $Array = @()
-       $array += $line.IconSet
-       $array += $line.IconSetDescription
-       $array += $line.IconSetDefaultInstall
-      # $array += $line.IconSetUserSelected
-       [void]$Script:GUIActions.AvailableIconSets.Rows.Add($array)
+       $RowData = @(
+           $line.IconSet
+           $line.IconSetDescription
+           $line.IconSetDefaultInstall
+       )
+      [void]$Script:GUIActions.AvailableIconSets.Rows.Add($RowData)
     }
     
     if (-not ($Script:GUIActions.SelectedIconSet)){

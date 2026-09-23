@@ -46,7 +46,7 @@ function Check-ProcessingImage {
            if ($Script:GUIActions.DiskSizeSelected){
                
                if ($Script:GUIActions.InstallOSFiles -eq $true){
-                   $SystemDeviceName = (Get-InputCSVs -Diskdefaults | Where-Object {$_.Disk -eq 'System'}).DeviceName
+                   $SystemDeviceName = ((Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Disk -eq 'System'}).DeviceName
                    $DefaultID76Partition = $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries | Where-Object {$_.Partition.defaultgptmbrpartition -eq $true -and $_.Partition.PartitionSubType -eq 'ID76'}
                }
                

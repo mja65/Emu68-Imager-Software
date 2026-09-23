@@ -20,19 +20,45 @@ $WPF_DP_ResettoDefault.Add_Click({
             $Script:GUIActions.ImageSizeSelected = $null
             $Script:GUIActions.OutputType = $null
             if ($Script:GUIActions.InstallOSFiles -eq $false){
-                $Script:GUIActions.UnicamEnabled = $false    
+                $Script:GUIActions.EnableBupTest = $true
+                $Script:GUIActions.SCSIDeviceDisabled = $false
+                $Script:GUIActions.DMAEnabled = $false
+                $Script:GUIActions.IRQEnabled = $false
+                $Script:GUIActions.AgnusType = $null
+                $Script:GUIActions.SDLowSpeed = $true
+                $Script:GUIActions.SDOverClock = $false
+                $Script:GUIActions.SDOverClockSpeed = $null
+                $Script:GUIActions.UnicamEnabled = $false
+                Get-InputFileCSV -CSV "Emu68Versions" | ForEach-Object {
+                    if ($Script:GUIActions.Emu68VersionType -eq $_.Emu68VersionType){
+                        $Script:GUIActions.PoseidonVersion = $_.PoseidonVersion
+                        if ($Script:GUIActions.PoseidonVersion){
+                            $Script:GUIActions.EnableUSBStack = $true
+                        }
+                        else {
+                            $Script:GUIActions.EnableUSBStack = $false
+                        }
+                        If ($Script:GUIActions.NetworkStack -notin @($_.NetworkStack -split ',')){
+                            $Script:GUIActions.NetworkStack = $_.NetworkStackDefault
+                        }
+                    }
+                }                    
+                $Script:GUIActions.UnicamDeviceType = $null     
                 $Script:GUIActions.UnicamStartonBoot = [bool]$null
                 $Script:GUIActions.UnicamScalingType = $null
-                #$Script:GUIActions.UnicamPhase = $null
                 $Script:GUIActions.UnicamBParameter = $null
                 $Script:GUIActions.UnicamCParameter = $null
-                $Script:GUIActions.UnicamSizeXPosition = $null
-                $Script:GUIActions.UnicamSizeYPosition = $null
-                $Script:GUIActions.UnicamOffsetXPosition = $null
-                $Script:GUIActions.UnicamOffsetYPosition = $null
+                $Script:GUIActions.UnicamPhase = $null
+                $Script:GUIActions.UnicamAspectRatio = $null
+                $Script:GUIActions.UnicamScanLinesNonLaced = $null
+                $Script:GUIActions.UnicamScanLinesLaced = $null  
+                $Script:GUIActions.UnicamSizeX = $null
+                $Script:GUIActions.UnicamSizeY = $null
+                $Script:GUIActions.UnicamOffsetX = $null
+                $Script:GUIActions.UnicamOffsetY = $null                  
                 $Script:GUIActions.WorkbenchBackDropEnabled = $false
                 $Script:GUIActions.ScreenModeType = "Native"
-                $Script:GUIActions.AvailableScreenModesWB = Get-InputCSVs -ScreenModesWB
+                $Script:GUIActions.AvailableScreenModesWB = (Get-InputFileCSV -CSV 'ScreenModesWB')
                 $Script:GUIActions.AvailableScreenModesWB | Where-Object 'Type' -eq "RTG" | ForEach-Object {
                     $WPF_StartPage_ScreenModeWorkbench_Dropdown.AddChild($_.FriendlyName)
                     if ($_.DefaultMode -eq $true){
@@ -45,8 +71,10 @@ $WPF_DP_ResettoDefault.Add_Click({
                 }            
             } 
             $Script:GUIActions.InstallOSFiles = $true
-            $Script:GUIActions.DiskSizeSelected = $null
-            $Script:GUIActions.NetworkStack = "Roadshow"
+            $Script:GUIActions.DiskSizeSelected = $null 
+            $Script:GUIActions.NetworkStack = ((Get-InputFileCSV -CSV "NetworkStackVersions").where({ $_.Default -eq $true })).NetworkStackFriendlyName 
+            $Script:GUIActions.MUIVersion = "3.8"    
+            $Script:GUIActions.PoseidonVersion = $null 
         
             $Script:WPF_DP_MediaSelect_Type_DropDown.SelectedItem = $null
             $WPF_DP_MediaSelect_DropDown.SelectedItem = $null

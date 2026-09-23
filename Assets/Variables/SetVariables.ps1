@@ -1,10 +1,9 @@
 $Script:DP_Settings = [PSCustomObject]@{
     PartitionPrefix = 'WPF_DP_Partition_'
 }
-$osInfo = Get-WmiObject -Class Win32_OperatingSystem
+$osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
 
 $Script:Settings = [PSCustomObject]@{
-    Emu68BootCmdline = "sd.unit0=rw emmc.unit0=rw"
     MBRSectorSizeBytes = [int]512
     MBRPartitionsMaximum = [int]4
     AmigaPartitionsperDiskMaximum = [int]10
@@ -30,14 +29,19 @@ $Script:Settings = [PSCustomObject]@{
     WindowsVersion = $osInfo.Caption
     Architecture = $osInfo.OSArchitecture
     TempFolder = '.\Temp'
+    ConfigFileLocation = '.\Emu68Imagerconfig.ini'
     InterimAmigaDrives = '.\Temp\InterimAmigaDrives' 
+    Emu68ImagerSupportingFiles = '.\Temp\WebPackagesDownload\SupportingFiles\AmigaFiles'
+    LocalAmigaPackagesLocation = '.\Assets\AmigaFiles\LocalAmigaPackages'
     WebPackagesDownloadLocation = '.\Temp\WebPackagesDownload'
+    CDTemporaryFiles = '.\Temp\CDFiles'
+    ADFTemporaryFiles = '.\Temp\ADFFiles'
     LocalPackagesDownloadLocation = '.\Temp\LocalPackagesDownload'
-    StartupFiles = '.\Temp\StartupFiles'
     LocationofAmigaFiles = '.\Assets\AmigaFiles'
     DefaultSettingsLocation = '.\Settings'
-    MiamiFilesLocation = '.\UserFiles\Miami'
-    RoadshowFilesLocation = '.\UserFiles\Roadshow'
+    MiamiFilesLocation = '.\UserFiles\ExistingApplications'
+    RoadshowFilesLocation = '.\UserFiles\ExistingApplications'
+    Picasso96FilesLocation = '.\UserFiles\ExistingApplications'
     DefaultOutputImageLocation = '.\UserFiles\SavedOutputImages'
     DefaultInstallMediaLocation = '.\UserFiles\InstallMedia'
     DefaultImportLocation = '.\UserFiles\ImportFiles'
@@ -45,68 +49,16 @@ $Script:Settings = [PSCustomObject]@{
     DownloadedFileSystems = '.\UserFiles\FileSystems'
     DefaultAmigaFileSystemLocation = '.\Assets\AmigaFileSystems'
     InputFiles = [PSCustomObject]@{
-        Path = '.\InputFiles'
-        InputFileSpreadsheetURL = 'https://docs.google.com/spreadsheets/d/12UcKD7INDH9y7Tw_w1q3ebQOUS9JtARIs8Z9JWfLUWg/'
+        InputFileSpreadsheetURL = 'https://docs.google.com/spreadsheets/d/1GeggL_zOH4MpJs-Kx0ywXR6RyOwLbp7Wb0_9qcTYftw/'
+        GID = '765528653'
     }
-    AminetMirrorsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\AminetMirrors.CSV'
-        GID = '1378987830'
-    }
-    StartupFilesCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\StartupFiles.CSV'
-        GID = '970627624'
-    }
-    OSVersionstoInstallCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\OSVersionstoInstall.CSV'
-        GID = '280506415'
-    }
-    IconSetsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\IconSets.CSV'
-        GID = '26108954'
-    }
-    ROMHashesCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\RomHashes.CSV'
-        GID = '1439711656'
-    }
-    InstallMediaHashesCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\InstallMediaHashes.CSV'
-        GID = '0'
-    }
-    ListofPackagestoInstallCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\ListofPackagestoInstall.CSV'
-        GID = '550697464'
-    }
-    ScreenModesCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\ScreenModes.CSV'
-        GID = '1007905875'       
-    }
-    ScreenModesWBCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\ScreenModesWB.CSV'
-        GID = '491578007'
-    }
-    FileSystemsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\FileSystems.CSV'
-        GID = '379284989'
-    }
-    DiskDefaultsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\DiskDefaults.CSV'
-        GID = '784658683'
-    }
-    IconPositionsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\IconPositions.CSV'
-        GID = '49639817'
-    }        
-    DocumentationURLsCSV = [PSCustomObject]@{
-        Path = '.\InputFiles\DocumentationURLs.CSV'
-        GID = '432393286'
-    }         
     TotalNumberofTasks = $null
     CurrentTaskNumber = 0
     CurrentTaskName = $null
     TotalNumberofSubTasks = $null
     CurrentSubTaskNumber = $null
     CurrentSubTaskName = $null
-    ProgressBarMarkers = New-Object System.Collections.ArrayList
+    ProgressBarMarkers = [System.Collections.Generic.List[PSCustomObject]]::New()
     LogFolder = '.\Logs'
     LogLocation = $null
     HSTDetailedLogEnabled = $false
@@ -119,7 +71,11 @@ $Script:Settings = [PSCustomObject]@{
     # TempFolder = '.\Temp\'
 }
 
-$null = $Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
+$Script:InputCSVs = [PSCustomObject]@{}
+
+#$Script:Settings.ProgressBarMarkers = [System.Collections.Generic.List[PSCustomObject]]::New()
+
+$Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
     KickstartVersion = [System.Version]"3.1"
     ExtractOSFiles = [int]2000
     CopyIconFiles = [int]$null
@@ -130,7 +86,7 @@ $null = $Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
     AdjustParametersonImportedRDBPartitions = [int]$null
 })
 
-$null = $Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
+$Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
     KickstartVersion = [System.Version]"3.2"
     ExtractOSFiles = [int]3930
     CopyIconFiles = [int]$null
@@ -141,7 +97,7 @@ $null = $Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
     AdjustParametersonImportedRDBPartitions = [int]$null
 })
 
-$null = $Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
+$Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
     KickstartVersion = [System.Version]"3.9"
     ExtractOSFiles = [int]5930
     CopyIconFiles = [int]$null
@@ -152,8 +108,16 @@ $null = $Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
     AdjustParametersonImportedRDBPartitions = [int]$null
 })
 
-
 $Script:GUICurrentStatus = [PSCustomObject]@{
+    LastSelectedPackage = $null
+    CurrentlySelectedPackage = $null
+    AllowVirtualDrives =$false
+    RunParallelInstalled = $null
+    GithubAPIToken = $null
+    HaveRunHSTImager = $false
+    MiamiUserFiles = $null
+    RoadshowUserFiles = $null
+    Picasso96UserFiles = $null
     LoadingSettings = $null
     OperationMode = $null
     ForceRecheckAmigaPartitionsandBoundaries = $false
@@ -163,16 +127,16 @@ $Script:GUICurrentStatus = [PSCustomObject]@{
     FileBoxOpen = $false
     RunMode = $null
     ProgressBarMarkers = New-Object System.Collections.ArrayList
-    HSTCommandstoProcess = [PSCustomObject]@{
-        ExtractOSFiles =  [System.Collections.Generic.List[PSCustomObject]]::New()
-        CopyIconFiles = [System.Collections.Generic.List[PSCustomObject]]::New()
+    HSTImagerCommandstoProcess = [PSCustomObject]@{     
         NewDiskorImage = [System.Collections.Generic.List[PSCustomObject]]::New()
         DiskStructures = [System.Collections.Generic.List[PSCustomObject]]::New()
-        CopyImportedFiles = [System.Collections.Generic.List[PSCustomObject]]::New()
-        WriteDirectFilestoDisk = [System.Collections.Generic.List[PSCustomObject]]::New()
         WriteFilestoDisk = [System.Collections.Generic.List[PSCustomObject]]::New() 
-        AdjustParametersonImportedRDBPartitions = [System.Collections.Generic.List[PSCustomObject]]::New() 
-        CDExtractionCommands = [System.Collections.Generic.List[PSCustomObject]]::New() 
+    }
+    HSTAmigaCommandstoProcess = [PSCustomObject]@{
+        UpdateDefaultIcons = [System.Collections.Generic.List[PSCustomObject]]::New()  
+        AdjustIcons = [System.Collections.Generic.List[PSCustomObject]]::New() 
+        ModifyToolTypes = [System.Collections.Generic.List[PSCustomObject]]::New()    
+        ReplaceToolTypes = [System.Collections.Generic.List[PSCustomObject]]::New()   
     }
     NewPartitionDefaultScale = $null
     NewPartitionMinimumSizeBytes = $null
@@ -180,13 +144,12 @@ $Script:GUICurrentStatus = [PSCustomObject]@{
     NewPartitionAcceptedNewValue = $false
     ImageSizeAcceptedValue = $null
     ImageSizeDefaultScale = $null
-    AvailablePackagesNeedingGeneration = $true
+    AvailablePackagesNeedingGeneration = "TRUE"
     RunOptionstoReport = New-Object System.Data.DataTable
     IssuesFoundBeforeProcessing = New-Object System.Data.DataTable
     ProcessImageStatus = $false
     ProcessImageConfirmedbyUser = $false
     PathstoRDBPartitions = [System.Collections.Generic.List[PSCustomObject]]::New()
-    InstallMediaRequiredFromUserSelectablePackages = @()
     StartTimeForRunningInstall = $null
     EndTimeForRunningInstall  = $null
     ImportedPartitionType = $null
@@ -231,6 +194,19 @@ $Script:GUIActions = [PSCustomObject]@{
     #InstallType = $null
     InstallType = 'PiStorm'
     #Not in GUI - End
+    DeleteAllDownloadedFiles = $null
+    DiskType = $null
+    RunParallel = $null
+    EnableBupTest = $null
+    SCSIDeviceDisabled = $null
+    DMAEnabled = $null
+    IRQEnabled  = $null
+    AgnusType = $null
+    SDLowSpeed = $null
+    SDOverClock = $null
+    SDOverClockSpeed = $null
+    EnableUSBStack = $null
+    PoseidonVersion = $null
     ScreenModetoUse = $null
     CustomScreenMode_Width = $null
     CustomScreenMode_Height = $null
@@ -243,16 +219,20 @@ $Script:GUIActions = [PSCustomObject]@{
     ScreenModetoUseWB = $null
     WorkbenchBackDropEnabled = $null
     ScreenModeWBColourDepth = $null
-    UnicamEnabled = $false    
-    UnicamStartonBoot = [bool]$null
+    UnicamEnabled = $false
+    UnicamDeviceType = $null    
+    UnicamStartonBoot = [bool]$null 
     UnicamScalingType = $null
     UnicamBParameter = $null
     UnicamCParameter = $null
-    #UnicamPhase = $null
-    UnicamSizeXPosition = $null
-    UnicamSizeYPosition = $null
-    UnicamOffsetXPosition = $null
-    UnicamOffsetYPosition = $null
+    UnicamPhase = $null
+    UnicamAspectRatio = $null
+    UnicamScanLinesNonLaced = $null
+    UnicamScanLinesLaced = $null
+    UnicamSizeX = $null
+    UnicamSizeY = $null
+    UnicamOffsetX = $null
+    UnicamOffsetY = $null
     ScreenModetoUseFriendlyName =$null
     AvailableKickstarts = $null
     AvailableScreenModes = $null
@@ -262,11 +242,13 @@ $Script:GUIActions = [PSCustomObject]@{
     AvailablePackages = New-Object System.Data.DataTable
     AvailableIconSets = New-Object System.Data.DataTable 
     SelectedIconSet = $null 
+    Emu68VersionType = $null 
     KickstartVersiontoUse = $null
     KickstartVersiontoUseFriendlyName = $null
     OSInstallMediaType = $null
     #UseGlowIcons = $null
     NetworkStack = $null
+    MUIVersion = $null
     SSID = $null
     WifiPassword = $null
     FoundInstallMediatoUse = $null
@@ -299,7 +281,6 @@ $Script:GUIActions = [PSCustomObject]@{
 $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSet",([String])))
 $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDescription",([String])))
 $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDefaultInstall",([Bool])))
-$Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetUserSelected",([Bool])))
 for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.Columns.Count; $i++) {
     if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSet'){
         $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $true
@@ -307,34 +288,33 @@ for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.Columns.Count; $i++) {
     if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSetDescription'){
         $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $true
     }
-    if (($Script:GUIActions.AvailableIconSets.Columns[$i].ColumnName) -eq 'IconSetUserSelected'){
-        $Script:GUIActions.AvailableIconSets.Columns[$i].ReadOnly = $false
-    }
 }
 
 $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameUserSelected",([bool])))
 $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameDefaultInstall",([bool])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageName",([string])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageType",([string])))
 $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameFriendlyName",([string])))
 $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameGroup",([string])))
 $Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageNameDescription",([string])))
-$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "InstallMediaFlag",([bool])))
-for ($i = 0; $i -lt $Script:GUIActions.AvailablePackages.Columns.Count; $i++) {
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'PackageNameFriendlyName'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $true
-    }
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'PackageNameGroup'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $true
-    }
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'PackageNameDescription'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $true
-    }
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'InstallMediaFlag'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $true
-    }    
-    if (($Script:GUIActions.AvailablePackages.Columns[$i].ColumnName) -eq 'PackageNameUserSelected'){
-        $Script:GUIActions.AvailablePackages.Columns[$i].ReadOnly = $false
-    }
-}
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageURL",([string])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageAuthor",([string])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "UserDefinableInstallPath",([bool])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageDefaultDrive",([string])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageUserDrive",([string])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageDefaultPath",([string])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageUserPath",([string])))
+$Script:GUIActions.AvailablePackages.Columns.Add((New-Object System.Data.DataColumn "PackageinScope",([bool])))
+
+$Script:GUIActions.AvailablePackages.Columns["PackageName"].ReadOnly = $true
+$Script:GUIActions.AvailablePackages.Columns["PackageType"].ReadOnly = $true
+$Script:GUIActions.AvailablePackages.Columns["PackageAuthor"].ReadOnly = $true
+$Script:GUIActions.AvailablePackages.Columns["PackageURL"].ReadOnly = $true
+$Script:GUIActions.AvailablePackages.Columns["PackageNameFriendlyName"].ReadOnly = $true
+$Script:GUIActions.AvailablePackages.Columns["PackageNameGroup"].ReadOnly = $true
+$Script:GUIActions.AvailablePackages.Columns["PackageNameDescription"].ReadOnly = $true
+$Script:GUIActions.AvailablePackages.Columns["PackageDefaultDrive"].ReadOnly = $true
+$Script:GUIActions.AvailablePackages.Columns["PackageDefaultPath"].ReadOnly = $true
 
 $Script:GUIVisuals = [PSCustomObject]@{
     ColourFAT32 = "#FF3B67A2"
@@ -361,10 +341,10 @@ $Script:SDCardMinimumsandMaximums = [PSCustomObject]@{
 }
 
 $Script:ExternalProgramSettings = [PSCustomObject]@{
-    SevenZipFilePath = '.\Programs\7z.exe'
-    UnlzxFilePath = '.\Programs\unlzx.exe'
-    FindFreeSpacePath = '.\Programs\FindFreeSpace.exe'
-    DDTCPath = '.\Programs\ddtc.exe'
+    UnADFFilePath = '.\Programs\unadf\bin\unadf.exe'
+    SevenZipFilePath = '.\Programs\7z\7z.exe'
+    UnlzxFilePath = '.\Programs\Unlzx\unlzx.exe'
+    UnLHAFilePath = '.\Programs\Lhasa\lha.exe'
     HSTImagerPath = '.\Programs\HSTImager\hst.imager.exe'
     HSTAmigaPath =  '.\Programs\HSTAmiga\Hst.amiga.exe'
 }

@@ -4,6 +4,8 @@ $WPF_Window_Button_SetupDisk.Add_Click({
         return
     }
 
+    Confirm-ValidPackageInstallDrives 
+    
     # Write-debug "Set up Disk button pressed"
 
 

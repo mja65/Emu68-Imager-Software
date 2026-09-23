@@ -23,7 +23,7 @@ function Update-AmigaScripts {
     # $NameofChange = 'Add OnetimeRun Section'
     # $ScriptEditStartPoint = 'Binddrivers'
 
-    Write-InformationMessage -Message "Processing Change $NameofChange."
+    Write-InformationMessage -Message "Processing Change $NameofChange" -NewLineBefore
 
     $OriginalScript = Import-TextFileforAmiga -SystemType 'Amiga' -ImportFile $ScripttoModifyPath 
     $ScriptChanges = @()
@@ -34,7 +34,7 @@ function Update-AmigaScripts {
     }
 
     if ($Action -eq 'Add'){
-        Write-InformationMessage "Adding Lines to $ScripttoModifyPath"
+        write-informationMessage -Message "Adding Lines to $ScripttoModifyPath"
 
         $ScriptChanges += ""
         $ScriptChanges += ";$NameofChange - Added by Emu68 Imager version $([string]$Script:Settings.Version) - BEGIN"
@@ -51,7 +51,7 @@ function Update-AmigaScripts {
 
     }
     elseif (($Action -eq 'InjectBefore') -or ($Action -eq 'InjectAfter')){
-        Write-InformationMessage "Injecting Lines to $ScripttoModifyPath"
+        write-informationMessage -Message "Injecting Lines to $ScripttoModifyPath"
         if ($AREXXFlag){
             $ScriptChanges += ""
             $ScriptChanges += "/*"
@@ -132,7 +132,7 @@ function Update-AmigaScripts {
         }
     }    
     
-    Export-TextFileforAmiga -ExportFile $ScripttoModifyPath  -DatatoExport $RevisedScript -AddLineFeeds 'TRUE'   
+    Export-TextFile -Amiga -ExportFile $ScripttoModifyPath  -DatatoExport $RevisedScript -AddLineFeeds  
 
     return
 }

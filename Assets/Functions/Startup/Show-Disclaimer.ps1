@@ -8,7 +8,7 @@ function Show-Disclaimer {
     $null = $WPF_Disclaimer.ShowDialog()
 
     if (-not ($Script:GUICurrentStatus.OperationMode)){
-        Write-ErrorMessage -Message 'Exiting - Disclaimer Not Accepted'
+        Write-ErrorMessage -Message "Exiting - Disclaimer Not Accepted"
         exit    
     }
 }

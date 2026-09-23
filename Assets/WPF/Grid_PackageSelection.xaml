@@ -1,48 +1,109 @@
-   <Grid x:Name="Window_PackageSelection" Background="Transparent"  Margin="200,100,0,0" Height="800" VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="Visible"
-   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-   xmlns:local="clr-namespace:WpfApp14"
-   mc:Ignorable="d">
-         <TextBox x:Name="PackageSelection_Label" HorizontalAlignment="Left" Margin="50,7,0,0" TextWrapping="Wrap" Text="Note: If you make changes on this screen after you have performed checks on the installation media you will need to reperform those checks" VerticalAlignment="Top" Width="940" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" FontWeight="Bold"/>
-            <GroupBox x:Name="IconSet_GroupBox" Header="Icon Set Selection"  Background="Transparent" Margin="0,100,0,0" Width="600" Height="150" VerticalAlignment="Top" HorizontalAlignment="Center">
-               <Grid Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
-                   <TextBlock x:Name="textBlock_iconsets" HorizontalAlignment="Center" Margin="0,0,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" >
-     Select a different iconset if you do not want to use the selected one.
-                   </TextBlock>      
-                    <TextBox x:Name="CurrentlySelectedIconSet_Label" HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="Currently selected icon set is:" VerticalAlignment="Top" Height="20" Width="160" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
-                    <TextBox x:Name="CurrentlySelectedIconSet_Value" HorizontalAlignment="Left" Margin="180,20,0,0" TextWrapping="Wrap" Text="XXXXXX" VerticalAlignment="Top" Height="20" Width="160" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" FontWeight="Bold"/>                     
-                   <DataGrid Name="Datagrid_IconSets" CanUserAddRows="False" HorizontalAlignment="Center" AutoGenerateColumns="False" Margin="0,50,0,0"  VerticalAlignment="Top" HorizontalScrollBarVisibility="Auto" GridLinesVisibility="None" HorizontalGridLinesBrush="#FF505050" VerticalGridLinesBrush="#FF505050" SelectionMode="Single"  >
-                       <DataGrid.Columns>
- <DataGridTextColumn Header="Icon Set" Binding="{Binding IconSet, Mode=OneWay}" Width="75"/>
-  <DataGridTextColumn Header="Icon Set Description" Binding="{Binding IconSetDescription , Mode=OneWay}" Width="440"/>
-           <DataGridCheckBoxColumn Header="DefaultInstall" Binding="{Binding IconSetDefaultInstall, Mode=OneWay}" Visibility = "Hidden"/>
+   <Grid x:Name="Window_PackageSelection" Background="Transparent"  Margin="200,100,0,0" Height="803" VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="Visible"
+xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+xmlns:local="clr-namespace:WpfApp14"
+mc:Ignorable="d" Width="1100">
+       <TextBox x:Name="PackageSelection_Label" HorizontalAlignment="Left" Margin="50,7,0,0" TextWrapping="Wrap" Text="Note: If you make changes on this screen after you have performed checks on the installation media you will need to reperform those checks" VerticalAlignment="Top" Width="940" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" FontWeight="Bold"/>
+       <GroupBox x:Name="IconSet_GroupBox" Header="Icon Set Selection"  Background="Transparent" Margin="0,50,0,0" Width="600" Height="150" VerticalAlignment="Top" HorizontalAlignment="center">
+           <Grid Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
+               <TextBlock x:Name="textBlock_iconsets" HorizontalAlignment="Center" Margin="0,0,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" >
+  Select a different iconset if you do not want to use the selected one.
+               </TextBlock>
+               <TextBox x:Name="CurrentlySelectedIconSet_Label" HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="Currently selected icon set is:" VerticalAlignment="Top" Height="20" Width="160" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
+               <TextBox x:Name="CurrentlySelectedIconSet_Value" HorizontalAlignment="Left" Margin="180,20,0,0" TextWrapping="Wrap" Text="XXXXXX" VerticalAlignment="Top" Height="20" Width="160" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" FontWeight="Bold"/>
+               <DataGrid Name="Datagrid_IconSets" CanUserAddRows="False" HorizontalAlignment="Center" AutoGenerateColumns="False" Margin="0,50,0,0"  VerticalAlignment="Top" HorizontalScrollBarVisibility="Auto" GridLinesVisibility="None" HorizontalGridLinesBrush="#FF505050" VerticalGridLinesBrush="#FF505050" SelectionMode="Single"  >
+                   <DataGrid.Columns>
+                       <DataGridTextColumn Header="Icon Set" Binding="{Binding IconSet, Mode=OneWay}" Width="75"/>
+                       <DataGridTextColumn Header="Icon Set Description" Binding="{Binding IconSetDescription , Mode=OneWay}" Width="440"/>
+                       <DataGridCheckBoxColumn Header="DefaultInstall" Binding="{Binding IconSetDefaultInstall, Mode=OneWay}" Visibility = "Hidden"/>
 
-                       </DataGrid.Columns>
+                   </DataGrid.Columns>
 
-                   </DataGrid>
-               </Grid>
-           </GroupBox>
-           <GroupBox x:Name="Packages_GroupBox" Header="Package Selection"  Background="Transparent" Margin="0,300,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="1000">
-               <Grid Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Button x:Name="ResettoDefault" Content="Reset Packages to Default" HorizontalAlignment="Left" Margin="780,10,0,0" Height="20" VerticalAlignment="Top" Background="#FF6688BB" Foreground="White" FontWeight="Bold" BorderBrush="Transparent" ToolTip="Click to reset all packages back to the default"/>
-                <TextBlock x:Name="textBlock_packages" HorizontalAlignment="Center" Margin="0,0,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="516">
-     If you want to change any of the packages selected for installation, unselect or select the relevant row. Note, if you decide you want this later on you will need to manually install it!
-                   </TextBlock>
-                   <DataGrid Name="Datagrid_Packages" CanUserAddRows="False" HorizontalAlignment="Center" AutoGenerateColumns="False" Margin="0,50,0,0"  VerticalAlignment="Top" HorizontalScrollBarVisibility="Auto" GridLinesVisibility="None" HorizontalGridLinesBrush="#FF505050" VerticalGridLinesBrush="#FF505050"  >
-                       <DataGrid.Columns>
-                           <DataGridCheckBoxColumn  Header="Select Package for Installation" Binding="{Binding PackageNameUserSelected}" Width="175"/>
-                           <DataGridTextColumn Header="Name of Package" Binding="{Binding PackageNameFriendlyName, Mode=OneWay}" Width="165"/>
-                           <DataGridTextColumn Header="Package Type" Binding="{Binding PackageNameGroup, Mode=OneWay}" Width="140"/>
-                           <DataGridTextColumn Header="Description" Binding="{Binding PackageNameDescription, Mode=OneWay}" Width="480"/>
-                           <DataGridTextColumn Header="PackageNameDefaultInstall" Binding="{Binding PackageNameDefaultInstall, Mode=OneWay}" Visibility = "Hidden"/>
-                       </DataGrid.Columns>
+               </DataGrid>
+           </Grid>
+       </GroupBox>
+       <GroupBox x:Name="Packages_GroupBox" Header="Package Selection"  Background="Transparent" Margin="0,200,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="1000" >
+           <Grid Background="Transparent" HorizontalAlignment="Left" Width="1000" VerticalAlignment="Top" Height="603">
+               <GroupBox x:Name="PackageDetails_GroupBox" Header="Package Details"  Background="Transparent" Margin="0,60,15,25" Width="400" VerticalAlignment="Bottom" HorizontalAlignment="right" Height="520">
+                   <Grid Background="Transparent" HorizontalAlignment="Left" Width="400" VerticalAlignment="Top">
+                       <TextBox x:Name="Title_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Title:" Width="80" VerticalAlignment="Top" Height="20" IsUndoEnabled="False" IsTabStop="False" Focusable="False" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsHitTestVisible="False" FontSize="12" FontWeight="Bold" Margin="5,10,0,0"/>
+                       <TextBox x:Name="Title_Value" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Author(s)" VerticalAlignment="Top" Height="20" IsUndoEnabled="False" IsTabStop="False" Focusable="False" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsHitTestVisible="False" FontSize="12" Margin="90,10,0,0"/>
 
-                   </DataGrid>
-               </Grid>
-           </GroupBox>
+                       <TextBox x:Name="Description_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Description:" Width="80" VerticalAlignment="Top" Height="20" IsUndoEnabled="False" IsTabStop="False" Focusable="False" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsHitTestVisible="False" FontSize="12" FontWeight="Bold" Margin="5,130,0,0"/>
+                       <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Width="290" Height="200" Margin="90,40,0,0">
+                           <TextBlock x:Name="PackageDetails_text" VerticalAlignment="Center" TextAlignment="Justify" TextWrapping="Wrap"  Text="Package description text"/>
+                       </Grid>
+                       <TextBox x:Name="Author_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Author(s) / Company:" Width="80" VerticalAlignment="Top" Height="40" IsUndoEnabled="False" IsTabStop="False" Focusable="False" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsHitTestVisible="False" FontSize="12" FontWeight="Bold" Margin="5,240,0,0"/>
+                       <TextBox x:Name="Author_Value" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Author(s)" VerticalAlignment="Top" Height="20" IsUndoEnabled="False" IsTabStop="False" Focusable="False" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsHitTestVisible="False" FontSize="12" Margin="90,250,0,0"/>
+                       <TextBox x:Name="InstallDrive_Label" HorizontalAlignment="Left" Margin="5,345,0,0" TextWrapping="Wrap" Text="Install Drive:" VerticalAlignment="Top" Height="20" Width="80" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" FontSize="12" FontWeight="Bold" BorderBrush="Transparent"/>
+                       <TextBox x:Name="Link_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Webpage" Width="75" VerticalAlignment="Top" Height="20" IsUndoEnabled="False" IsTabStop="False" Focusable="False" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsHitTestVisible="False" FontSize="12" FontWeight="Bold" Margin="5,280,0,0"/>
+                       <TextBlock x:Name="Link_Value" HorizontalAlignment="Left" Margin="90,280,0,0" TextWrapping="Wrap"  TextAlignment="Left" VerticalAlignment="Top" Width="300" Height="20" >
+                            <Hyperlink x:Name="QuickStartDocumentationURL" FontSize="14" NavigateUri="https://mja65.github.io/Emu68-Imager/quickstart.html">hexcvxcvre</Hyperlink>
+                       </TextBlock>
+
+                       <ComboBox x:Name="InstallDrive_Dropdown" HorizontalAlignment="Left" Margin="90,345,0,0" VerticalAlignment="Top" Width="120"/>
+                       <TextBox x:Name="InstallPath_Label" HorizontalAlignment="Left" Margin="5,375,0,0" TextWrapping="Wrap" Text="Install Path:" VerticalAlignment="Top" Height="20" Width="75" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" FontSize="12" FontWeight="Bold" Focusable="False" BorderBrush="Transparent"/>
+                       <TextBox x:Name="InstallPath_Value" HorizontalAlignment="Left" Margin="90,375,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="20" Width="220" IsUndoEnabled="False" IsTabStop="False" Focusable="True" Background="White"/>
+                   </Grid>
+               </GroupBox>
+               <Button x:Name="ResettoDefault" Content="Reset Packages to Default" HorizontalAlignment="Left" Margin="780,10,0,0" Width ="175" Height="20" VerticalAlignment="Top" Background="#FF6688BB" Foreground="White" FontWeight="Bold" BorderBrush="Transparent" ToolTip="Click to reset all packages back to the default" Grid.ColumnSpan="2"/>
+               <Button x:Name="ResetInstallPathstoDefault" Content="Reset Install Paths to Default" HorizontalAlignment="Left" Margin="780,35,0,0" Width ="175" Height="20" VerticalAlignment="Top" Background="#FF6688BB" Foreground="White" FontWeight="Bold" BorderBrush="Transparent" ToolTip="Click to reset all packages back to the default" Grid.ColumnSpan="2"/>
+               <TextBlock x:Name="textBlock_packages" HorizontalAlignment="Left" Margin="0,0,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="700">
+  If you want to change any of the packages selected for installation, unselect or select the relevant row. Note, if you decide you want this later on you will need to manually install it!
+               </TextBlock>
+               <DataGrid Name="Datagrid_Packages" 
+       CanUserAddRows="False" 
+       HorizontalAlignment="Left" 
+       AutoGenerateColumns="False" 
+       Margin="20,50,0,25"  
+       VerticalAlignment="Bottom" 
+       HorizontalScrollBarVisibility="Auto" 
+       GridLinesVisibility="None" 
+       HorizontalGridLinesBrush="#FF505050" 
+       VerticalGridLinesBrush="#FF505050" Height="520" >
+
+                   <DataGrid.Resources>
+                       <!-- Center Column Headers Vertically & Horizontally -->
+                       <Style TargetType="DataGridColumnHeader">
+                           <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                           <Setter Property="VerticalContentAlignment" Value="Center"/>
+                           <Setter Property="BorderThickness" Value="0"/>
+                           <Setter Property="Padding" Value="4,2"/>
+                       </Style>
+
+                       <!-- Center Cell Contents Vertically & Horizontally -->
+                       <Style TargetType="DataGridCell">
+                           <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                           <Setter Property="VerticalContentAlignment" Value="Center"/>
+                       </Style>
+
+                       <!-- Enable Text Wrapping & Center Text Alignment for Cell Contents -->
+                       <Style TargetType="TextBlock">
+                           <Setter Property="TextWrapping" Value="Wrap"/>
+                           <Setter Property="TextAlignment" Value="Center"/>
+                       </Style>
+                   </DataGrid.Resources>
+
+                   <DataGrid.Columns>
+                       <DataGridCheckBoxColumn Header="Select Package for Installation" Binding="{Binding PackageNameUserSelected}" Width="100">
+                           <DataGridCheckBoxColumn.HeaderTemplate>
+                               <DataTemplate>
+                                   <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center"/>
+                               </DataTemplate>
+                           </DataGridCheckBoxColumn.HeaderTemplate>
+                       </DataGridCheckBoxColumn>
+
+                       <DataGridTextColumn Header="Name of Package" Binding="{Binding PackageNameFriendlyName, Mode=OneWay}" Width="165"/>
+                       <DataGridTextColumn Header="Package Type" Binding="{Binding PackageNameGroup, Mode=OneWay}" Width="140"/>
+                       <DataGridTextColumn Header="PackageNameDefaultInstall" Binding="{Binding PackageNameDefaultInstall, Mode=OneWay}" Visibility="Hidden"/>
+                   </DataGrid.Columns>
+
+               </DataGrid>
+
+           </Grid>
+       </GroupBox>
 
 
-       </Grid>
-    
+   </Grid>
