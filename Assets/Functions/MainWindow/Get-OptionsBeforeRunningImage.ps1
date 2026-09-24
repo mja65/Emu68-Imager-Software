@@ -83,7 +83,7 @@ function Get-OptionsBeforeRunningImage {
     } 
     else {
         $WPF_RunWindow_RunOptionsNotes_Value.Visibility = "Hidden"
-        $WPF_RunWindow_SRunOptionsNotes_Label.Visibility = "Hidden"
+        $WPF_RunWindow_RunOptionsNotes_Label.Visibility = "Hidden"
         $WPF_RunWindow_RunOptions_Datagrid.Height = 500
     }
 
