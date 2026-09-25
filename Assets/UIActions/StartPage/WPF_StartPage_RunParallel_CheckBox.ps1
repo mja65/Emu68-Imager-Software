@@ -7,7 +7,7 @@ $WPF_StartPage_RunParallel_CheckBox.add_UnChecked({
 }) 
 
 
-If ($Script:GUICurrentStatus.RunParallelInstalled = "Yes"){
+If ($Script:GUICurrentStatus.RunParallelInstalled -eq "Yes"){
     $Script:GUIActions.RunParallel = $true
 }
 else {
