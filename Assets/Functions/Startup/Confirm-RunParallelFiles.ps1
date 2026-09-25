@@ -27,10 +27,21 @@ Select "No" and packages will be downloaded sequentially. Select "Never Again" t
     
     if ($NeedsNuGet) {
         Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
+        $NeedsNuGet = -not (Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction Ignore)
+        if ($NeedsNuGet){
+            Write-ErrorMessage -Message "Could not install NuGet! Either rerun and try again, consult the documentation for manual install steps, or select the option for sequential packages."
+            Exit
+        }
     }
     
     if ($NeedsThreadJob) {
         Install-Module -Name ThreadJob -Scope CurrentUser -Force -AllowClobber
+        $NeedsThreadJob = -not (Get-Module -Name ThreadJob -ListAvailable)
+        If ($NeedsThreadJob){
+            Write-ErrorMessage -Message "Could not install ThreadJob! Either rerun and try again, consult the documentation for manual install steps, or select the option for sequential packages."
+            Exit                
+        }
+
     }
 
     return "Yes"
