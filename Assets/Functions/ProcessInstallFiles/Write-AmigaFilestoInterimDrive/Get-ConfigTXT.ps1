@@ -80,8 +80,9 @@ function Get-ConfigTXT {
                 if ($Script:GUIActions.UnicamEnabled -eq $true) {
                     "dtoverlay=unicam"
                     ""
-                    if ($Script:GUIActions.UnicamStartonBoot -eq $true) { "dtparam=boot" }                    
-                    if ([string]::IsNullOrWhiteSpace($Script:GUIActions.UnicamDeviceType) -eq $false) { "dtparam=type=$($Script:GUIActions.UnicamDeviceType)" }
+                    if ($Script:GUIActions.UnicamStartonBoot -eq $true) { "dtparam=boot" }       
+                    # Workaround for FT parameter not working                                
+                    if (([string]::IsNullOrWhiteSpace($Script:GUIActions.UnicamDeviceType) -eq $false) -and ($Script:GUIActions.UnicamDeviceType -ne "ft")) { "dtparam=type=$($Script:GUIActions.UnicamDeviceType)" }
                     if ($Script:GUIActions.UnicamScalingType -eq "Smooth") {
                         "dtparam=smooth"
                         "dtparam=b=$($Script:GUIActions.UnicamBParameter)"
