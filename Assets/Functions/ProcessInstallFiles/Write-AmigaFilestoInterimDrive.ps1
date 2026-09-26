@@ -294,12 +294,12 @@ function Write-AmigaFilestoInterimDrive {
                 ExtractedZFileSourcePath = $ExtractedZFileSourcePath
                 DestinationPath = $DestinationPath
             })
-            [System.IO.File]::Copy($SourcePath, $StagingDestinationPath, $true)
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $StagingDestinationPath
             $ZFileNameCounter ++
         }
         else {
             #Write-host "SourcePath is: $SourcePath DestinationPath is: $DestinationPath"
-            [System.IO.File]::Copy($SourcePath, $DestinationPath, $true)
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath
         }
         If ($Line.ProtectionBits){
             $FileName = [System.IO.Path]::GetFileName($DestinationPath)
@@ -342,7 +342,7 @@ function Write-AmigaFilestoInterimDrive {
                 $null = [System.IO.Directory]::CreateDirectory($DestinationFolder)
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }
-            [System.IO.File]::Copy($SourcePath, $DestinationPath, $true)
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath
         }
 
     }
@@ -363,7 +363,7 @@ function Write-AmigaFilestoInterimDrive {
                 $null = [System.IO.Directory]::CreateDirectory($DestinationFolder)
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }             
-            [System.IO.File]::Copy($SourcePath, $DestinationPath, $true)  
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath 
        
         }
         if (($Script:GUIActions.InstallOSFiles -eq $true) -and (-not [string]::IsNullOrWhiteSpace($ROM.WHDLoadName))){
@@ -375,7 +375,7 @@ function Write-AmigaFilestoInterimDrive {
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }
             #Write-host "SourcePath is: $SourcePath DestinationPath is: $DestinationPath"
-            [System.IO.File]::Copy($SourcePath, $DestinationPath, $true)                  
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath                  
        }
     }    
 
@@ -487,13 +487,13 @@ function Write-AmigaFilestoInterimDrive {
                     }
                 }
                 'Web - Github Emu68 Documentation'{
-                    [System.IO.File]::Copy($Item.Source, $Item.Destination, $true)
+                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination
                     if ([System.IO.Path]::GetExtension($Item.Destination) -eq ".html"){
                         Update-Emu68ImagerDocumentation -Emu68ImagerDocumentationPath $Item.Destination                   
                     }
                 }
                 default {
-                    [System.IO.File]::Copy($Item.Source, $Item.Destination, $true)
+                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination
                     If ($Item.ProtectionBits){
                         $FileName = [System.IO.Path]::GetFileName($Item.Destination)
                         $ProtectionBits = $Item.ProtectionBits.ToUpper()
@@ -512,8 +512,6 @@ function Write-AmigaFilestoInterimDrive {
                     }                
                 }
             }
-            
-
             
         }
     }
