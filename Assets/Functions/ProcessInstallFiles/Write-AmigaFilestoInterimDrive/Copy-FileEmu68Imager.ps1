@@ -17,6 +17,7 @@ Function Copy-FileEmu68Imager {
             }
         }
         catch {
+            Write-ErrorMessage -Message "Error copying file! SourcePath is: [$SourcePath] Destination is: [$DestinationPath]"
             throw $_
         }
 

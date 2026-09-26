@@ -1,5 +1,5 @@
 $WPF_PackageSelection_Datagrid_Packages.add_PreparingCellForEdit({ 
-    if ($WPF_PackageSelection_Datagrid_Packages.SelectedItem.PackageType -eq "OS" -and $Script:GUICurrentStatus.PackagesChanged -ne $true){
+    if ($WPF_PackageSelection_Datagrid_Packages.SelectedItem.PackageType -eq "Selectable OS" -and $Script:GUICurrentStatus.PackagesChanged -ne $true){
         $Script:GUICurrentStatus.PackagesChanged = $true
         $Script:GUIActions.DefaultPackagesSelected = $false
         if ($Script:GUIActions.FoundInstallMediatoUse){
