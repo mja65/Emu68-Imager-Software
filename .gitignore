@@ -1,0 +1,81 @@
+# Visual Studio user-specific files
+.vs/
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio generated files
+Generated Files/
+ipch/
+*.VC.db
+*.VC.VC.opendb
+*.opendb
+*.cachefile
+*.pdb
+*.ilk
+*.obj
+*.iobj
+*.ipdb
+*.tlog
+*.lastbuildstate
+
+# Test and coverage output
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+coverage-*.xml
+
+# NuGet packages and artifacts
+packages/
+*.nupkg
+*.snupkg
+.nuget/
+
+# PowerShell build, analysis, and publishing artifacts
+out/
+publish/
+.psscriptanalyzercache/
+*.clixml
+
+# Local tooling and operating-system files
+_ReSharper*/
+*.DotSettings.user
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Emu68 Imager generated and local files
+/Assets/AmigaFileSystems/
+/Logs/
+/Programs/HSTAmiga/
+/Programs/HSTImager/
+/Settings/
+/Temp/
+/Emu68Imagerconfig.ini
+
+# User-provided files; retain only the repository instructions file
+/UserFiles/*
+!/UserFiles/ExistingApplications/
+/UserFiles/ExistingApplications/*
+!/UserFiles/ExistingApplications/Put Miami and Roadshow Files here.txt
