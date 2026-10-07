@@ -66,7 +66,11 @@ function Write-AmigaFilestoInterimDrive {
         }                            
         if ($Line.SourceType -match "Web"){              
             $FileExists = Test-Path -Path $Line.OutputLocation
-            if ((-not $FileExists) -or ($Line.AlwaysDownload -eq $true)){
+            $ArchiveTypeValid = (-not $FileExists) -or (Test-ArchiveFileType -Path $Line.OutputLocation)
+            if ($FileExists -and -not $ArchiveTypeValid) {
+                Write-InformationMessage -Message "Previously downloaded file does not match its file extension and will be downloaded again: $($Line.OutputLocation)"
+            }
+            if ((-not $FileExists) -or ($Line.AlwaysDownload -eq $true) -or (-not $ArchiveTypeValid)){
                 $Line.DownloadFileFlag = $true 
 
             }            

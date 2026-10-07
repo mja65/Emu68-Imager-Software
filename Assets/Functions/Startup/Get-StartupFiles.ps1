@@ -55,7 +55,7 @@ function Get-StartupFiles {
             $DownloadLocation = join-pathMulti $Script:Settings.TempFolder "StartupFiles" $Line.FileDownloadName
             if ($Line.Source -eq 'Web'){
                 #Write-host "URL: $($Line.SourceLocation) LocationforDL: $DownloadLocation"
-                if (-not (Get-AmigaFileWeb -AminetMirrors $AminetMirrors -URL $Line.SourceLocation -LocationforDL $DownloadLocation)){
+                if (-not (Get-AmigaFileWeb -AminetMirrors $AminetMirrors -URL $Line.SourceLocation -LocationforDL $DownloadLocation -turranclient $Script:GUICurrentStatus.HttpClientTurran -httpclient $Script:GUICurrentStatus.HttpClientPowerShell)){
                     Write-ErrorMessage -Message "Error downloading $($Line.PackageName)! Cannot continue!"
                     return $false
                 }
@@ -66,7 +66,7 @@ function Get-StartupFiles {
                     Write-ErrorMessage -Message "Error finding Github release for $($Line.PackageName)! Cannot continue!"
                     return $false
                 }           
-                if (-not(Get-AmigaFileWeb -URL $DownloadURL -LocationforDL $DownloadLocation -NumberofAttempts 3 -RunParallel $false)){
+                if (-not(Get-AmigaFileWeb -URL $DownloadURL -LocationforDL $DownloadLocation -NumberofAttempts 3 -RunParallel $false -turranclient $Script:GUICurrentStatus.HttpClientTurran -httpclient $Script:GUICurrentStatus.HttpClientPowerShell)){
                     Write-ErrorMessage -Message "Error downloading $($Line.PackageName)! Cannot continue!"
                     return $false
                 }

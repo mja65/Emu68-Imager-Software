@@ -39,10 +39,13 @@ function Get-PackagesfromInternet {
         If (($Line.SourceType -in $SourceTypesforDownload) -and ($Line.DownloadFileFlag -eq $true)) {
             $DownloadSuccess = $false
             If ($Line.SourceType -match "Github"){
-                $DownloadSuccess =  (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -LocationforDL $line.OutputLocation -NumberofAttempts 1)                
+                $DownloadSuccess =  (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -LocationforDL $line.OutputLocation -NumberofAttempts 3  -turranclient $Script:GUICurrentStatus.HttpClientTurran -httpclient $Script:GUICurrentStatus.HttpClientPowerShell)
             } 
+            elseif ($Line.SourceType -match "Web - Aminet") {
+                $DownloadSuccess =  (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -AminetMirrors (Get-InputFileCSV -CSV 'AminetMirrors') -LocationforDL $line.OutputLocation -NumberofAttempts 1 -turranclient $Script:GUICurrentStatus.HttpClientTurran -httpclient $Script:GUICurrentStatus.HttpClientPowerShell)                
+            }
             else {
-                $DownloadSuccess =  (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -AminetMirrors (Get-InputFileCSV -CSV 'AminetMirrors') -LocationforDL $line.OutputLocation -BackupURL $Line.BackupURL -NumberofAttempts 1)
+                $DownloadSuccess =  (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -LocationforDL $line.OutputLocation -BackupURL $Line.BackupURL -NumberofAttempts 3 -turranclient $Script:GUICurrentStatus.HttpClientTurran -httpclient $Script:GUICurrentStatus.HttpClientPowerShell)
             }
             if ($DownloadSuccess -eq $false){
                 Write-ErrorMessage -Message "Error in downloaded packages! Unable to continue!"
@@ -73,6 +76,9 @@ function Get-PackagesfromInternet {
             }
             elseif ($DownloadFileExtension -eq '.adf'){
                 $ExtractionFolder = join-pathMulti $Script:Settings.ADFTemporaryFiles $Line.SourceLocation -UseFullPath
+            }
+            If (($DownloadFileExtension -in @('.lha','.zip','.lzx')) -and (Test-Path $ExtractionFolder -PathType Container)){
+                Remove-Item $ExtractionFolder -Recurse -Force
             }
             If (-not (Test-Path $ExtractionFolder -PathType Container)){
                 $null = New-Item $ExtractionFolder -ItemType Directory
