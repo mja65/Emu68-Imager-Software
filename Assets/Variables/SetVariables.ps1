@@ -109,6 +109,8 @@ $Script:Settings.ProgressBarMarkers.Add([PSCustomObject]@{
 })
 
 $Script:GUICurrentStatus = [PSCustomObject]@{
+    HttpClientPowerShell = [System.Net.Http.HttpClient]::new()
+    HttpClientTurran = [System.Net.Http.HttpClient]::new()
     LastSelectedPackage = $null
     CurrentlySelectedPackage = $null
     AllowVirtualDrives =$false
@@ -178,6 +180,10 @@ $Script:GUICurrentStatus = [PSCustomObject]@{
 #   MBRPartitionContextMenuEnabled = $false
 #    AmigaPartitionContextMenuEnabled = $false
 }
+
+$Script:GUICurrentStatus.HttpClientPowerShell.DefaultRequestHeaders.UserAgent.ParseAdd("PowerShellHttpClient")
+$Script:GUICurrentStatus.HttpClientTurran.DefaultRequestHeaders.UserAgent.ParseAdd("AmigaHttpClient")
+
 $Script:GUICurrentStatus.RunOptionstoReport.Columns.Add((New-Object System.Data.DataColumn "Setting",([string])))
 $Script:GUICurrentStatus.RunOptionstoReport.Columns.Add((New-Object System.Data.DataColumn "Value",([string])))
 $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Columns.Add((New-Object System.Data.DataColumn "Area",([string])))

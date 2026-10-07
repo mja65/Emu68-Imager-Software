@@ -61,6 +61,8 @@
             UnLZXFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLZXFilePath)
             Packages = $CurrentBatch
             Mirrors  = $AminetMirrors
+            HttpClientPowerShell = $Script:GUICurrentStatus.HttpClientPowerShell 
+            HttpClientTurran = $Script:GUICurrentStatus.HttpClientTurran             
         }
 
         $Jobs += Start-ThreadJob -ThrottleLimit 50 -ArgumentList $ThreadArgs -ScriptBlock {
@@ -79,7 +81,9 @@
             $UnLHAFilePath = $Bundle.UnLHAFilePath  
             $UnADFFilePath = $Bundle.UnADFFilePath
             $UnLZXFilePath = $Bundle.UnLZXFilePath
-                           
+            $HttpClientTurran = $Bundle.HttpClientTurran
+            $HttpClientPowerShell = $Bundle.HttpClientPowerShell
+            . .\Assets\Functions\Test-ArchiveFileType.ps1
             . .\Assets\Functions\Get-AmigaFileWeb.ps1
             . .\Assets\Functions\Join-PathMulti.ps1
             . .\Assets\Functions\ProcessInstallFiles\Write-AmigaFilestoInterimDrive\Compare-FileHash.ps1
@@ -144,10 +148,13 @@
                 }
                 if ($Result.DownloadStatus -eq "To Be Downloaded") {
                     if ($Line.SourceType -match "Github"){
-                        $result.DownloadSuccess = (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -LocationforDL $Result.FileName -NumberofAttempts 1 -RunParallel $true -ParallelRunLogFolder $ParallelRunDebugLogFolderToUse)                
+                        $result.DownloadSuccess = (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -LocationforDL $Result.FileName -NumberofAttempts 3 -RunParallel $true -ParallelRunLogFolder $ParallelRunDebugLogFolderToUse -turranclient $HttpClientTurran -httpclient $HttpClientPowerShell)
                     } 
+                    elseif ($Line.SourceType -match "Web - Aminet"){
+                        $result.DownloadSuccess = (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -AminetMirrors $Mirrors -LocationforDL $Result.FileName -BackupURL $Line.BackupURL -NumberofAttempts 3 -RunParallel $true -ParallelRunLogFolder $ParallelRunDebugLogFolderToUse -turranclient $HttpClientTurran -httpclient $HttpClientPowerShell)
+                    }
                     else {
-                        $result.DownloadSuccess = (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -AminetMirrors $Mirrors -LocationforDL $Result.FileName -BackupURL $Line.BackupURL -NumberofAttempts 1 -RunParallel $true -ParallelRunLogFolder $ParallelRunDebugLogFolderToUse)
+                        $result.DownloadSuccess = (Get-AmigaFileWeb -URL $Line.RevisedDownloadURL -LocationforDL $Result.FileName -NumberofAttempts 3 -RunParallel $true -ParallelRunLogFolder $ParallelRunDebugLogFolderToUse -turranclient $HttpClientTurran -httpclient $HttpClientPowerShell)
                     }
                     if ($result.DownloadSuccess -ne $true){
                         Remove-Item -Path $Result.FileName -Force -ErrorAction SilentlyContinue
@@ -162,6 +169,9 @@
                     }
                 }   
                 if ($Result.ExtractionFolder) {
+                    If (($Result.FileNameExtension -in @('.lha','.zip','.lzx')) -and (Test-Path $Result.ExtractionFolder -PathType Container)){
+                        Remove-Item $Result.ExtractionFolder -Recurse -Force
+                    }
                     If (-not (Test-Path $Result.ExtractionFolder -PathType Container)){
                         $null = New-Item $Result.ExtractionFolder -ItemType Directory
                     }
