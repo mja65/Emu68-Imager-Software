@@ -47,6 +47,7 @@ $Script:Settings = [PSCustomObject]@{
     DefaultImportLocation = '.\UserFiles\ImportFiles'
     DefaultROMLocation = '.\UserFiles\Kickstarts'
     DownloadedFileSystems = '.\UserFiles\FileSystems'
+    UserVolumeFilesLocation = '.\UserFiles\Volumes'
     DefaultAmigaFileSystemLocation = '.\Assets\AmigaFileSystems'
     InputFiles = [PSCustomObject]@{
         InputFileSpreadsheetURL = 'https://docs.google.com/spreadsheets/d/1GeggL_zOH4MpJs-Kx0ywXR6RyOwLbp7Wb0_9qcTYftw/'

@@ -79,3 +79,8 @@ Desktop.ini
 !/UserFiles/ExistingApplications/
 /UserFiles/ExistingApplications/*
 !/UserFiles/ExistingApplications/Put Miami and Roadshow Files here.txt
+!/UserFiles/Volumes/
+/UserFiles/Volumes/*
+!/UserFiles/Volumes/Work/
+/UserFiles/Volumes/Work/*
+!/UserFiles/Volumes/Work/Put files for the Work volume here.txt

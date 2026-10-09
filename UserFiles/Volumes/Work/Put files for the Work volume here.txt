@@ -1,0 +1,9 @@
+Anything placed in this folder is copied to the Work volume of the image that is
+built, keeping its folder structure. Drop a WHDLoad collection, your own
+applications, whatever you like, in here.
+
+One folder per Amiga volume: the folder name must match the volume name shown in
+the partition editor. "Work" is the default second volume; use "System" for the
+Workbench volume, or "Work_1", "Work_2" and so on if you have added more.
+
+A folder for a volume that does not exist in the image is ignored.

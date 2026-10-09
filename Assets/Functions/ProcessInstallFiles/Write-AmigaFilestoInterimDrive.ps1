@@ -911,5 +911,8 @@ function Write-AmigaFilestoInterimDrive {
     }
     
     Write-TaskCompleteMessage
+
+    # Last, so a user's own files are copied verbatim and nothing moves them after.
+    Copy-UserFilestoVolumes
       
 } 
