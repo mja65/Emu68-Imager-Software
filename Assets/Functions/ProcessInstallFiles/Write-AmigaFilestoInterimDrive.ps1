@@ -853,7 +853,7 @@ function Write-AmigaFilestoInterimDrive {
         $null = Copy-Item -Path $ScreenModePrefsFile "$ScreenModePrefsFile.Native"
     }
 
-    if ($wifiprefs){
+    if ((-not [string]::IsNullOrWhiteSpace($Script:GUIActions.WifiPassword)) -and (-not [string]::IsNullOrWhiteSpace($Script:GUIActions.SSID))){
         $Script:Settings.CurrentSubTaskNumber ++
         $Script:Settings.CurrentSubTaskName = "Creating Wifi Prefs"
         Write-StartSubTaskMessage

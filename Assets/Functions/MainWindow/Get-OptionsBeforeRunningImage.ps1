@@ -17,19 +17,20 @@ function Get-OptionsBeforeRunningImage {
 
     $DiskSizetoReport = (Get-ConvertedSize -Size $WPF_DP_Disk_GPTMBR.DiskSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 2)
     $NumberofMBRPartitions = ($Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries).Count
-    if ($Script:GUIActions.WifiPassword){
+    
+    if ((-not [string]::IsNullOrWhiteSpace($Script:GUIActions.WifiPassword)) -and (-not [string]::IsNullOrWhiteSpace($Script:GUIActions.SSID))){
         $WifiPassword = "Password has been set"
-    }
-    else{
-        $WifiPassword = "Not Configured"
-    }
-    if ($Script:GUIActions.SSID){
         $SSID = $Script:GUIActions.SSID
     }
-    else{
-        $SSID  = "Not Configured"
+    elseif (([string]::IsNullOrWhiteSpace($Script:GUIActions.WifiPassword)) -and ([string]::IsNullOrWhiteSpace($Script:GUIActions.SSID))){
+        $WifiPassword = "Not Configured"
+        $SSID = "Not Configured"
     }
-
+    else {
+        $WifiPassword = "N/A - both SSID and password must be set"
+        $SSID = "N/A - both SSID and password must be set"
+    }
+    
     if ($Script:GUIActions.InstallOSFiles -eq $true){
         $InstallType = "Full Install"
     }    
