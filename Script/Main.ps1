@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 2.2.8.1
+.VERSION 2.2.8.2
 .GUID 73d9401c-ab81-4be5-a2e5-9fc0834be0fc
 .AUTHOR SupremeTurnip
 .COMPANYNAME
@@ -39,8 +39,10 @@ Get-ChildItem -Path '.\Assets\Functions\' -File -Recurse | ForEach-Object {
 }
 
 
-if ((Get-Location).Path -match '[^a-zA-Z0-9\s\.\-_:\\]'){
-    Write-ErrorMessage -Message "The path to the Emu68 Imager contains special characters which may cause issues with some of the tools used in the image creation process. Please move Emu68 Imager to a location that does not contain any special characters and try again." -Title "Invalid Path" -ShowPopup
+$CurrentPath = (Get-Location).Path
+
+if ($CurrentPath -match '[^a-zA-Z0-9\s\.\-_:\\]'){
+    Write-ErrorMessage -NoLog -Message "The path to the Emu68 Imager (`"$CurrentPath`") contains special characters which may cause issues with some of the tools used in the image creation process. Please move Emu68 Imager to a location that does not contain any special characters and try again."
     exit
 }
 
@@ -56,7 +58,7 @@ else {
     $Script:GUICurrentStatus.RunMode = "CommandLine"
 }
 
-$Script:Settings.Version = [system.version]'2.2.8.1'
+$Script:Settings.Version = [system.version]'2.2.8.2'
 
 $Script:GUIActions.ScriptPath = (Split-Path -Path $PSScriptRoot -Parent)
 
