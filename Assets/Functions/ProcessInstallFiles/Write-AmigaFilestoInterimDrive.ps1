@@ -276,12 +276,14 @@ function Write-AmigaFilestoInterimDrive {
         If ($InstallMediaType -eq "Archive"){
             $SourcePath = join-pathMulti $Script:Settings.WebPackagesDownloadLocation $FileName $Line.SourcePath -UseFullPath -ExtendedPrefix                 
         }
-        # elseif ($InstallMediaType -eq "CD"){
-        #     $SourcePath = join-pathMulti $Script:Settings.CDTemporaryFiles $Line.SourceLocation $Line.SourcePath -UseFullPath -ExtendedPrefix         
-        # }
         elseif ($InstallMediaType -eq "Disk"){
-            #Write-Host "ADFTemporaryFilesPath is: $($Script:Settings.ADFTemporaryFiles) SourceLocation is: $($Line.SourceLocation) SourcePath is: $($Line.SourcePath)"
-            $SourcePath = join-pathMulti $Script:Settings.ADFTemporaryFiles $Line.SourceLocation $Line.SourcePath -UseFullPath -ExtendedPrefix  
+            If ([string]::IsNullOrWhiteSpace($Line.SourcePathMangled)){
+                $SourcePath = join-pathMulti $Script:Settings.ADFTemporaryFiles $Line.SourceLocation $Line.SourcePath -UseFullPath -ExtendedPrefix  
+            }
+            else {
+                $SourcePath = join-pathMulti $Script:Settings.ADFTemporaryFiles $Line.SourceLocation $Line.SourcePathMangled -UseFullPath -ExtendedPrefix  
+            }
+            #Write-Host "ADFTemporaryFilesPath is: $($Script:Settings.ADFTemporaryFiles) SourceLocation is: $($Line.SourceLocation) SourcePath is: $SourcePath "
         }
         $DestinationPath = join-pathMulti $Script:Settings.InterimAmigaDrives $Line.DrivetoInstall $Line.DestinationPath -UseFullPath -ExtendedPrefix
         $DestinationFolder = [System.IO.Path]::GetDirectoryName($DestinationPath)

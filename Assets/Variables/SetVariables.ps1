@@ -353,4 +353,5 @@ $Script:ExternalProgramSettings = [PSCustomObject]@{
     UnLHAFilePath = '.\Programs\Lhasa\lha.exe'
     HSTImagerPath = '.\Programs\HSTImager\hst.imager.exe'
     HSTAmigaPath =  '.\Programs\HSTAmiga\Hst.amiga.exe'
+    CapCLIPath = '.\Programs\Capitoline\Capitoline'
 }

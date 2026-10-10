@@ -1,6 +1,6 @@
 function Get-StartupFiles {
     param (
-        
+        $InstallTime
     )
     
     if (-not (Test-path $Script:ExternalProgramSettings.SevenZipFilePath)){
@@ -22,7 +22,9 @@ function Get-StartupFiles {
     $PackagesNeedUpdating = $false
     $LogPathStandardOutput = join-path $Script:Settings.TempFolder "LogStd.txt"
    
-    foreach ($Line in (Get-InputFileCSV -CSV 'StartupFiles')){
+    $StartupFiles = (Get-InputFileCSV -CSV 'StartupFiles').where({ $_.InstallTime -eq $InstallTime })
+
+    foreach ($Line in $StartupFiles){
     
         If ($PackageName -ne $Line.PackageName){
             $PackageUptoDate = $true
@@ -53,13 +55,20 @@ function Get-StartupFiles {
                 $null = New-Item -Path $DownloadLocation -ItemType Directory
             }  
             $DownloadLocation = join-pathMulti $Script:Settings.TempFolder "StartupFiles" $Line.FileDownloadName
-            if ($Line.Source -eq 'Web'){
+            if ($Line.Source -eq 'Web - Aminet'){
                 #Write-host "URL: $($Line.SourceLocation) LocationforDL: $DownloadLocation"
                 if (-not (Get-AmigaFileWeb -AminetMirrors $AminetMirrors -URL $Line.SourceLocation -LocationforDL $DownloadLocation -turranclient $Script:GUICurrentStatus.HttpClientTurran -httpclient $Script:GUICurrentStatus.HttpClientPowerShell)){
                     Write-ErrorMessage -Message "Error downloading $($Line.PackageName)! Cannot continue!"
                     return $false
                 }
             }
+            elseif ($Line.Source -eq 'Web'){
+                #Write-host "URL: $($Line.SourceLocation) LocationforDL: $DownloadLocation"
+                if (-not (Get-AmigaFileWeb -URL $Line.SourceLocation -LocationforDL $DownloadLocation -BackupURL $Line.SourceLocationBackup -turranclient $Script:GUICurrentStatus.HttpClientTurran -httpclient $Script:GUICurrentStatus.HttpClientPowerShell)){
+                    Write-ErrorMessage -Message "Error downloading $($Line.PackageName)! Cannot continue!"
+                    return $false
+                }
+            }            
             elseif ($Line.Source -eq 'Github'){
                 $DownloadURL = Get-GithubRelease -GithubRepository $Line.SourceLocation -GithubReleaseType $Line.GithubReleaseType -Tag_Name $Line.GithubRelease -Name $Line.GithubName -GithubNameExclude $Line.GithubNameExclude -GithubSortTagPrefix $Line.GithubSortTagPrefix -GithubSortSemanticVersion $Line.GithubSortSemanticVersion -MinimumPublishedDate $Line.GithubMinimumPublishedDate
                 if (-not($DownloadURL)){

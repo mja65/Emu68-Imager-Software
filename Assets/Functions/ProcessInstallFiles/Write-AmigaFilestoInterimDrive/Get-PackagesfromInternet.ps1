@@ -125,12 +125,7 @@ function Get-PackagesfromInternet {
                     Write-informationMessage -Message "Extracting ADF $($DownloadtoProcess.ArchiveFileName)"
                     $oldPreference = $ErrorActionPreference
                     $ErrorActionPreference = 'SilentlyContinue'
-                    If ($DownloadtoProcess.ADFUseMangledNames -eq $true) {
-                        $OutputMessage = & $UnADFFilePath -w -d $($DownloadtoProcess.ExtractionFolder) $($DownloadtoProcess.ArchiveFileName) 2>&1  
-                    }
-                    else {
-                        $OutputMessage = & $UnADFFilePath -d $($DownloadtoProcess.ExtractionFolder) $($DownloadtoProcess.ArchiveFileName) 2>&1                        
-                    }
+                    $OutputMessage = & $UnADFFilePath -w -d $($DownloadtoProcess.ExtractionFolder) $($DownloadtoProcess.ArchiveFileName) 2>&1  
                     $ErrorActionPreference = $oldPreference
                 }                   
                 elseif ($DownloadtoProcess.ArchiveFileExtension -eq '.lzx'){

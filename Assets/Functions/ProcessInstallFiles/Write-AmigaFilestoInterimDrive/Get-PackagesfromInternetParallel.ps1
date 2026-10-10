@@ -217,12 +217,7 @@
                 if ($DownloadstoProcess){
                     foreach ($DownloadtoProcess in $DownloadstoProcess) {
                         if ($DownloadtoProcess.FileNameExtension -eq '.adf'){
-                            If ($DownloadtoProcess.ADFUseMangledNames -eq $true) {
-                                $OutputMessage = & $UnADFFilePath -w -d $DownloadtoProcess.ExtractionFolder $($DownloadtoProcess.FileName) 2>&1 
-                            }
-                            else {
-                                $OutputMessage = & $UnADFFilePath -d $DownloadtoProcess.ExtractionFolder $($DownloadtoProcess.FileName) 2>&1 
-                            }
+                            $OutputMessage = & $UnADFFilePath -w -d $DownloadtoProcess.ExtractionFolder $($DownloadtoProcess.FileName) 2>&1 
                             If ($LASTEXITCODE -ne 0) {
                                 If ($DownloadtoProcess.AiA){
                                     $Result_AIA.ExtractionSuccess = $false
