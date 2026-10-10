@@ -41,7 +41,7 @@ Get-ChildItem -Path '.\Assets\Functions\' -File -Recurse | ForEach-Object {
 
 $CurrentPath = (Get-Location).Path
 
-if ($CurrentPath -match '[^a-zA-Z0-9\s\.\-_:\\]'){
+if ($CurrentPath -cmatch '[^a-zA-Z0-9\s\.\-_:\\]'){
     Write-ErrorMessage -NoLog -Message "The path to the Emu68 Imager (`"$CurrentPath`") contains special characters which may cause issues with some of the tools used in the image creation process. Please move Emu68 Imager to a location that does not contain any special characters and try again."
     exit
 }
