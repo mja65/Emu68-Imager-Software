@@ -124,7 +124,7 @@ in your install path for the tool and select this path to scan.
                 }
             }
         }
-        $FileHash = (Get-FileHash -LiteralPath $FileName -Algorithm MD5).Hash.ToUpper()
+        $FileHash = (Get-FileHash -LiteralPath $FileName -Algorithm MD5).Hash.ToUpperInvariant()
         if (($RequiredInstallMediaandHashes["Hash;$FileHash"]) -and ($RequiredInstallMediaandHashes["Hash;$FileHash"].Sequence -gt $MatchedLine.Sequence)){
             $FoundCD = [PSCustomObject]@{
                 Hash = $FileHash
@@ -153,7 +153,7 @@ in your install path for the tool and select this path to scan.
 
     Foreach ($Archive in $ArchivestoCheck) {
         $FileName = $Archive.FullName
-        $FileHash = (Get-FileHash -LiteralPath $FileName -Algorithm MD5).Hash.ToUpper()
+        $FileHash = (Get-FileHash -LiteralPath $FileName -Algorithm MD5).Hash.ToUpperInvariant()
         if ($RequiredInstallMediaandHashes["Hash;$FileHash"]){
             $TargetADF = $RequiredInstallMediaandHashes["Hash;$FileHash"]
             

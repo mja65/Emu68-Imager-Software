@@ -88,12 +88,12 @@ in your install path for the tool and select this path to scan.
             if ($HashCache.ContainsKey($FilePath)) {
                 $FileHash = $HashCache[$FilePath]
             } else {
-                $FileHash = (Get-FileHash -LiteralPath $FilePath -Algorithm MD5).Hash.ToUpper()
+                $FileHash = (Get-FileHash -LiteralPath $FilePath -Algorithm MD5).Hash.ToUpperInvariant()
                 $HashCache[$FilePath] = $FileHash
             }
     
             # Check if this file's hash matches ANY rule for this target
-            $MatchedRule = $RulesForTarget | Where-Object { $_.Hash.ToUpper() -eq $FileHash }
+            $MatchedRule = $RulesForTarget | Where-Object { $_.Hash.ToUpperInvariant() -eq $FileHash }
     
             if ($null -ne $MatchedRule) {
                 $CurrentSequence = [int]$MatchedRule.Sequence

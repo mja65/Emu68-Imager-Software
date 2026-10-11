@@ -72,7 +72,7 @@ function Get-OSSources {
         $TotalSources.Add([PSCustomObject]@{
             PackageName    = $Source.PackageName
             SourceType     = $Source.SourceType
-            CDParent = $(If ($Source.CDParent) {($Source.CDParent.toupper())} else {""})
+            CDParent = $(If ($Source.CDParent) {($Source.CDParent.ToUpperInvariant())} else {""})
             SourceLocation = $Source.SourceLocation
             ADFUseMangledNames = $ADFUseMangledNames
             ArchiveinArchiveName = $Source.ArchiveinArchiveName

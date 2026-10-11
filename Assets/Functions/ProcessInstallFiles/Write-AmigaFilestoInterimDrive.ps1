@@ -309,7 +309,7 @@ function Write-AmigaFilestoInterimDrive {
         }
         If ($Line.ProtectionBits){
             $FileName = [System.IO.Path]::GetFileName($DestinationPath)
-            $ProtectionBits = $Line.ProtectionBits.ToUpper()
+            $ProtectionBits = $Line.ProtectionBits.ToUpperInvariant()
             $H = if ($ProtectionBits.Contains('H')) { 'H' } else { '-' }
             $S = if ($ProtectionBits.Contains('S')) { 'S' } else { '-' }
             $P = if ($ProtectionBits.Contains('P')) { 'P' } else { '-' }
@@ -502,7 +502,7 @@ function Write-AmigaFilestoInterimDrive {
                     Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination
                     If ($Item.ProtectionBits){
                         $FileName = [System.IO.Path]::GetFileName($Item.Destination)
-                        $ProtectionBits = $Item.ProtectionBits.ToUpper()
+                        $ProtectionBits = $Item.ProtectionBits.ToUpperInvariant()
                         $H = if ($ProtectionBits.Contains('H')) { 'H' } else { '-' }
                         $S = if ($ProtectionBits.Contains('S')) { 'S' } else { '-' }
                         $P = if ($ProtectionBits.Contains('P')) { 'P' } else { '-' }
@@ -656,7 +656,7 @@ function Write-AmigaFilestoInterimDrive {
         $FilestoInstall = $IconsPathHash[$_.IconType].FilestoInstall
         $OldFileName = Split-Path $FilestoInstall -Leaf
         $NewFileName = $IconsPathHash[$_.IconType].NewFileName
-        $FileName = $(if ($NewFileName) {$NewFileName} else { $OldFileName }).ToLower()
+        $FileName = $(if ($NewFileName) {$NewFileName} else { $OldFileName }).ToLowerInvariant()
         $Source = $IconsPathHash[$_.IconType].Source
         $SourcePathtoUse = $(
             if ($InstallMediaType -eq "ADF") { 

@@ -17,7 +17,7 @@ function Get-UAEFSDB {
 
     process {
         # --- 1. Compute Header Bits (Offsets 0x0 to 0x4) ---
-        $flagString = $Flags.ToUpper()
+        $flagString = $Flags.ToUpperInvariant()
         [byte]$mask = 0
 
         if ($flagString.Length -eq 8) {
