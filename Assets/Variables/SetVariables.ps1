@@ -350,7 +350,6 @@ $Script:ExternalProgramSettings = [PSCustomObject]@{
     UnADFFilePath = '.\Programs\unadf\bin\unadf.exe'
     SevenZipFilePath = '.\Programs\7z\7z.exe'
     UnlzxFilePath = '.\Programs\Unlzx\unlzx.exe'
-    UnLHAFilePath = '.\Programs\Lhasa\lha.exe'
     HSTImagerPath = '.\Programs\HSTImager\hst.imager.exe'
     HSTAmigaPath =  '.\Programs\HSTAmiga\Hst.amiga.exe'
     CapCLIPath = '.\Programs\Capitoline\Capitoline'

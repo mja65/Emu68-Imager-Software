@@ -57,7 +57,6 @@
             ParallelRunDebugLogFolderToUse = $ParallelRunDebugLogFolder
             SevenZipFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.SevenZipFilePath) 
             UnADFFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnADFFilePath) 
-            UnLHAFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLHAFilePath)
             UnLZXFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLZXFilePath)
             Packages = $CurrentBatch
             Mirrors  = $AminetMirrors
@@ -78,11 +77,11 @@
             $TempFolder = $Bundle.TempFolder
             $ParallelRunDebugLogFolderToUse = $Bundle.ParallelRunDebugLogFolderToUse
             $SevenZipFilePath = $Bundle.SevenZipFilePath 
-            $UnLHAFilePath = $Bundle.UnLHAFilePath  
             $UnADFFilePath = $Bundle.UnADFFilePath
             $UnLZXFilePath = $Bundle.UnLZXFilePath
             $HttpClientTurran = $Bundle.HttpClientTurran
             $HttpClientPowerShell = $Bundle.HttpClientPowerShell
+            . .\Assets\Functions\Expand-LhaArchive.ps1
             . .\Assets\Functions\Test-ArchiveFileType.ps1
             . .\Assets\Functions\Get-AmigaFileWeb.ps1
             . .\Assets\Functions\Join-PathMulti.ps1
@@ -90,10 +89,10 @@
 
             $Results = [System.Collections.Generic.List[PSObject]]::new()
             
-            # $ThreadID = [System.Threading.Thread]::CurrentThread.ManagedThreadId
-            # $DebugLog = join-path $ParallelRunLogFolder "Thread$($ThreadID)_ParallelJob_Debug.log"                    
-            # $StartTime = [datetime]::Now
-            # "$($StartTime.ToString('HH:mm:ss:ms'));Thread-$([System.Threading.Thread]::CurrentThread.ManagedThreadId);Starting Job" | Out-File $DebugLog -Append
+            $ThreadID = [System.Threading.Thread]::CurrentThread.ManagedThreadId
+            $DebugLog = join-path $ParallelRunDebugLogFolderToUse "Thread$($ThreadID)_ParallelJob_Debug.log"                    
+            $StartTime = [datetime]::Now
+            "$($StartTime.ToString('HH:mm:ss:ms'));Thread-$([System.Threading.Thread]::CurrentThread.ManagedThreadId);Starting Job" | Out-File $DebugLog -Append
        
             foreach ($Line in $PackageList) {
                 $DownloadstoProcess = @()
@@ -229,7 +228,7 @@
                                 }                            
                             }
                             else {
-                                If ($DownloadtoProcess.AiA){
+                                If ($DownloadtoProcess.AiA){ 
                                     $Result_AIA.ExtractionSuccess = $true
                                 }
                                 else {
@@ -238,25 +237,13 @@
                             }                    
                         }
                         elseif ($DownloadtoProcess.FileNameExtension -eq '.lha' -and $DownloadtoProcess.UseLHASAFlag -match "TRUE"){
-                            try {
-                                $OutputMessage = & $UnLHAFilePath "xfw=$($DownloadtoProcess.ExtractionFolder)" "$($DownloadtoProcess.FileName)" 2>&1
-                                If ($DownloadtoProcess.AiA){
-                                    $Result_AIA.ExtractionSuccess = $true
-                                }
-                                else {
-                                    $Result.ExtractionSuccess = $true
-                                }                                
+                            Expand-LhaArchive -Path $DownloadtoProcess.FileName -DestinationPath $DownloadtoProcess.ExtractionFolder -ReplaceChar "_" -Quiet -NoProgress
+                            If ($DownloadtoProcess.AiA){
+                                $Result_AIA.ExtractionSuccess = $true
                             }
-                            catch {
-                                If ($DownloadtoProcess.AiA){
-                                    $Result_AIA.ExtractionSuccess = $false
-                                    $Result_AIA.ExtractMessage = $OutputMessage
-                                }
-                                else {
-                                    $Result.ExtractionSuccess = $false
-                                    $Result.ExtractMessage = $OutputMessage
-                                }                              
-                            }       
+                            else {
+                                $Result.ExtractionSuccess = $true
+                            }                                     
                         }
                         elseif ($DownloadtoProcess.FileNameExtension -eq '.lzx'){
                             Push-location -Path $DownloadtoProcess.ExtractionFolder
@@ -320,6 +307,10 @@
             }
             
             Write-Output $Results   
+
+            $EndTime = [datetime]::Now
+            $ElapsedTime = ($EndTime - $StartTime)
+            "$($EndTime.ToString('HH:mm:ss:ms'));Thread-$([System.Threading.Thread]::CurrentThread.ManagedThreadId);Elapsed Time: $($ElapsedTime.TotalSeconds)  Finished Job" | Out-File $DebugLog -Append
         }        
     }
 

@@ -36,6 +36,7 @@ ipch/
 *.lastbuildstate
 
 # Test and coverage output
+Testing/
 TestResults/
 [Tt]est[Rr]esult*/
 *.trx

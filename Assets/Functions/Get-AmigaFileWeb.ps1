@@ -21,7 +21,7 @@ function Get-AmigaFileWeb {
 
     If ($RunParallel) {
         $ThreadID = [System.Threading.Thread]::CurrentThread.ManagedThreadId
-        $DebugLog = join-path $ParallelRunLogFolder "Thread$($ThreadID)_Download_Hang_Debug.log"
+        $DebugLog = join-path $ParallelRunLogFolder "Thread$($ThreadID)_Download_Debug.log"
         $StartTime = [datetime]::Now
         "$($StartTime.ToString('HH:mm:ss:ms'));Thread-$([System.Threading.Thread]::CurrentThread.ManagedThreadId);Starting Download" | Out-File $DebugLog -Append
     }

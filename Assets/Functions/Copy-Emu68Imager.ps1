@@ -26,11 +26,6 @@ Function Copy-Emu68Imager {
         ".\Programs\7z\7z.dll",
         ".\Programs\7z\7z.exe",
         ".\Programs\7z\\7zLicense",
-        ".\Programs\Lhasa\lha.exe",
-        ".\Programs\Lhasa\Copying.txt"
-        ".\Programs\Lhasa\lha.html"
-        ".\Programs\Lhasa\News.txt"
-        ".\Programs\Lhasa\Readme.txt"
         ".\Programs\UnLzx\unlzx.exe"
         ".\Programs\UnLzx\W95unlzx.readme"
         ".\Programs\UnADF\bin"

@@ -398,6 +398,7 @@ function Write-AmigaFilestoInterimDrive {
         else {
             $ExtractedFileFolder = [System.IO.Path]::GetFileNameWithoutExtension($Line.SourceLocation) 
         }
+        $SourcePathToUse = if ([string]::IsNullOrWhiteSpace($line.SourcePathMangled)) { $line.SourcePath } else { $line.SourcePathMangled }
         Switch ($line.SourceType) {
             { $_ -in 'Local - Files' } {
                 $BaseFolder = $Script:Settings.LocationofAmigaFiles
@@ -428,8 +429,8 @@ function Write-AmigaFilestoInterimDrive {
         }
                                       
         $ItemstoCopy = @()
-        if ($line.SourcePath.Contains('*')) {
-            $CombinedWildcard = join-pathMulti $BaseFolder $line.SourcePath
+        if ($SourcePathToUse.Contains('*')) {
+            $CombinedWildcard = join-pathMulti $BaseFolder $SourcePathToUse
             $Matches = @(Get-ChildItem -Path $CombinedWildcard -ErrorAction SilentlyContinue)
             foreach ($match in $Matches) {
                 $ItemstoCopy += [PSCustomObject]@{
@@ -446,10 +447,10 @@ function Write-AmigaFilestoInterimDrive {
         }
         else {
             If ($Line.ArchiveinArchiveName){
-                $SourcePath =  join-pathMulti $BaseFolder "AiA" $Line.SourcePath  -UseFullPath -ExtendedPrefix   
+                $SourcePath =  join-pathMulti $BaseFolder "AiA" $SourcePathToUse  -UseFullPath -ExtendedPrefix   
             }
             else {
-                $SourcePath =  join-pathMulti $BaseFolder $Line.SourcePath -UseFullPath -ExtendedPrefix   
+                $SourcePath =  join-pathMulti $BaseFolder $SourcePathToUse -UseFullPath -ExtendedPrefix   
             }
             $ItemstoCopy += [PSCustomObject]@{
                 Source  = $SourcePath 

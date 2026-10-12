@@ -18,7 +18,6 @@ function Get-PackagesfromInternet {
 
     $UnADFFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnADFFilePath) 
     $SevenZipFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.SevenZipFilePath) 
-    $UnLHAFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLHAFilePath)
     $UnLZXFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLZXFilePath)
        
     $SourceTypesforDownload = @('Web - Aminet','Web - Github','Web - AminetSearch','Web','Web - Github Emu68 Documentation','Web - WHDLoadWrapper')
@@ -145,18 +144,7 @@ function Get-PackagesfromInternet {
                 }                    
                   
                 elseif ($DownloadtoProcess.ArchiveFileExtension -eq '.lha' -and $DownloadtoProcess.UseLHASAFlag -match "TRUE"){
-                    $LogPathStandardOutput = Join-Path  $LogTempFolder "$($DownloadtoProcess.ArchiveFileNameNoExtension)LogStd.txt"
-                    try {
-                        & $UnLHAFilePath "xfw=$($DownloadtoProcess.ExtractionFolder)" "$($DownloadtoProcess.ArchiveFileName)" 2>&1 | Out-File -FilePath $LogPathStandardOutput -Encoding UTF8
-                        if (($DownloadtoProcess.UseLHASAFlag -ne "TRUE - NOCHECK") -and ($LASTEXITCODE -ne 0)) {
-                            Write-ErrorMessage -Message "Error extracting $($DownloadtoProcess.ArchiveFileName)! Exiting"
-                            exit
-                        }
-                    }
-                    catch {
-                        Write-ErrorMessage -Message "A critical scripting error occurred while running UnLHA: $_"
-                        exit
-                    }             
+                    Expand-LhaArchive -Path $DownloadtoProcess.ArchiveFileName -DestinationPath $DownloadtoProcess.ExtractionFolder -ReplaceChar "_" -Quiet -NoProgress        
                  }
                 else{
                     $LogPathStandardOutput = Join-Path  $LogTempFolder "$($DownloadtoProcess.ArchiveFileNameNoExtension)LogStd.txt"
