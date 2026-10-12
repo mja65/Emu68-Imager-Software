@@ -41,7 +41,7 @@ in your install path for the tool and select this path to scan.
     # 2. Build the target list and look up the FriendlyName dynamically from the priority table
     $FileNamesToFind = (Get-OSSources).where{($_.SourceType -eq 'ADF')} 
     
-    $CandidateFiles = Get-ChildItem -Path $PathtoADFFiles  -Recurse -File | Where-Object { $_.Length -eq $RequiredSizeInBytes }
+    $CandidateFiles = Get-ChildItem -Path $PathtoADFFiles  -Recurse -File -force | Where-Object { $_.Length -eq $RequiredSizeInBytes }
     $CandidateFilesParent = $CandidateFiles | Where-Object { $_.DirectoryName -eq $PathtoADFFiles  }
     $TotalNumberFiles = $CandidateFiles.count
     $TotalNumberFilesParent = $CandidateFilesParent.count
