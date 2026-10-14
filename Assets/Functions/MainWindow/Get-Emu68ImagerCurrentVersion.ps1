@@ -29,12 +29,10 @@ function Get-Emu68ImagerCurrentVersion {
     )
 
     if ($GithubDetails) {
-        foreach ($line in $GithubDetails) {
-            $line.tag_name = $line.tag_name -replace '^v', '' # Remove leading v if it exists
-        }             
-        $GithubDetails = $GithubDetails | Where-Object {$_.prerelease.tostring() -eq "False"} | Sort-Object -Property "tag_name" -Descending | Select-Object -First 1
-        $VersionFound = ($GithubDetails | Select-Object -First 1).tag_name      
-               
+
+        $GithubLatest = $GithubDetails | Where-Object {$_.prerelease.tostring() -eq "False"} |Sort-Object { [version]($_.tag_name -replace '^v') } -Descending | Select-Object -First 1
+        $VersionFound = ($GithubLatest.tag_name -replace '^v')
+          
         if([system.version]$VersionFound -gt $Script:Settings.Version){
 
             $VersionInformationtoReport = [PSCustomObject]@{
