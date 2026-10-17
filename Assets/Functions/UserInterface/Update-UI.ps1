@@ -107,8 +107,13 @@ function Update-UI {
         }
 
         if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
-            $WPF_StartPage_SettingsMUIVersion_GroupBox.Visibility = "Hidden"
-            $WPF_StartPage_SettingsEmu68Imager_GroupBox.Visibility = "Hidden"
+            $WPF_StartPage_MUIVersion_Label.Visibility = "Hidden"
+            $WPF_StartPage_MUIVersion_38.Visibility = "Hidden"
+            $WPF_StartPage_MUIVersion_50.Visibility = "Hidden"
+            $WPF_StartPage_Emu68Version_Label.Text  = "Emu68 Version"
+            $WPF_StartPage_Emu68Version_Dropdown.IsHitTestVisible = "False"
+            $WPF_StartPage_Emu68Version_Dropdown.Focusable = "False"
+            $WPF_StartPage_Emu68Version_Dropdown.IsTabStop = "False"
             $WPF_StartPage_Unicam_button.Visibility = "Hidden" 
         }
 

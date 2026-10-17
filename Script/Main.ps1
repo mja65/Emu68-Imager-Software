@@ -152,18 +152,23 @@ else {
 }
 
 
-If ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
-    $WPF_StartPage = Get-XAML -WPFPrefix 'WPF_StartPage_' -XMLFile '.\Assets\WPF\Grid_StartPageAdvancedMode.xaml' -ActionsPath '.\Assets\UIActions\StartPage\' -AddWPFVariables
-}
-elseif ($Script:GUICurrentStatus.OperationMode -eq "Simple"){
-    $WPF_StartPage = Get-XAML -WPFPrefix 'WPF_StartPage_' -XMLFile '.\Assets\WPF\Grid_StartPageSimpleMode.xaml' -ActionsPath '.\Assets\UIActions\StartPage\' -AddWPFVariables
-}
+$WPF_StartPage = Get-XAML -WPFPrefix 'WPF_StartPage_' -XMLFile '.\Assets\WPF\Grid_StartPage.xaml' -ActionsPath '.\Assets\UIActions\StartPage\' -AddWPFVariables
+
 $WPF_Partition = Get-XAML -WPFPrefix 'WPF_DP_' -XMLFile '.\Assets\WPF\Grid_DiskPartition.xaml' -ActionsPath '.\Assets\UIActions\DiskPartition\' -AddWPFVariables
 
 If ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
     $WPF_PackageSelection = Get-XAML -WPFPrefix 'WPF_PackageSelection_' -XMLFile '.\Assets\WPF\Grid_PackageSelection.xaml' -ActionsPath '.\Assets\UIActions\PackageSelection\' -AddWPFVariables
     Set-PartitionGridActions
 }
+else {
+    $blockUser = {
+        param($sender, $e)
+        $e.Handled = $true
+    }
+    $WPF_StartPage_Emu68Version_DropDown.add_PreviewMouseDown($blockUser)
+    $WPF_StartPage_Emu68Version_DropDown.add_PreviewKeyDown($blockUser)
+}
+        
 
 $Script:GUICurrentStatus.ProcessImageStatus = $false
 
