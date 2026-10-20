@@ -49,19 +49,19 @@ function Get-ConfigTXT {
                 break
             }
             "[DTOVERLAY_PAL]" {
-                if ($Script:GUIActions.AgnusType -eq "PAL") { "dtoverlay=PAL" }
+                if ($Script:GUIActions.AgnusType -eq "PAL") { "dtoverlay=pal" }
                 break
             }
             "[DTOVERLAY_NTSC]" {
-                if ($Script:GUIActions.AgnusType -eq "NTSC") { "dtoverlay=NTSC" }
+                if ($Script:GUIActions.AgnusType -eq "NTSC") { "dtoverlay=ntsc" }
                 break
             }
             "[DTOVERLAY_SDHC]" {
                 "dtoverlay=sdhc"
                 ""
                 "dtparam=unit0=rw"
-                if ($Script:GUIActions.DMAEnabled -eq $true) { "dtparam=DMA" }
-                if ($Script:GUIActions.IRQEnabled -eq $true) { "dtparam=IRQ" }  
+                if ($Script:GUIActions.DMAEnabled -eq $true) { "dtparam=dma" }
+                if ($Script:GUIActions.IRQEnabled -eq $true) { "dtparam=irq" }  
                 if ($Script:GUIActions.SDLowSpeed -eq $true) { "dtparam=low_speed" } 
                 if ([string]::IsNullOrWhiteSpace($Script:GUIActions.SDOverClockSpeed) -eq $false) { "dtparam=Speed=$($Script:GUIActions.SDOverClockSpeed)" }
                 break
@@ -70,8 +70,8 @@ function Get-ConfigTXT {
                 "dtoverlay=emmc"
                 ""
                 "dtparam=unit0=rw"
-                if ($Script:GUIActions.DMAEnabled -eq $true) { "dtparam=DMA" }
-                if ($Script:GUIActions.IRQEnabled -eq $true) { "dtparam=IRQ" }  
+                if ($Script:GUIActions.DMAEnabled -eq $true) { "dtparam=dma" }
+                if ($Script:GUIActions.IRQEnabled -eq $true) { "dtparam=irq" }  
                 if ($Script:GUIActions.SDLowSpeed -eq $true) { "dtparam=low_speed" } 
                 if ([string]::IsNullOrWhiteSpace($Script:GUIActions.SDOverClockSpeed) -eq $false) { "dtparam=Speed=$($Script:GUIActions.SDOverClockSpeed)" }
                 break
