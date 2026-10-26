@@ -79,13 +79,17 @@ function Start-HSTCommands {
             $streamWriter.WriteLine($line) 
         }
         if ($line -match '\[.*?ERR\]') {
-            Write-ErrorMessage -Message "Error running HST Imager! Error was: $line"
+            Write-ErrorMessage -Message "Error running HST Imager to write image! Error was: $line"
 
             Write-Progress -Activity $ActivityDescription -Completed
             if ($loggingEnabled){
                 $streamWriter.Close()   # Close the StreamWriter so file is saved properly
             }
-            Write-HSTCommandstoLog
+            
+            Write-ErrorMessage -Message "Examine the HST script run at $([System.IO.Path]::GetFullPath($HSTCommandScriptPath)) for issues. Running this script on a terminal with Admin access by navigating"
+            Write-ErrorMessage -Message "to the HST Imager folder at `"$([System.IO.Path]::GetFullPath((split-path $Script:ExternalProgramSettings.HSTImagerPath -Parent)))`" and running the command:"
+            Write-ErrorMessage -Message "HST.imager -script `"$([System.IO.Path]::GetFullPath($HSTCommandScriptPath))`" "
+            Write-ErrorMessage -Message "will retry the attempt to write the image and show a log with more detailed information."
             exit            
         }
         if ($line -match '\[.*?INF\]') {
