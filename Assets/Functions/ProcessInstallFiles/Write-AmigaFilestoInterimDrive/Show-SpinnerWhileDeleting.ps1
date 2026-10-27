@@ -2,7 +2,7 @@ function Show-SpinnerWhileDeleting {
     param (
         [scriptblock]$ScriptBlock,
         [int]$Delay = 100,
-        [string]$Message = "Deleting files"
+        [string]$Message = "Deleting files process"
     )
 
     $spinner = @('|', '/', '-', '\')
@@ -16,7 +16,7 @@ function Show-SpinnerWhileDeleting {
     }
 
     try {
-        Receive-Job $job -ErrorAction Stop | Out-Null
+        Receive-Job $job -ErrorAction Stop
         Write-InformationMessage -Message "$Message complete." -NewLineBefore
     } catch {
         Write-InformationMessage -Message "$Message failed: $_" -NewLineBefore

@@ -52,8 +52,16 @@ function Expand-AmigaZFiles {
 
     $LocationofZFiles = [System.IO.Path]::GetFullPath($LocationofZFiles)
 
-    Show-SpinnerWhileDeleting -ScriptBlock {
-        Get-ChildItem -Path $using:LocationofZFiles -Filter "*.Z" -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
+    
+
+    $DeletionErrors = Show-SpinnerWhileDeleting -ScriptBlock {
+        Get-ChildItem -Path $using:LocationofZFiles -Filter "*.Z" -Recurse | Remove-Item -Force -ErrorAction Continue 2>&1
+    }
+
+    If ($DeletionErrors) {
+        Write-ErrorMessage "Unable to delete files!"
+        Write-InformationMessage $DeletionErrors
+        Exit
     }
     
 }
