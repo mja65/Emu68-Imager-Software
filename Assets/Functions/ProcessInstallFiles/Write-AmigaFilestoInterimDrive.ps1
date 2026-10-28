@@ -201,9 +201,14 @@ function Write-AmigaFilestoInterimDrive {
     $ValidPackages = $ListofPackagestoInstall | ForEach-Object { ($_.PackageName -split ",").Trim() } | Select-Object -Unique
     $PackageFilestoInstall = (Get-InputFileCSV -CSV "PackagestoInstall").where({ $_.PackageName.Trim() -in $ValidPackages }) 
     
-    $ValidOSPackages = @((($OSSources | select-object PackageName).PackageName -split ",").Trim() | Select-Object  -Unique)
-    $OSFilestoInstall = (Get-InputFileCSV -CSV "OSFilestoInstall").where({ $_.PackageName -in $ValidOSPackages }) 
-
+    If ($Script:GUIActions.InstallOSFiles -eq $true){
+        $ValidOSPackages = @((($OSSources | select-object PackageName).PackageName -split ",").Trim() | Select-Object  -Unique)
+        $OSFilestoInstall = (Get-InputFileCSV -CSV "OSFilestoInstall").where({ $_.PackageName -in $ValidOSPackages }) 
+    }
+    else {
+        $OSFilestoInstall = $null
+    }
+    
     $CreatedDirectories = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 
     $OSPathLookup = @{}

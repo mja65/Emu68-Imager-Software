@@ -37,7 +37,12 @@ function Get-PackageSources {
     $AdditionalPackagesList = @()
    
     If ($Emu68) {
-        $AdditionalPackagesList = @((Get-ConfigurablePackages -Emu68Packages).where({$_.IndexOf("Core Files") -gt 0 }))
+
+        $AdditionalPackagesList = @(
+            (Get-ConfigurablePackages -Emu68Packages).where({
+                $_.Contains("Core Files") -or $_.Contains("Emu68 Cmdline") -or $_.Contains("Emu68 ConfigTXT")
+            })
+        )
         $PackagesList = (Get-InputFileCSV -CSV 'Packages').Where({ $_.PackageName -in $AdditionalPackagesList })
     }
     else {

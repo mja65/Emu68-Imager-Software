@@ -155,11 +155,12 @@ function Update-UI {
             $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_SourceFiles_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_ADFpath_Button.Visibility = 'Visible'
-            $WPF_StartPage_ADFpath_Button_Check.Visibility = 'Visible'
+            $WPF_StartPage_ADFpath_Button_Check.Visibility = 'Visible' 
             $WPF_StartPage_ADFPath_Label.Visibility = 'Visible'
             $WPF_StartPage_SettingsScreen_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_SettingsScreenWB_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_SettingsNetworkUSB_GroupBox.Visibility = 'Visible'
+            $WPF_StartPage_SettingsMUIVersion_GroupBox.Visibility = 'Visible'
         }
         elseif ($Script:GUIActions.InstallOSFiles -eq $false){
             $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Visible'
@@ -170,6 +171,7 @@ function Update-UI {
             $WPF_StartPage_SettingsScreen_GroupBox.Visibility = 'Visible'
             $WPF_StartPage_SettingsScreenWB_GroupBox.Visibility = 'Hidden'
             $WPF_StartPage_SettingsNetworkUSB_GroupBox.Visibility = 'Hidden'
+            $WPF_StartPage_SettingsMUIVersion_GroupBox.Visibility = 'Hidden'
         }
         if ($Script:GUIActions.ROMLocation){
             $WPF_StartPage_RomPath_Label.Text = Get-FormattedPathforGUI -PathtoTruncate $Script:GUIActions.ROMLocation
