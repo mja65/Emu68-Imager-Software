@@ -25,9 +25,9 @@ $WPF_DP_Button_AddNewAmigaPartition.add_click({
     Set-AmigaDiskSizeOverhangPixels -AmigaDisk $AmigaDiskName
     
     $CurrentNumberofPartitionsonAmigaDisk = (@($Script:GUICurrentStatus.AmigaPartitionsandBoundaries | Where-Object { $_.PartitionName -match $AmigaDiskName })).count
-    
-    if ($CurrentNumberofPartitionsonAmigaDisk -eq $Script:Settings.AmigaPartitionsperDiskMaximum){
-        $null = Show-WarningorError -Msg_Header "Exceeded maximum number of partitions" -Msg_Body "You have $($Script:Settings.AmigaPartitionsperDiskMaximum) partitions on this disk! No more partitions can be added." -BoxTypeError -ButtonType_OK
+    $MaximumNumberPartitions = ((Get-InputFileCSV -CSV 'DiskDefaults').where({ $_.Disk -eq "Work" })).MaximumNumberPartitions
+    if ($CurrentNumberofPartitionsonAmigaDisk -eq $MaximumNumberPartitions){
+        $null = Show-WarningorError -Msg_Header "Exceeded maximum number of partitions" -Msg_Body "You have $MaximumNumberPartitions partitions on this disk! No more partitions can be added." -BoxTypeError -ButtonType_OK
         return
     }
 
@@ -64,11 +64,13 @@ $WPF_DP_Button_AddNewAmigaPartition.add_click({
     $AvailableFreeSpace = (Get-AmigaNearestSizeBytes -RoundDown $AvailableFreeSpace)
     #Write-debug "Available free space rounded down is: $AvailableFreeSpace"
 
-    if ($AvailableFreeSpace -gt $Script:SDCardMinimumsandMaximums.PFS3Maximum) {
-        $AvailableFreeSpace = $Script:SDCardMinimumsandMaximums.PFS3Maximum
+    $AmigaDefaultDetails = Get-AmigaPartitionDefaultDetails -AmigaPartition "System"
+
+    if ($AvailableFreeSpace -gt $AmigaDefaultDetail.MaximumSizeBytes) {
+        $AvailableFreeSpace = $AmigaDefaultDetail.MaximumSizeBytes
     }
 
-    $MinimumFreeSpace = (Get-AmigaNearestSizeBytes -RoundDown $Script:SDCardMinimumsandMaximums.PFS3Minimum)
+    $MinimumFreeSpace = (Get-AmigaNearestSizeBytes -RoundDown $AmigaDefaultDetail.MinimumSizeBytes)
     if ($AvailableFreeSpace -lt $MinimumFreeSpace){
         $null = Show-WarningorError -Msg_Header 'No Free Space' -Msg_Body 'Insufficient freespace to create partition!' -BoxTypeError -ButtonType_OK
     }

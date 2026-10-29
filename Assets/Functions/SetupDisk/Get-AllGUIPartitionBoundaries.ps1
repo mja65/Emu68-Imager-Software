@@ -15,8 +15,8 @@ function Get-AllGUIPartitionBoundaries {
         $GPTMBRTopMargin = $DiskPartitionGridMargins.Top + $GroupBoxGPTMBRMargins.Top + $DiskGridGPTMBRMargins.Top
         $AllPartitionBoundaries_MBR = [System.Collections.Generic.List[PSCustomObject]]::New()        
 
-        Get-AllGUIPartitions -PartitionType 'MBR' | ForEach-Object {   
-            $PartitionType = 'MBR'
+        Get-AllGUIPartitions -PartitionType $Script:GUIActions.DiskType | ForEach-Object {   
+            $PartitionType = $Script:GUIActions.DiskType
             $LeftMarginWindow = $GPTMBRLeftMargin + $_.Value.Margin.Left
             $TopMarginWindow = $GPTMBRTopMargin 
             $RightMarginWindow = $GPTMBRLeftMargin + $_.Value.Margin.Left + (Get-GUIPartitionWidth -Partition $_.Value)
@@ -27,10 +27,7 @@ function Get-AllGUIPartitionBoundaries {
                 Partition = $_.Value
                 PartitionType = $PartitionType
                 PartitionSubType = $_.Value.PartitionSubType
-                ImportedPartition = $_.Value.ImportedPartition
-                ImportedPartitionMethod = $_.Value.ImportedPartitionMethod
                 ImportedFilesPath = $_.Value.ImportedFilesPath 
-                ImportedPartitionPath = $_.Value.ImportedPartitionPath
                 CanMove = $_.Value.CanMove
                 CanDelete = $_.Value.CanDelete
                 CanResizeLeft = $_.Value.CanResizeLeft
@@ -86,7 +83,7 @@ function Get-AllGUIPartitionBoundaries {
             }
             else{
                 $AllPartitionBoundaries_MBR[$i].PixelsAvailableRight = $WPF_DP_Disk_GPTMBR.RightDiskBoundary - $AllPartitionBoundaries_MBR[$i].RightMargin
-                $AllPartitionBoundaries_MBR[$i].BytesAvailableRight =  $WPF_DP_Disk_GPTMBR.DiskSizeBytes - $WPF_DP_Disk_GPTMBR.MBROverheadBytes - $AllPartitionBoundaries_MBR[$i].EndingPositionBytes
+                $AllPartitionBoundaries_MBR[$i].BytesAvailableRight =  $WPF_DP_Disk_GPTMBR.DiskSizeBytes - $WPF_DP_Disk_GPTMBR.GPTMBROverheadBytes - $AllPartitionBoundaries_MBR[$i].EndingPositionBytes
             }                  
         }
         
@@ -114,10 +111,7 @@ function Get-AllGUIPartitionBoundaries {
                 PartitionName = $_.Name
                 Partition = $_.Value
                 PartitionType = $PartitionType
-                ImportedPartition = $_.Value.ImportedPartition
-                ImportedPartitionMethod = $_.Value.ImportedPartitionMethod
                 ImportedFilesPath = $_.Value.ImportedFilesPath 
-                ImportedPartitionPath = $_.Value.ImportedPartitionPath
                 CanMove = $_.Value.CanMove
                 CanDelete = $_.Value.CanDelete
                 CanResizeLeft = $_.Value.CanResizeLeft

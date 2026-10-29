@@ -8,10 +8,6 @@ function Add-GUIPartitiontoGPTMBRDisk {
         $PartitionNameNextto, 
         $SizeBytes,
         [Switch]$DefaultPartition,
-        [switch]$ImportedPartition,
-        $ImportedPartitionMethod,
-        [switch]$DerivedImportedPartition,
-        $PathtoImportedPartition,
         $VolumeName,
         $StartingPositionBytes
     )
@@ -22,23 +18,14 @@ function Add-GUIPartitiontoGPTMBRDisk {
     # $SizePixels = 100
     # $LeftMargin = 0
     # $PartitionNameNextto = 'WPF_DP_Partition_ID76_1'
-
-    if ($ImportedPartition -eq $true){
-        # Write-debug "Importing MBR Partition $PathtoImportedPartition"
-    }
-    
+   
     $SizePixels = $SizeBytes / $Script:WPF_DP_Disk_GPTMBR.BytestoPixelFactor
     if ($SizePixels -gt 4){
         $SizePixels -= 4
     }
     
-    if ($PartitionType -eq 'MBR'){
-        $NewPartitionNumber = $Script:WPF_DP_Disk_GPTMBR.NextPartitionMBRNumber
-    }
-    elseif ($PartitionType -eq 'GPT') {
-        Write-ErrorMessage -Message "Error in coding - Add-GUIPartitiontoGPTMBRDisk!"
-        $WPF_MainWindow.Close()
-        exit
+    if (($PartitionType -eq 'MBR' ) -or ($PartitionType -eq 'GPT')){
+        $NewPartitionNumber = $Script:WPF_DP_Disk_GPTMBR.NextPartitionGPTMBRNumber
     }
     
     if ($LoadSettings){
@@ -52,8 +39,9 @@ function Add-GUIPartitiontoGPTMBRDisk {
     # Write-debug "New Partition Name is: $NewPartitionName" 
 
     if ($AddType -eq 'AtEnd' -or $AddType -eq 'Initial'){
-        $LeftMargin = (Get-GUIPartitionStartEnd -PartitionType 'MBR').EndingPositionPixels
-        $StartingPositionBytes = (Get-GUIPartitionStartEnd -PartitionType 'MBR').EndingPositionBytes
+        $LeftMargin = (Get-GUIPartitionStartEnd -PartitionType $Script:GUIActions.DiskType).EndingPositionPixels
+        $StartingPositionBytes = (Get-GUIPartitionStartEnd -PartitionType $Script:GUIActions.DiskType).EndingPositionBytes
+        
     }
     else{
         $PartitionNameNexttoDetails = (Get-AllGUIPartitionBoundaries -GPTMBR -Amiga | Where-Object {$_.PartitionName -eq $PartitionNameNextto}) 
@@ -66,7 +54,7 @@ function Add-GUIPartitiontoGPTMBRDisk {
             $StartingPositionBytes = $PartitionNameNexttoDetails.StartingPositionBytes - $SizeBytes
         }
         elseif ($AddType -eq 'SpecificPosition'){
-            $CheckLastPartitioninCaseofOverrrun = (Get-GUIPartitionStartEnd -PartitionType 'MBR').EndingPositionPixels
+            $CheckLastPartitioninCaseofOverrrun = (Get-GUIPartitionStartEnd -PartitionType $Script:GUIActions.DiskType).EndingPositionPixels
             if ($CheckLastPartitioninCaseofOverrrun -lt $StartingPositionBytes/$WPF_DP_Disk_GPTMBR.BytestoPixelFactor){
                 $LeftMargin = $CheckLastPartitioninCaseofOverrrun
             }
@@ -80,9 +68,6 @@ function Add-GUIPartitiontoGPTMBRDisk {
         $NewPartition = New-GUIPartition -PartitionName $NewPartitionName -PartitionType $PartitionType -PartitionSubType $PartitionSubType -DefaultPartition 
 
     }
-    elseif ($ImportedPartition){
-        $NewPartition = New-GUIPartition -PartitionName $NewPartitionName -PartitionType $PartitionType -PartitionSubType $PartitionSubType -ImportedPartition -ImportedPartitionMethod $ImportedPartitionMethod
-    }
     else{
         $NewPartition = New-GUIPartition -PartitionName $NewPartitionName -PartitionType $PartitionType -PartitionSubType $PartitionSubType
     }
@@ -93,12 +78,6 @@ function Add-GUIPartitiontoGPTMBRDisk {
     }
     $NewPartition.StartingPositionBytes = [int64]$StartingPositionBytes
     $NewPartition.StartingPositionSector = [int64]($StartingPositionBytes/$Script:Settings.MBRSectorSizeBytes)
-
-    if ($ImportedPartition){
-        $NewPartition.ImportedPartition = $true
-        $NewPartition.ImportedPartitionMethod = $ImportedPartitionMethod
-        $NewPartition.ImportedPartitionPath = $PathtoImportedPartition
-    }
 
     $NewPartition.Margin = [System.Windows.Thickness]"$LeftMargin,0,0,0"
     
@@ -114,20 +93,17 @@ function Add-GUIPartitiontoGPTMBRDisk {
 "@
 
     Invoke-Expression $PSCommand  
-   
-    If ($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'ID76' -and (-not ($LoadSettings)) -and (-not ($ImportedPartition))){
-       
-        Add-AmigaDisktoID76Partition -ID76PartitionName $NewPartitionName
+   if ((-not $LoadSettings) -and (($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'ID76') -or ($PartitionType -eq 'GPT' -and $PartitionSubType -eq 'Amiga'))){
+        Add-AmigaDisktoGPTMBRPartition -ID76PartitionName $NewPartitionName
         if ($DefaultPartition -eq $true){
-
-            $SystemDefaultValues = (Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Type -eq "Amiga" -and $_.Disk -eq 'System'}
-            $WorkDefaultValues = (Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Type -eq "Amiga" -and $_.Disk -eq 'Work'}
-
-            Add-GUIPartitiontoAmigaDisk -AmigaDiskName ($NewPartitionName+'_AmigaDisk') -SizeBytes (Get-AmigaNearestSizeBytes -RoundDown -SizeBytes $Script:SDCardMinimumsandMaximums.WorkbenchDefault) -AddType 'AtEnd' -PartitionTypeAmiga 'Workbench' -DeviceName $SystemDefaultValues.DeviceName -VolumeName $SystemDefaultValues.VolumeName  -Buffers $SystemDefaultValues.Buffers -MaxTransfer $SystemDefaultValues.MaxTransfer -DosType $SystemDefaultValues.DosType -Bootable $SystemDefaultValues.BootableFlag -NoMount $SystemDefaultValues.NoMountFlag -Priority ([int]$SystemDefaultValues.Priority) -mask ($SystemDefaultValues.Mask)
+            $SystemDefaultValues = Get-AmigaPartitionDefaultDetails -AmigaPartition "System" -DiskSizeBytes $SizeBytes
+            $WorkDefaultValues = Get-AmigaPartitionDefaultDetails -AmigaPartition "Work" -DiskSizeBytes $SizeBytes
+           
+            Add-GUIPartitiontoAmigaDisk -AmigaDiskName ($NewPartitionName+'_AmigaDisk') -DefaultPartition -SizeBytes (Get-AmigaNearestSizeBytes -RoundDown -SizeBytes $SystemDefaultValues.PartitionSizeBytes) -AddType 'AtEnd' -PartitionTypeAmiga 'Workbench' -DeviceName $SystemDefaultValues.DeviceName -VolumeName $SystemDefaultValues.VolumeName  -Buffers $SystemDefaultValues.Buffers -MaxTransfer $SystemDefaultValues.MaxTransfer -DosType $SystemDefaultValues.DosType -Bootable $SystemDefaultValues.BootableFlag -NoMount $SystemDefaultValues.NoMountFlag -Priority $SystemDefaultValues.Priority -mask ($SystemDefaultValues.Mask)
             
-            $RemainingSpace = $SizeBytes-1032192- (Get-AmigaNearestSizeBytes -RoundDown -SizeBytes $Script:SDCardMinimumsandMaximums.WorkbenchDefault) 
+            $RemainingSpace = $SizeBytes-1032192- (Get-AmigaNearestSizeBytes -RoundDown -SizeBytes $SystemDefaultValues.PartitionSizeBytes) 
 
-            $NumberofPartitions = [math]::Ceiling($RemainingSpace/$Script:SDCardMinimumsandMaximums.PFS3Maximum)
+            $NumberofPartitions = [math]::Ceiling($RemainingSpace/$WorkDefaultValues.MaximumSizeBytes)
 
             $SpacetoAllocatetoAmigaWorkPartition =  Get-AmigaNearestSizeBytes -RoundDown -SizeBytes ($RemainingSpace/$NumberofPartitions) 
             $LastPartitionSpacetoAllocate = Get-AmigaNearestSizeBytes -RoundDown -SizeBytes ($RemainingSpace-($SpacetoAllocatetoAmigaWorkPartition*($NumberofPartitions-1)))
@@ -148,7 +124,7 @@ function Add-GUIPartitiontoGPTMBRDisk {
                     $SpacetoAllocatetoAmigaWorkPartition = $LastPartitionSpacetoAllocate
                 }
 
-                Add-GUIPartitiontoAmigaDisk -AmigaDiskName ($NewPartitionName+'_AmigaDisk') -SizeBytes $SpacetoAllocatetoAmigaWorkPartition -PartitionTypeAmiga 'Work' -AddType 'AtEnd' -VolumeName $WorkVolumeName -DeviceName $DeviceName -Buffers $WorkDefaultValues.Buffers -MaxTransfer $WorkDefaultValues.MaxTransfer -DosType $WorkDefaultValues.DosType -Bootable $WorkDefaultValues.BootableFlag -NoMount $WorkDefaultValues.NoMountFlag -Priority ([int]$WorkDefaultValues.Priority) -mask $WorkDefaultValues.Mask
+                Add-GUIPartitiontoAmigaDisk -AmigaDiskName ($NewPartitionName+'_AmigaDisk') -SizeBytes $SpacetoAllocatetoAmigaWorkPartition -PartitionTypeAmiga 'Work' -AddType 'AtEnd' -VolumeName $WorkVolumeName -DeviceName $DeviceName -Buffers $WorkDefaultValues.Buffers -MaxTransfer $WorkDefaultValues.MaxTransfer -DosType $WorkDefaultValues.DosType -Bootable $WorkDefaultValues.BootableFlag -NoMount $WorkDefaultValues.NoMountFlag -Priority $WorkDefaultValues.Priority -mask $WorkDefaultValues.Mask
             }
             
         }
@@ -157,18 +133,14 @@ function Add-GUIPartitiontoGPTMBRDisk {
     }
     
     if (-not ($LoadSettings)){
-        if ($PartitionType -eq 'MBR'){
-            $NewPartitionNumber = $Script:WPF_DP_Disk_GPTMBR.NextPartitionMBRNumber
-            $Script:WPF_DP_Disk_GPTMBR.NextPartitionMBRNumber ++
-            $Script:WPF_DP_Disk_GPTMBR.NumberofPartitionsMBR ++
-        }
-        elseif ($PartitionType -eq 'GPT'){
-            Write-ErrorMessage -Message "Coding Error - Add-GUIPartitiontoGPTMBRDisk!"
-            $WPF_MainWindow.Close()
-            exit
+        if (($PartitionType -eq 'MBR') -or ($PartitionType -eq 'GPT')){
+            $NewPartitionNumber = $Script:WPF_DP_Disk_GPTMBR.NextPartitionGPTMBRNumber
+            $Script:WPF_DP_Disk_GPTMBR.NextPartitionGPTMBRNumber ++
+            $Script:WPF_DP_Disk_GPTMBR.NumberofPartitionsGPTMBR ++
         }
 
     }
+
     $WPF_DP_DiskGrid_GPTMBR.UpdateLayout()
     $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -GPTMBR)
 

@@ -19,19 +19,13 @@ function Write-AmigaFilestoInterimDrive {
         $PathtoDelete = [System.IO.Path]::GetFullPath($($Script:Settings.WebPackagesDownloadLocation))
         Write-informationMessage -Message "Deleting existing files in $PathtoDelete"
         if (Test-Path $PathtoDelete) {
-            $DeletionErrors = Show-SpinnerWhileDeleting -ScriptBlock {
+            Show-SpinnerWhileDeleting -ScriptBlock {
                 $PathtoDeletetoUse = Join-Path $using:PathtoDelete "\*"
-                Remove-Item $PathtoDeletetoUse -Recurse -ErrorAction Continue 2>&1
-               }      
+                Remove-Item $PathtoDeletetoUse -Recurse -Force -ErrorAction SilentlyContinue               
+            }      
         }
     }
-    
-    If ($DeletionErrors) {
-        Write-ErrorMessage "Unable to delete files!"
-        Write-InformationMessage $DeletionErrors
-        Exit
-    }
-
+   
     $Script:Settings.CurrentSubTaskNumber ++
     $Script:Settings.CurrentSubTaskName = "Identifying files to be installed"
     Write-StartSubTaskMessage
@@ -39,8 +33,8 @@ function Write-AmigaFilestoInterimDrive {
     $ListofPackagestoInstall = $(if ($Script:GUIActions.InstallOSFiles -eq $false) { Get-PackageSources -Emu68 } else { Get-PackageSources }) | sort-object { $_.PackageName }      
     $OSSources = Get-OSSources
     $OSSources_AIA = $OSSources.where({$_.SourceType -eq "ArchiveinArchive"})
-    
-    $ListofOSPackagestoInstall = $(if ($Script:GUIActions.InstallOSFiles -eq $true) {$OSSources}) | Select-Object SourceLocation, SourceType, ArchiveinArchiveName, ArchiveinArchivePassword, OutputLocation, ADFUseMangledNames, CDParent -Unique
+    ,
+    $ListofOSPackagestoInstall = $(if ($Script:GUIActions.InstallOSFiles -eq $true) {$OSSources}) | Select-Object SourceLocation, SourceType, ArchiveinArchiveName, ArchiveinArchivePassword, OutputLocation CDParent -Unique
    
     $ListofOSPackagestoInstall.ForEach({
         $Line = $_
@@ -57,7 +51,7 @@ function Write-AmigaFilestoInterimDrive {
     @{
         Name = 'UseLhasa'
         Expression = { if ($_.SourceType -in @('ArchiveInArchive', 'Archive'))  { 'TRUE - NOCHECK' } else {$null } }
-    }, CDParent, ArchiveinArchiveName, ArchiveinArchivePassword, OutputLocation, ADFUseMangledNames -Unique
+    }, CDParent, ArchiveinArchiveName, ArchiveinArchivePassword, OutputLocation -Unique
     
         
     $Script:Settings.CurrentSubTaskNumber ++
@@ -199,7 +193,7 @@ function Write-AmigaFilestoInterimDrive {
     Write-StartSubTaskMessage
     
     $ValidPackages = $ListofPackagestoInstall | ForEach-Object { ($_.PackageName -split ",").Trim() } | Select-Object -Unique
-    $PackageFilestoInstall = (Get-InputFileCSV -CSV "PackagestoInstall").where({ $_.PackageName.Trim() -in $ValidPackages }) 
+    $PackageFilestoInstall = (Get-InputFileCSV -CSV "PackagestoInstall").where({ ($_.PackageName.Trim() -in $ValidPackages) -and (([string]::IsNullOrWhiteSpace($Line.Language)) -or  ($Line.Language -in $Script:GUIActions.Languages)) }) 
     
     $ValidOSPackages = @((($OSSources | select-object PackageName).PackageName -split ",").Trim() | Select-Object  -Unique)
     $OSFilestoInstall = (Get-InputFileCSV -CSV "OSFilestoInstall").where({ $_.PackageName -in $ValidOSPackages }) 
@@ -257,17 +251,20 @@ function Write-AmigaFilestoInterimDrive {
         } 
 
     }
-        
-    $ZFileNameCounter = 1
+    else {
 
-    $ZFileStagingFolder = join-pathMulti $Script:Settings.TempFolder "ZFileStaging" -UseFullPath
-
-    If (Test-Path $ZFileStagingFolder){
-        $null = Remove-Item $ZFileStagingFolder -Recurse -Force
-    }
-    $null = New-Item $ZFileStagingFolder -ItemType Directory
+        $ZFileNameCounter = 1
     
-    $ZfileLookupTable = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $ZFileStagingFolder = join-pathMulti $Script:Settings.TempFolder "ZFileStaging" -UseFullPath
+    
+        If (Test-Path $ZFileStagingFolder){
+            $null = Remove-Item $ZFileStagingFolder -Recurse -Force
+        }
+        $null = New-Item $ZFileStagingFolder -ItemType Directory
+        
+        $ZfileLookupTable = [System.Collections.Generic.List[PSCustomObject]]::new()
+
+    }    
    
     #foreach ($Line in ($OSFilestoInstall.where({$_.DecompressFile -eq "True"})) ){
 
@@ -280,7 +277,12 @@ function Write-AmigaFilestoInterimDrive {
         if ($InstallMediaType -eq "CD") { continue }
         $FileName = $SourceInfo.FileName
         If ($InstallMediaType -eq "Archive"){
-            $SourcePath = join-pathMulti $Script:Settings.WebPackagesDownloadLocation $FileName $Line.SourcePath -UseFullPath -ExtendedPrefix                 
+            If ([string]::IsNullOrWhiteSpace($Line.SourcePathMangled)){
+                $SourcePath = join-pathMulti $Script:Settings.WebPackagesDownloadLocation $FileName $Line.SourcePath -UseFullPath -ExtendedPrefix                                  
+            }
+            else {
+                $SourcePath = join-pathMulti $Script:Settings.WebPackagesDownloadLocation $FileName $Line.SourcePathMangled -UseFullPath -ExtendedPrefix                 
+            }
         }
         elseif ($InstallMediaType -eq "Disk"){
             If ([string]::IsNullOrWhiteSpace($Line.SourcePathMangled)){
@@ -306,12 +308,12 @@ function Write-AmigaFilestoInterimDrive {
                 ExtractedZFileSourcePath = $ExtractedZFileSourcePath
                 DestinationPath = $DestinationPath
             })
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $StagingDestinationPath -OriginalLinetoProcess $Line
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $StagingDestinationPath
             $ZFileNameCounter ++
         }
         else {
             #Write-host "SourcePath is: $SourcePath DestinationPath is: $DestinationPath"
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $Line
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath
         }
         If ($Line.ProtectionBits){
             $FileName = [System.IO.Path]::GetFileName($DestinationPath)
@@ -354,16 +356,33 @@ function Write-AmigaFilestoInterimDrive {
                 $null = [System.IO.Directory]::CreateDirectory($DestinationFolder)
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $ZFile
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath
         }
 
+    }
+
+    $RomstoCopy = $Script:GUIActions.FoundKickstarttoUse.where({$_.Status -eq "Found"})
+    $MainKickstart = $RomstoCopy.where({ -not ([string]::IsNullOrWhiteSpace($_.KickstartVersion)) })
+    
+    If ($Script:GUIActions.CreateCustomKickstart -eq $true){
+        $OutputFile = [System.IO.Path]::GetFileNameWithoutExtension($MainKickstart.Fat32Name)
+        $Script:GUIActions.CustomKickstartROMPath = Join-PathMulti $Script:Settings.InterimAmigaDrives "Emu68Boot" "$($OutputFile)_custom2mbROM.rom" -UseFullPath
+        $Script:Settings.CurrentSubTaskNumber ++
+        $Script:Settings.CurrentSubTaskName = "Creating custom Kickstart ROM"
+        Write-StartSubTaskMessage
+        $CapitolineScript = Get-CustomAmigaKickstartScript -KickstartRom $MainKickstart
+        if ((Write-CustomAmigaKickstart -Script $CapitolineScript) -eq $true){ 
+            $null = rename-Item $OutputRomPath "$($OutputRomPath).rom"
+        }
+        else {
+            $Script:GUIActions.CustomKickstartROMPath = $null
+        }
     }
 
     $Script:Settings.CurrentSubTaskNumber ++
     $Script:Settings.CurrentSubTaskName = "Copying Kickstart ROMS to FAT32 Interim Drive and Devs/Kickstarts"
     Write-StartSubTaskMessage
     
-    $RomstoCopy = $Script:GUIActions.FoundKickstarttoUse.where({$_.Status -eq "Found"})
 
     foreach ($ROM in $RomstoCopy){
         $SourcePath = $Rom.KickstartPath
@@ -375,7 +394,7 @@ function Write-AmigaFilestoInterimDrive {
                 $null = [System.IO.Directory]::CreateDirectory($DestinationFolder)
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }             
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $ROM
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath 
        
         }
         if (($Script:GUIActions.InstallOSFiles -eq $true) -and (-not [string]::IsNullOrWhiteSpace($ROM.WHDLoadName))){
@@ -387,7 +406,7 @@ function Write-AmigaFilestoInterimDrive {
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }
             #Write-host "SourcePath is: $SourcePath DestinationPath is: $DestinationPath"
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $ROM                 
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath                  
        }
     }    
 
@@ -477,13 +496,14 @@ function Write-AmigaFilestoInterimDrive {
             switch ($Line.SourceType) {
                 'Local - Files - Config.txt'{
                     Write-InformationMessage -Message "Preparing Config.txt" 
+                    $Fat32RomPath = if ($Script:GUIActions.CustomKickstartROMPath) { $Script:GUIActions.CustomKickstartROMPath } else { $Script:GUIActions.FoundKickstarttoUse.Where({$_.KickstartVersion}).Fat32Name }
                     if ($Script:GUIActions.EnableBupTest -eq $true -and $Script:GUIActions.Emu68VersionType -ne "Release"){
-                        $UpdatedConfig = Get-ConfigTXT -PathtoConfigTXT $Item.Source
-                        $UpdatedConfigNoBUPTEST = Get-ConfigTXT -PathtoConfigTXT $Item.Source -NoBuptest
+                        $UpdatedConfig = Get-ConfigTXT -PathtoConfigTXT $Item.Source -KickstartRomPath $Fat32RomPath
+                        $UpdatedConfigNoBUPTEST = Get-ConfigTXT -PathtoConfigTXT $Item.Source -NoBuptest -KickstartRomPath $Fat32RomPath
                         Export-TextFile -PC -DatatoExport $UpdatedConfigNoBUPTEST -ExportFile "$($Item.Destination).BAK" -AddLineFeeds
                     }                   
                     else {
-                        $UpdatedConfig = Get-ConfigTXT -PathtoConfigTXT $Item.Source -NoBuptest
+                        $UpdatedConfig = Get-ConfigTXT -PathtoConfigTXT $Item.Source -NoBuptest -KickstartRomPath $Fat32RomPath
                         #$UpdatedConfig = Get-ConfigTXT "C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Assets\AmigaFiles\EMU68Boot\config11.txt" -NoBuptest
                     }
                     Export-TextFile -PC -DatatoExport $UpdatedConfig -ExportFile $Item.Destination -AddLineFeeds
@@ -500,13 +520,13 @@ function Write-AmigaFilestoInterimDrive {
                     }
                 }
                 'Web - Github Emu68 Documentation'{
-                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination -OriginalLinetoProcess $Item
+                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination
                     if ([System.IO.Path]::GetExtension($Item.Destination) -eq ".html"){
                         Update-Emu68ImagerDocumentation -Emu68ImagerDocumentationPath $Item.Destination                   
                     }
                 }
                 default {
-                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination -OriginalLinetoProcess $Item
+                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination
                     If ($Item.ProtectionBits){
                         $FileName = [System.IO.Path]::GetFileName($Item.Destination)
                         $ProtectionBits = $Item.ProtectionBits.ToUpperInvariant()
@@ -604,12 +624,110 @@ function Write-AmigaFilestoInterimDrive {
     $Script:Settings.CurrentSubTaskName = "Modifying icons and infotypes"
     Write-StartSubTaskMessage
 
+    $IconTempDestinationPath = Join-PathMulti $Script:Settings.TempFolder "IconFiles" -UseFullPath
+
+    if (Test-Path -Path $IconTempDestinationPath -PathType Container) {
+        Remove-Item -Path $IconTempDestinationPath -Force -Recurse -ErrorAction SilentlyContinue
+    }
+    $null = New-Item $IconTempDestinationPath -ItemType Directory -Force
+    
+    $IconsPathHash = @{}
+    
+    foreach ($item in Get-IconPaths) {
+        $IconsPathHash[$item.IconType] = $item
+    }
+
+
+
+    $DiskIconsToAddFAT32 = if ($FAT32Partitions) {
+        $FAT32Partitions | Select-Object @{ Name = 'IconType'; Expression = { 'Emu68BootDisk' } }, VolumeName
+    }
+    $DiskIconsToAddAmiga = if ($RDBPartitions) {
+        $RDBPartitions | Select-Object @{
+            Name       = 'IconType'
+            Expression = { if ($_.DefaultAmigaWorkbenchPartition) { 'SystemDisk' } else { 'WorkDisk' } }
+        }, VolumeName
+    }
+    $FolderIconToAdd = [pscustomobject]@{
+        IconType   = 'NewFolder'
+        VolumeName = 'NewFolder'
+    }
+
+    $CombinedDiskAndFolderIcons = @(
+        $DiskIconsToAddFAT32
+        $DiskIconsToAddAmiga
+        $FolderIconToAdd
+    ) | Where-Object { $_ -ne $null }
+
+
+    $DiskIconPositionsHash = @{}
+    
+    Foreach ($item in (Get-DiskIconPositions -ListofDisks ($CombinedDiskandFolderIconstoAdd.VolumeName).where({$_ -ne "NewFolder"}))){
+        $DiskIconPositionsHash[$item.Volume] = $item        
+    }
+
+    foreach ($icon in $CombinedDiskAndFolderIcons) {
+        $iconConfig = $IconsPathHash[$icon.IconType]
+        $IconPositions = $DiskIconPositionsHash[$icon.VolumeName]
+        $InstallMediaType = $iconConfig.InstallMedia
+        $FilesToInstall = $iconConfig.FilestoInstall
+        $OldFileName  = Split-Path $FilesToInstall -Leaf
+        $FileName = $(if ($iconConfig.NewFileName) { $iconConfig.NewFileName } else { $OldFileName }).ToLowerInvariant()
+        $VolumeName = if ($icon.VolumeName -eq "Workbench") { "System" } else { $icon.VolumeName }
+        if ($InstallMediaType -eq 'CD'){
+            $SourcePathtoUse = $FilesToInstall
+        }
+        else {
+            $SourcePathtoUse = Join-PathMulti $Script:Settings.ADFTemporaryFiles $iconConfig.Source $FilesToInstall -UseFullPath
+        }
+        if ($icon.IconType -eq "NewFolder"){
+            $DestinationPathToUse = Join-PathMulti $Script:Settings.TempFolder "IconFiles" $DestinationPathFolder $FileName -UseFullPath 
+            $IconPositions = $null
+        }
+        else {
+            $IconPositions = $DiskIconPositionsHash[$icon.VolumeName]            
+            $DestinationPathToUse = Join-PathMulti $Script:Settings.InterimAmigaDrives $VolumeName $FileName -UseFullPath
+        }
+        #Write-Host "SourcePath is: $SourcePathtoUse Destination Path is: $DestinationPathToUse"
+        if ($InstallMediaType -eq 'CD'){
+            [ISOExtractor]::ExtractExplicitFiles($iconConfig.InstallMediaPath,$SourcePathtoUse,$DestinationPathToUse)            
+        }
+        else {
+            $null = Copy-Item $SourcePathtoUse $DestinationPathToUse -Force -Recurse 
+        }
+        if ($IconPositions){
+
+        }
+    }
+     
+    $icon = [AmigaIconKit.AmigaIconEngine]::ReadIcon("C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Temp\InterimAmigaDrives\EMU68BOOT\disk.info")
+
+  
+
+
+
+
+
+#######################
+    $IconTempDestinationPath = Join-pathMulti $Script:Settings.TempFolder "IconFiles" -UseFullPath 
+    
+    if (Test-Path -Path $IconTempDestinationPath -PathType Container){
+        Remove-Item -Path  $IconTempDestinationPath -Force -recurse -ErrorAction SilentlyContinue
+    }
+    
+    $null = New-Item $IconTempDestinationPath -ItemType Directory -Force
+
+    $IconsPathHash = @{}
+
+    foreach ($item in Get-IconPaths) {
+        $IconsPathHash[$item.IconType] = $item
+    }
+
     $DiskIconstoAddFAT32 = $FAT32Partitions | Select-Object @{
         Name = 'IconType'
         Expression = { if ($_.DefaultGPTMBRPartition -eq $true) { "Emu68BootDisk" } else { "Emu68BootDisk" } }
     }, VolumeName
    
-
     $DiskIconstoAddAmiga = $RDBPartitions | Select-Object @{
         Name = 'IconType'
         Expression = { if ($_.DefaultAmigaWorkbenchPartition -eq $true) { "SystemDisk" } else { "WorkDisk" } }
@@ -622,40 +740,15 @@ function Write-AmigaFilestoInterimDrive {
         }
     )
     
-    $CombinedDiskIconstoAdd = @(
-        if ($null -ne $DiskIconstoAddFAT32) { $DiskIconstoAddFAT32 }
-        if ($null -ne $DiskIconstoAddAmiga) { $DiskIconstoAddAmiga }
-        if ($null -ne $FolderIconsToAdd) { $FolderIconsToAdd }
-    )
+    $CombinedDiskandFolderIconstoAdd = @(
+        $DiskIconstoAddFAT32
+        $DiskIconstoAddAmiga
+        $FolderIconToAdd
+    ) | Where-Object { $_ -ne $null }
+        
 
-    $IconsPathHash = @{}
-
-    $IconTempDestinationPath = Join-pathMulti $Script:Settings.TempFolder "IconFiles" -UseFullPath 
-
-    if (Test-Path -Path $IconTempDestinationPath -PathType Container){
-        Remove-Item -Path  $IconTempDestinationPath -Force -recurse -ErrorAction SilentlyContinue
-    }
-    $null = New-Item $IconTempDestinationPath -ItemType Directory -Force
-
+    $DiskIconPositions = Get-DiskIconPositions -ListofDisks ($CombinedDiskandFolderIconstoAdd.VolumeName).where({$_ -ne "NewFolder"})
     
-    (Get-IconPaths).foreach({
-        $IconsPathHash[$_.IconType] = [PSCustomObject]@{  
-            Source  =  $_.Source
-            SourceLocation =  $_.SourceLocation   
-            InstallMedia  =  $_.InstallMedia   
-            FilestoInstall =  $_.FilestoInstall  
-            ModifyInfoFileType =$_.ModifyInfoFileType
-            NewFileNameFlag  = $_.NewFileNameFlag
-            InstallMediaPath  = $_.InstallMediaPath
-            NewFileName =    $_.NewFileName
-            
-        } 
-    })
-    
-    $Script:GUICurrentStatus.HSTAmigaCommandstoProcess.UpdateDefaultIcons = [System.Collections.Generic.List[PSCustomObject]]::New()
-
-    $CDFileExtractionMap = [System.Collections.Generic.List[PSCustomObject]]::new()
-
     $CombinedDiskIconstoAdd.ForEach({
         $InstallMediaType = $IconsPathHash[$_.IconType].InstallMedia
         $IconType = $_.IconType
@@ -675,7 +768,16 @@ function Write-AmigaFilestoInterimDrive {
             else {
                 "ERROR" 
             }
-        )
+            )
+        })
+
+        
+
+
+
+        $CDFileExtractionMap = [System.Collections.Generic.List[PSCustomObject]]::new()
+
+
         If ($IconType -eq "NewFolder"){
             $DestinationPathFolder = Join-pathMulti $Script:Settings.TempFolder "IconFiles" -UseFullPath 
             if (Test-Path -Path $DestinationPathFolder -PathType Container){
@@ -697,7 +799,7 @@ function Write-AmigaFilestoInterimDrive {
         }
         else {
             #Write-host "Source: $SourcePathtoUse Destination: $DestinationPathToUse"
-            Copy-FileEmu68Imager -SourcePath $SourcePathtoUse -DestinationPath $DestinationPathToUse -OriginalLinetoProcess $_
+            $null = Copy-Item $SourcePathtoUse $DestinationPathToUse -Force -Recurse 
         }
         If ($IconsPathHash[$_.IconType].ModifyInfoFileType){
             $Script:GUICurrentStatus.HSTAmigaCommandstoProcess.UpdateDefaultIcons.Add([PSCustomObject]@{
@@ -707,7 +809,6 @@ function Write-AmigaFilestoInterimDrive {
            })
 
         }
-    })
 
     if ($CDFileExtractionMap) {
         $CDGroupedFiles = $CDFileExtractionMap | Group-Object -Property FullPath
@@ -723,17 +824,21 @@ function Write-AmigaFilestoInterimDrive {
     $Script:GUICurrentStatus.HSTAmigaCommandstoProcess.AdjustIcons = [System.Collections.Generic.List[PSCustomObject]]::New()
 
     $DiskIconPositions = Get-DiskIconPositions -ListofDisks ($CombinedDiskIconstoAdd.VolumeName).where({$_ -ne "NewFolder"})
-    $IconPositions = @(Get-InputFileCSV -CSV 'IconPositions')
 
-    $IconPositions.foreach({
-        $FilePath = join-pathmulti $Script:Settings.InterimAmigaDrives $_.Drive $_.file.replace("/","\") -UseFullPath
-        if (Test-path -Path $FilePath){
-            $Script:GUICurrentStatus.HSTAmigaCommandstoProcess.AdjustIcons.Add([PSCustomObject]@{
-                Command = (Get-ToolTypeCommands -FilePath $FilePath -Type $_.type -IconX $_.IconX -IconY $_.IconY -DrawerX $_.DrawerX -DrawerY $_.DrawerY -DrawerWidth $_.DrawerWidth -DrawerHeight $_.DrawerHeight)
-                Sequence = 1
-            })
-        }   
-    })
+
+
+
+    #$IconPositions = @(Get-InputFileCSV -CSV 'IconPositions')
+
+    # $IconPositions.foreach({
+    #     $FilePath = join-pathmulti $Script:Settings.InterimAmigaDrives $_.Drive $_.file.replace("/","\") -UseFullPath
+    #     if (Test-path -Path $FilePath){
+    #         $Script:GUICurrentStatus.HSTAmigaCommandstoProcess.AdjustIcons.Add([PSCustomObject]@{
+    #             Command = (Get-ToolTypeCommands -FilePath $FilePath -Type $_.type -IconX $_.IconX -IconY $_.IconY -DrawerX $_.DrawerX -DrawerY $_.DrawerY -DrawerWidth $_.DrawerWidth -DrawerHeight $_.DrawerHeight)
+    #             Sequence = 1
+    #         })
+    #     }   
+    # })
 
     $DiskIconPositions.foreach({
         $Drive = if ($_.Volume -eq "Workbench") {"System"} else {$_.Volume }
@@ -835,6 +940,27 @@ function Write-AmigaFilestoInterimDrive {
     }
     [System.IO.File]::WriteAllBytes($WBConfigPrefsFile, $WBConfigPrefsToWrite)
 
+    Write-InformationMessage -Message "Generating P96 Settings"
+    
+    $P96SettingsPath = Join-PathMulti InterimAmigaDrives $Script:Settings.InterimAmigaDrives "System" "Devs" "Picasso96Settings"
+    
+    If ($Script:GUICurrentStatus.Picasso96UserFiles){
+        $P96Version = "3.x" 
+        $Alternate96Version = "2.x"
+        $AlternativeP96SettingsPath = "$($P96SettingsPath)_P96v3"         
+    }
+    else {
+        $P96Version = "2.x" 
+        $Alternate96Version = "3.x"
+        $AlternativeP96SettingsPath = "$($P96SettingsPath)_P96v2"      
+    }
+    
+    $P96Settings = Get-P96Settings -Resolutions $Script:GUIActions.SelectedP96Resolutions -GlobalRefreshRate 60 -BaseDisplayID 0x50001000 -P96Version $P96Version
+    $P96AlternateSettings = Get-P96Settings -Resolutions $Script:GUIActions.SelectedP96Resolutions -GlobalRefreshRate 60 -BaseDisplayID 0x50001000 -P96Version $Alternate96Version
+    
+    Export-P96Settings -P96Object $P96Settings -Path $P96SettingsPath
+    Export-P96Settings -P96Object $P96AlternateSettings -Path $AlternativeP96SettingsPath 
+
     write-informationMessage -Message "Setting ScreenMode.prefs"
     
     $ScreenModePrefsFile = join-pathMulti $Script:Settings.InterimAmigaDrives "System" "Prefs" "Env-Archive" "Sys" "ScreenMode.prefs" -UseFullPath
@@ -842,15 +968,23 @@ function Write-AmigaFilestoInterimDrive {
 
     $null = Copy-Item -Path $ScreenModePrefsFile -Destination $ScreenModePrefsFileUser
     
-    $ScreenModePrefsToWrite = Get-ScreenModePrefs -SourcePath $ScreenModePrefsFile -ScreenMode $Script:GUIActions.ScreenModetoUseWB -ColourDepth $Script:GUIActions.ScreenModeWBColourDepth 
-    [System.IO.File]::WriteAllBytes($ScreenModePrefsFileUser, $ScreenModePrefsToWrite)
-    
     if ($Script:GUIActions.ScreenModeType -eq "RTG"){
+        if ($Script:GUIActions.ScreenModetoUseWB.replace("VideoCore:","") -match '^(?<Width>\d+)x(?<Height>\d+)') {
+            $Width = [int]$Matches.Width
+            $Height = [int]$Matches.Height
+        }       
+        $ModeIDRTG = "{0:X}" -f (($P96Settings.Resolutions.Where({ $_.Width -eq $Width -and $_.Height -eq $Height })).DisplayID + 3)
+        $ScreenModePrefsToWrite = Get-ScreenModePrefs -SourcePath $ScreenModePrefsFile -ScreenMode $ModeIDRTG -ColourDepth $Script:GUIActions.ScreenModeWBColourDepth 
+        [System.IO.File]::WriteAllBytes($ScreenModePrefsFileUser, $ScreenModePrefsToWrite)           
         $UAEScreenmodetoUse = $Script:GUIActions.AvailableScreenModesWB.where({ $_.FriendlyName -eq $Script:GUIActions.ScreenModetoUseWB }).UAERTGMode
         $ScreenModePrefsFileUAE = "$ScreenModePrefsFile.UAE"
         $null = Copy-Item -Path $ScreenModePrefsFile -Destination $ScreenModePrefsFileUAE
         $ScreenModePrefsToWrite = Get-ScreenModePrefs -SourcePath $ScreenModePrefsFileUAE -ModeID $UAEScreenmodetoUse -ColourDepth $Script:GUIActions.ScreenModeWBColourDepth 
         [System.IO.File]::WriteAllBytes($ScreenModePrefsFileUAE, $ScreenModePrefsToWrite)            
+    }
+    else {
+        $ScreenModePrefsToWrite = Get-ScreenModePrefs -SourcePath $ScreenModePrefsFile -ScreenMode $Script:GUIActions.ScreenModetoUseWB -ColourDepth $Script:GUIActions.ScreenModeWBColourDepth 
+        [System.IO.File]::WriteAllBytes($ScreenModePrefsFileUser, $ScreenModePrefsToWrite)        
     }
     
     $EnvarcScreenModeChipsetPath = join-pathMulti $Script:Settings.InterimAmigaDrives "System" "Prefs" "Env-Archive" "ScreenModeChipset"
@@ -891,8 +1025,8 @@ function Write-AmigaFilestoInterimDrive {
         if ($Folder.CreateInfoFile -eq $true){
             $DestinationPath = "$DestinationFolder.info"
             if (-not (Test-Path $DestinationPath)){
-                $SourcePath = Join-PathMulti $Script:Settings.TempFolder "IconFiles" "NewFolder.info"
-                Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $Folder  
+                $SourcePath = Join-PathMulti $Script:Settings.TempFolder "IconFiles" "NewFolder.info"  
+                $null = Copy-Item $SourcePath $DestinationPath           
             }
         }
 

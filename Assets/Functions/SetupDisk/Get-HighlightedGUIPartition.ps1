@@ -33,7 +33,7 @@ function Get-HighlightedGUIPartition {
                 $PartitionInformationtoReturn.PartitionName = $Partition.PartitionName
                 $PartitionInformationtoReturn.PartitionType = $Partition.PartitionType
                 $PartitionInformationtoReturn.PartitionSubType = $Partition.PartitionSubType
-                if ($Partition.PartitionType -eq 'MBR'){
+                if (($Partition.PartitionType -eq 'MBR') -or ($Partition.PartitionType -eq 'GPT')){
                     $PartitionInformationtoReturn.DiskName = 'WPF_DP_Disk_GPTMBR'
                 }
                 elseif ($Partition.PartitionType -eq 'Amiga'){
@@ -55,12 +55,12 @@ function Get-HighlightedGUIPartition {
     }
     else{
         foreach ($Partition in $PartitionDetails) {
-            if (($Partition.PartitionType -eq 'MBR') -or (($Script:GUICurrentStatus.SelectedGPTMBRPartition) -and $Partition.PartitionType -eq 'Amiga' -and  $Partition.PartitionName -match $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionName)){
+            if (($Partition.PartitionType -eq 'MBR' -or $Partition.PartitionType -eq 'GPT') -or (($Script:GUICurrentStatus.SelectedGPTMBRPartition) -and $Partition.PartitionType -eq 'Amiga' -and  $Partition.PartitionName -match $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionName)){
                 if ($MouseY -ge $Partition.TopMarginWindow -and $MouseY -le $Partition.BottomMarginWindow -and $MouseX -ge $Partition.LeftMarginWindow -and $MouseX -le $Partition.RightMarginWindow){
                         $PartitionInformationtoReturn.Partition = $Partition.Partition
                         $PartitionInformationtoReturn.PartitionName = $Partition.PartitionName
                         $PartitionInformationtoReturn.PartitionType = $Partition.PartitionType
-                        if ($Partition.PartitionType -eq 'MBR'){
+                        if (($Partition.PartitionType -eq 'MBR') -or ($Partition.PartitionType -eq 'GPT')){
                             $PartitionInformationtoReturn.DiskName = 'WPF_DP_Disk_GPTMBR'
                         }
                         elseif ($Partition.PartitionType -eq 'Amiga'){

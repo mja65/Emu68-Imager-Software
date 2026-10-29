@@ -6,7 +6,6 @@ $WPF_PackageSelection_ResettoDefault.Add_Click({
                 $Script:GUIActions.FoundInstallMediatoUse = $null
             }
             $Script:GUIActions.DefaultPackagesSelected = $true
-            $Script:GUICurrentStatus.PackagesChanged = $false
         }
         Update-UI -PackageSelectionWindow -Emu68Settings
         Get-SelectablePackages -PackagesOnly

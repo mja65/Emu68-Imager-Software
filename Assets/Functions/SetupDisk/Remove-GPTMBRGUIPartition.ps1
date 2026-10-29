@@ -1,4 +1,4 @@
-function Remove-MBRGUIPartition {
+function Remove-GPTMBRGUIPartition {
     param (
         $Partition
     )
@@ -7,7 +7,7 @@ function Remove-MBRGUIPartition {
         return $false
     }
     else{
-        $WPF_DP_Disk_GPTMBR.NumberofPartitionsMBR -= 1   
+        $WPF_DP_Disk_GPTMBR.NumberofPartitionsGPTMBR -= 1   
         $WPF_DP_DiskGrid_GPTMBR.Children.Remove($Partition)
         Remove-Variable -Scope Script -Name $Partition.PartitionName
         $WPF_DP_DiskGrid_GPTMBR.UpdateLayout()

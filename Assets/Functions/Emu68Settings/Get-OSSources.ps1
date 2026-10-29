@@ -3,11 +3,6 @@ function Get-OSSources {
     )
     
     $InstallMediaDescriptions = @{}
-    $PackageStatus = @{}
-
-    $MangledADFLookup = @(
-        (Get-InputFileCSV -CSV 'OSSources').Where({ $_.ADFUseMangledNames -eq $true }).SourceLocation | Select-Object -Unique
-    )
 
     if ($Script:GUICurrentStatus.AvailablePackagesNeedingGeneration -eq "TRUE"){
         Get-SelectablePackages
@@ -22,33 +17,10 @@ function Get-OSSources {
         $InstallMediaDescriptions[$_.ADF_Name] = $_.FriendlyName
     }
     
-    
     $PackagesList = (Get-InputFileCSV -CSV 'Packages').where({ $_.PackageType -in @("OS","Selectable OS","Selectable OS - DefaultInstall") })
     
-    $PackagesList.foreach({
-        $Status = $false
-        If ($_.PackageType -eq "OS") {
-            $Status = $true
-        }
-        $PackageStatus[$_.PackageName] = [PSCustomObject]@{       
-            PackageType = $_.PackageType 
-            PackageSelected = $Status
-        }                
-    }) 
-
-   $Script:GUIActions.AvailablePackages.DefaultView | ForEach-Object {
-        if ($PackageStatus[$_.PackageName] -and $_.PackageNameUserSelected -eq $true) {
-            $PackageStatus[$_.PackageName].PackageSelected = $_.PackageNameUserSelected       
-        }
-    }
-
-    if ($Script:GUIActions.SelectedIconSet){
-        $IconsettoUse = $Script:GUIActions.SelectedIconSet
-    }
-    else {
-        $IconsettoUse = ((Get-InputFileCSV -CSV 'IconSets') | Where-Object {  $_.IconsDefaultInstall -eq $true}).Iconset
-    }
-    
+    $IconsettoUse = $Script:GUIActions.SelectedIconSet
+   
     $MatchedIconSet = @(Get-InputFileCSV -CSV 'IconSets').Where({ $_.Iconset -eq $IconsettoUse })
       
     $IconSources = @(
@@ -60,21 +32,17 @@ function Get-OSSources {
         }) | Select-Object -Property 'PackageName', 'SourceLocation', 'SourceType', 'CDParent', 'PackageSelected','ArchiveinArchiveName','ArchiveinArchivePassword' -Unique
     )    
         
-    $OSSources = (Get-InputFileCSV -CSV 'OSSources') | Select-Object 'PackageName','SourceLocation','SourceType','CDParent','PackageSelected','ArchiveinArchiveName','ArchiveinArchivePassword' -Unique
-
+    $OSSources = (Get-InputFileCSV -CSV 'OSSources') | Where-Object { -not $_.Language -or $_.Language -in $Script:GUIActions.Languages }| Select-Object 'PackageName','SourceLocation','SourceType','CDParent','PackageSelected','ArchiveinArchiveName','ArchiveinArchivePassword','Language'  -Unique
+   
     $TotalSources = [System.Collections.Generic.List[PSCustomObject]]::new()
     
     Foreach ($Source in ($IconSources + $OSSources)) {
         $InstallMediaFriendlyName = $InstallMediaDescriptions[$Source.SourceLocation]
-        $ADFUseMangledNames = if ($Source.SourceLocation -in $MangledADFLookup) { $true } else { $false }
-        $PackageSelected = $PackageStatus[$Source.PackageName].PackageSelected   
-        If (-not $PackageSelected -eq $true) {continue}
         $TotalSources.Add([PSCustomObject]@{
             PackageName    = $Source.PackageName
             SourceType     = $Source.SourceType
             CDParent = $(If ($Source.CDParent) {($Source.CDParent.ToUpperInvariant())} else {""})
             SourceLocation = $Source.SourceLocation
-            ADFUseMangledNames = $ADFUseMangledNames
             ArchiveinArchiveName = $Source.ArchiveinArchiveName
             ArchiveinArchivePassword = $Source.ArchiveinArchivePassword
             InstallMediaFriendlyName  = $InstallMediaFriendlyName

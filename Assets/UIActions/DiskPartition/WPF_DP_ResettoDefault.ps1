@@ -5,13 +5,6 @@ $WPF_DP_ResettoDefault.Add_Click({
        
         if ((Show-WarningorError -Msg_Header $Msg_Header -Msg_Body $Msg_Body -BoxTypeWarning -ButtonType_OKCancel) -eq 'OK'){
             
-            # if ($Script:GUIActions.InstallOSFiles -eq $true){
-
-            # }
-            # else {
-                
-            # }
-
             $Script:GUICurrentStatus.SelectedAmigaPartition = $null
             $Script:GUICurrentStatus.SelectedGPTMBRPartition = $null
             $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = $null
@@ -55,7 +48,8 @@ $WPF_DP_ResettoDefault.Add_Click({
                 $Script:GUIActions.UnicamSizeX = $null
                 $Script:GUIActions.UnicamSizeY = $null
                 $Script:GUIActions.UnicamOffsetX = $null
-                $Script:GUIActions.UnicamOffsetY = $null                  
+                $Script:GUIActions.UnicamOffsetY = $null            
+                $Script:GUIActions.CreateCustomKickstart = $false      
                 $Script:GUIActions.WorkbenchBackDropEnabled = $false
                 $Script:GUIActions.ScreenModeType = "Native"
                 $Script:GUIActions.AvailableScreenModesWB = (Get-InputFileCSV -CSV 'ScreenModesWB')

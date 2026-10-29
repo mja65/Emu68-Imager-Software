@@ -97,18 +97,18 @@ function Set-PartitionGridActions {
                             }        
                         }
     
-                        elseif (($Script:GUICurrentStatus.ActionToPerform -eq 'MBR_ResizeFromRight') -or ($Script:GUICurrentStatus.ActionToPerform -eq 'MBR_ResizeFromLeft')) {
+                        elseif (($Script:GUICurrentStatus.ActionToPerform -eq 'GPTMBR_ResizeFromRight') -or ($Script:GUICurrentStatus.ActionToPerform -eq 'GPTMBR_ResizeFromLeft')) {
                             $WPF_Partition.Cursor = "SizeWE"
                             # Write-debug "Amount to Resize:$AmounttoMove"
-                            if ((Set-GUIPartitionNewSize -ResizePixels -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition -ActiontoPerform $Script:GUICurrentStatus.ActionToPerform -PartitionType 'MBR' -SizePixelstoChange $AmounttoMove) -eq $false){
+                            if ((Set-GUIPartitionNewSize -ResizePixels -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition -ActiontoPerform $Script:GUICurrentStatus.ActionToPerform -PartitionType $Script:GUIActions.DiskType -SizePixelstoChange $AmounttoMove) -eq $false){
                 
                             }
                         }
     
-                        elseif ($Script:GUICurrentStatus.ActionToPerform -eq 'MBR_Move'){
+                        elseif ($Script:GUICurrentStatus.ActionToPerform -eq 'GPTMBR_Move'){
                             $WPF_Partition.Cursor = "Hand"
                             # Write-debug "Amount to Move:$AmounttoMove"                  
-                            if ((Set-GUIPartitionNewPosition -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition -AmountMovedPixels $AmounttoMove -PartitionType 'MBR') -eq $false){
+                            if ((Set-GUIPartitionNewPosition -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition -AmountMovedPixels $AmounttoMove -PartitionType $Script:GUIActions.DiskType) -eq $false){
                                 # Write-debug "Cannot Move!"
                             }       
                         }
@@ -148,14 +148,14 @@ function Set-PartitionGridActions {
             $Script:GUICurrentStatus.MousePositionYatTimeofPress = $MouseCoordinates.MousePositionRelativetoWindowY
             #Write-debug "X (At time of Button press):$($Script:GUICurrentStatus.MousePositionXatTimeofPress) Y (At time of Button press):$($Script:GUICurrentStatus.MousePositionYatTimeofPress)"                                
             if ($Script:GUICurrentStatus.PartitionHoveredOver){
-                if ($Script:GUICurrentStatus.PartitionHoveredOver.PartitionType -eq 'MBR'){
+                if ($Script:GUICurrentStatus.PartitionHoveredOver.PartitionType -eq 'MBR' -or $Script:GUICurrentStatus.PartitionHoveredOver.PartitionType -eq 'GPT'){
 
                     if ($Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionName -eq $Script:GUICurrentStatus.PartitionHoveredOver.PartitionName){
                         if ($Script:GUICurrentStatus.PartitionHoveredOver.ResizeZone){
-                            $Script:GUICurrentStatus.ActionToPerform = "MBR_$($Script:GUICurrentStatus.PartitionHoveredOver.ResizeZone)"
+                            $Script:GUICurrentStatus.ActionToPerform = "GPTMBR_$($Script:GUICurrentStatus.PartitionHoveredOver.ResizeZone)"
                         }
                         else {
-                            $Script:GUICurrentStatus.ActionToPerform = 'MBR_Move' 
+                            $Script:GUICurrentStatus.ActionToPerform = 'GPTMBR_Move' 
                         }
                         #Write-debug $Script:GUICurrentStatus.ActionToPerform                      
                     } 

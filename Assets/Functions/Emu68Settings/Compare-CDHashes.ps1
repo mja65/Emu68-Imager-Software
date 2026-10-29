@@ -51,146 +51,79 @@ in your install path for the tool and select this path to scan.
         $ListofADFFilestoCheck = $ListofADFFilestoCheck |  Where-Object {$_.DirectoryName -eq $PathtoADFFiles.TrimEnd('\')} 
     }
 
-    # | Where-object {$_.SourceType -in @('Archive','CD')}
 
     $RequiredInstallMedia = Get-OSSources | Select-Object SourceLocation, InstallMediaFriendlyName, @{
         Name = 'SourceType'
         Expression = { if ($_.SourceType -eq 'ArchiveInArchive') { 'Archive' } else { $_.SourceType } }
     } -Unique
 
-    $RequiredInstallMediaandHashes = @{}
 
-    (Get-InputFileCSV -CSV 'InstallMediaHashes').where{($Script:GUIActions.KickstartVersiontoUse -in $_.WorkbenchVersion.Split(',').Trim())}.foreach({
-        $Check = $null
-        If ($_.TypeofCheck -eq "Hash"){
-            $Check = "Hash;$($_.Hash)"
-        }    
-        elseIf ($_.TypeofCheck -eq "FileCheck"){
-            $Check = "FileCheck;$($_.FileCheckDetails)"            
-        }          
-        $RequiredInstallMediaandHashes[$Check] = [PSCustomObject]@{       
-            Sequence = $_.Sequence
-            ADF_Name = $_.ADF_Name
-            FriendlyName = $_.FriendlyName
-            TypeofCheck = $_.TypeofCheck
-            InstallMedia = $_.InstallMedia
-            Hash = $_.Hash
-            FilesChecked = $_.FilesChecked
-            FileCheckDetails = $_.FileCheckDetails
-            ADFSource = $_.ADFSource            
-        }          
-    })
-
-    $CDFileSearch = @()
-    
-    ((Get-InputFileCSV -CSV 'InstallMediaHashes').where{($Script:GUIActions.KickstartVersiontoUse -in $_.WorkbenchVersion.Split(',').Trim())}).foreach({
-        if ($_.TypeofCheck -eq "FileCheck"){
-            $7zStringtoUse = $null
-            for ($i = 0; $i -lt ($_.FilesChecked -split ',').count; $i++) {
-                $7zStringtoUse += "`"-ir!$(($_.FilesChecked -split ',')[$i])`" "
-            }                          
-            $CDFileSearch += $7zStringtoUse                
-                         
-        }
-    })
+    $RequiredInstallMediaandHashes = (Get-InputFileCSV -CSV 'InstallMediaHashes').where{($Script:GUIActions.KickstartVersiontoUse -in $_.WorkbenchVersion.Split(',').Trim())}
     
     $CDFilestoCheck = $ListofADFFilestoCheck.where({$_.Name -match '.iso'})   
-    $MatchedInstallMedia = [System.Collections.Generic.List[PSObject]]::new()
+    $ArchivestoCheck = $ListofADFFilestoCheck.where({$_.Name -match '.lha'})
 
-    :Cdloop Foreach ($CD in $CDFilestoCheck) {
-        $FileName = $CD.FullName
-        foreach ($CommandString in $CDFileSearch) {
-            $FileCheckTest = & $Script:ExternalProgramSettings.SevenZipFilePath l $filename ($CommandString.Split(' '))     
-            $LinetoCheck= $FileCheckTest[$FileCheckTest.Count-1]
-            if ($LinetoCheck -match '^(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})?\s*(\d+)\s+(\d+)\s+(\d+)\s+files') {
-                $OutputLine = "$($matches[1]),$($matches[2]),$($matches[3])"
-                if ($RequiredInstallMediaandHashes["FileCheck;$OutputLine"]){
-                    $FoundCD = [PSCustomObject]@{
-                        Hash = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].Hash
-                        Path = $FileName 
-                        ADF_Name = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].ADF_Name
-                        FriendlyName = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].FriendlyName
-                        InstallMedia = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].InstallMedia
-                        Source = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].ADFSource    
-                        IsMatched = $true    
-#                       Sequence = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].Sequence
-#                       TypeofCheck = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].TypeofCheck
-#                       FilesChecked = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].FilesChecked
-#                       FileCheckDetails = $RequiredInstallMediaandHashes["FileCheck;$OutputLine"].FileCheckDetails
-                    }
-                    If ($RequiredInstallMediaandHashes["FileCheck;$OutputLine"].Sequence -eq 1){
-                        break CDLoop
-                    }
+    
+    $MatchedInstallMedia = [System.Collections.Generic.List[PSCustomObject]]::new()
+
+    Foreach ($RequiredItem in $RequiredInstallMediaandHashes) {
+        If ($RequiredItem.TypeofCheck -eq "FileCheck"){
+            $FilestoCheck = $RequiredItem.FilesChecked.Split(",")
+            $FileDetails  = $RequiredItem.FileCheckDetails.Split(",")
+            $FileSizeTotal = [long]$FileDetails[0]
+            $FileCount     = [int]$FileDetails[2]
+            Foreach ($CD in $CDFilestoCheck) {
+                $FileName = $CD.FullName
+                $FilesonCD = [ISOExtractor]::GetEntries($FileName)
+                $ItemsFound = $FilesonCD | Where-Object { $_.Path -in $FilestoCheck }
+                $SizeofItemsFound = ($ItemsFound.Size | ForEach-Object { [int]$_ } | Measure-Object -Sum).Sum
+                $NumberofItemsFound = $ItemsFound.Count 
+                if ($NumberofItemsFound -eq $FileCount -and $SizeofItemsFound -eq $FileSizeTotal){
+                    $MatchedInstallMedia.Add([PSCustomObject]@{
+                        Path         = $FileName 
+                        Hash         = "N/A - Matched through files"
+                        ADF_Name     = $RequiredItem.ADF_Name
+                        FriendlyName = $RequiredItem.FriendlyName
+                        InstallMedia = $RequiredItem.InstallMedia
+                        Source       = $RequiredItem.ADFSource 
+                        IsMatched    = $true
+                    })
+                    break # Exit inner loop immediately once matched
                 }
             }
         }
-        $FileHash = (Get-FileHash -LiteralPath $FileName -Algorithm MD5).Hash.ToUpperInvariant()
-        if (($RequiredInstallMediaandHashes["Hash;$FileHash"]) -and ($RequiredInstallMediaandHashes["Hash;$FileHash"].Sequence -gt $MatchedLine.Sequence)){
-            $FoundCD = [PSCustomObject]@{
-                Hash = $FileHash
-                Path = $FileName 
-                ADF_Name = $RequiredInstallMediaandHashes["Hash;$FileHash"].ADF_Name
-                FriendlyName = $RequiredInstallMediaandHashes["Hash;$FileHash"].FriendlyName
-                InstallMedia = $RequiredInstallMediaandHashes["Hash;$FileHash"].InstallMedia
-                Source = $RequiredInstallMediaandHashes["Hash;$FileHash"].ADFSource 
-                IsMatched = $true      
-#               Sequence = $RequiredInstallMediaandHashes["Hash;$FileHash"].Sequence
-#               TypeofCheck = $RequiredInstallMediaandHashes["Hash;$FileHash"].TypeofCheck
-#               FilesChecked = $null
-#               FileCheckDetails = $null
+        elseif ($RequiredItem.TypeofCheck -eq "Hash"){
+            Foreach ($Archive in $ArchivestoCheck) {
+                $FileName = $Archive.FullName
+                $FileHash = (Get-FileHash -LiteralPath $FileName -Algorithm MD5).Hash.ToUpperInvariant()   
+                If ($RequiredItem.Hash -eq $FileHash){
+                    $MatchedInstallMedia.Add([PSCustomObject]@{
+                        Path         = $FileName 
+                        Hash         = $RequiredItem.Hash
+                        ADF_Name     = $RequiredItem.ADF_Name
+                        FriendlyName = $RequiredItem.FriendlyName
+                        InstallMedia = $RequiredItem.InstallMedia
+                        Source       = $RequiredItem.ADFSource 
+                        IsMatched    = $true
+                    })
+                    break # Exit inner loop immediately once matched
+                }
             }
-            If ($RequiredInstallMediaandHashes["Hash;$FileHash"].Sequence -eq 1){
-                break CDLoop
-            }                                
         }
-    }  
-    
-    $MatchedInstallMedia += $FoundCD 
-    
-    $ArchivestoCheck = $ListofADFFilestoCheck.where({$_.Name -match '.lha'})
-    
-    $FoundADFNames = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-
-    Foreach ($Archive in $ArchivestoCheck) {
-        $FileName = $Archive.FullName
-        $FileHash = (Get-FileHash -LiteralPath $FileName -Algorithm MD5).Hash.ToUpperInvariant()
-        if ($RequiredInstallMediaandHashes["Hash;$FileHash"]){
-            $TargetADF = $RequiredInstallMediaandHashes["Hash;$FileHash"]
-            
-            if ($FoundADFNames.Contains($TargetADF.ADF_Name)) {
-                continue
-            }
-            $MatchedInstallMedia += [PSCustomObject]@{
-                Hash = $FileHash
-                Path = $FileName 
-                ADF_Name = $TargetADF.ADF_Name
-                FriendlyName = $TargetADF.FriendlyName
-                InstallMedia = $TargetADF.InstallMedia
-                Source = $TargetADF.ADFSource  
-                IsMatched = $true     
-#                Sequence = $TargetADF.Sequence
- #               TypeofCheck = $TargetADF.TypeofCheck
-  #              FilesChecked = $null
-   #             FileCheckDetails = $null
-            }
-            [void]$FoundADFNames.Add($TargetADF.ADF_Name)                       
-        }     
     }
-
+                
     $RequiredInstallMedia.where({ (-not $_.SourceLocation -in $MatchedInstallMedia.ADF_Name)}).foreach({
         $MatchedInstallMedia += [PSCustomObject]@{
-            Hash = ''
+            Hash = '' 
             Path = ''
             ADF_Name = $_.SourceLocation
             FriendlyName = $_.InstallMediaFriendlyName
             InstallMedia = $null
             Source = $null
-            IsMatched = $true      
+            IsMatched = $false      
         }
     })
     
     return $MatchedInstallMedia
     
 }  
-
-

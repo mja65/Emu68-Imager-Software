@@ -1,7 +1,7 @@
 function Get-InputFileCSV {
     param($CSV)
 
-    # $CSV = "Packages" 
+    # $CSV = "DiskTypes" 
 
     $Target = $Script:InputCSVs.$CSV
     $HeaderArr = $Target.Headers
@@ -37,17 +37,11 @@ function Get-InputFileCSV {
 
     $IndexMinimumInstallerVersion = $HeaderArr.IndexOf("MinimumInstallerVersion")
     $IndexInstallerVersionLessThan = $HeaderArr.IndexOf("InstallerVersionLessThan")
-    if ($CSV -in @("Emu68Versions", "PoseidonVersions", "NetworkStackVersions", "MUIVersions", "USBStackVersions", "GENETVersions")){
-        $IndexEmu68VersionType = -1
-       # $IndexPoseidonVersion = -1
-       # $IndexNetworkStack = -1
-       # $IndexMUIVersion = -1          
+    if ($CSV -in @("Emu68Versions", "PoseidonVersions", "NetworkStackVersions", "MUIVersions", "DiskTypes","USBStackVersions", "GENETVersions")){
+        $IndexEmu68VersionType = -1    
     } 
     else {
         $IndexEmu68VersionType = $HeaderArr.IndexOf("Emu68VersionType")
-       # $IndexPoseidonVersion =  $HeaderArr.IndexOf("PoseidonVersion")
-       # $IndexNetworkStack = $HeaderArr.IndexOf("NetworkStack")
-       # $IndexMUIVersion = $HeaderArr.IndexOf("MUIVersion")
     }
     $IndexInclude = $HeaderArr.IndexOf("Include")
     $IndexKickstartVersion = $HeaderArr.IndexOf("KickstartVersion")
@@ -66,8 +60,6 @@ function Get-InputFileCSV {
         $IndexInstallerVersionLessThan
         $IndexEmu68VersionLessThan
         $IndexInclude
-        #$IndexNetworkStack 
-        #$IndexPoseidonVersion 
         $IndexEmu68VersionType
         $IndexMUIVersion
         if ($CSV -ne "IconSets") { $IndexIconSet }    
@@ -86,24 +78,17 @@ function Get-InputFileCSV {
             if ($RowData[$IndexInclude] -ne "TRUE"){ continue }
         }
         if ($IndexMinimumInstallerVersion -ne -1) {
-            if ($Script:Settings.Version -lt [System.Version]$RowData[$IndexMinimumInstallerVersion]){ continue }
+            if ($Script:Settings.Version -lt [System.Version]$RowData[$IndexMinimumInstallerVersion]){                 Write-host "Index"
+             continue }
         }
         if ($IndexInstallerVersionLessThan -ne -1) {
-            if ($Script:Settings.Version -ge [System.Version]$RowData[$IndexInstallerVersionLessThan]){ continue }
+            if ($Script:Settings.Version -ge [System.Version]$RowData[$IndexInstallerVersionLessThan]){                 Write-host "Index"2
+            continue }
         }
         if ($IndexEmu68VersionType -ne -1) {
             if ((-not [string]::IsNullOrWhiteSpace($RowData[$IndexEmu68VersionType])) -and ($Script:GUIActions.Emu68VersionType -notin ($RowData[$IndexEmu68VersionType] -split ','))) { continue }            
         }
-        # if ($IndexPoseidonVersion -ne -1) {
-        #     if ((-not [string]::IsNullOrWhiteSpace($RowData[$IndexPoseidonVersion])) -and ($Script:GUIActions.PoseidonVersion -notin ($RowData[$IndexPoseidonVersion] -split ','))) { continue }
 
-        # }
-        # if ($IndexNetworkStack -ne -1) {
-        #     if ((-not [string]::IsNullOrWhiteSpace($RowData[$IndexNetworkStack])) -and ($Script:GUIActions.NetworkStack -notin ($RowData[$IndexNetworkStack] -split ','))) { continue }
-        # }
-        # if ($IndexMUIVersion -ne -1) {
-        #     if ((-not [string]::IsNullOrWhiteSpace($RowData[$IndexMUIVersion])) -and ($Script:GUIActions.MUIVersion -ne ($RowData[$IndexMUIVersion]))) { continue }     
-        # }
         $RowDatatoUse = $RowData
 
         If ($CSV -in @("FolderstoAdd","PackagestoInstall","FileContentsModifyPath","InfoFiles")){

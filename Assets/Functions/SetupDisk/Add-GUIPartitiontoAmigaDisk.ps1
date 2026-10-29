@@ -2,18 +2,14 @@ function Add-GUIPartitiontoAmigaDisk {
     param (
         [Switch]$LoadSettings,
         $NewPartitionNameFromSettings,
+        [switch]$DefaultPartition,
         $AmigaDiskName,
         $AddType,
         $PartitionNameNextto, 
         $SizeBytes,
         $PartitionTypeAmiga,
-        [Switch]$ImportedPartition,
-        $ImportedPartitionMethod,
         $ImportedFilesPath,
-        $ImportedPartitionOffsetBytes,
-        $ImportedPartitionEndBytes,
         $ImportedFilesSpaceBytes,
-        $PathtoImportedPartition,
         $DeviceName,
         $VolumeName,
         $Buffers,
@@ -32,14 +28,6 @@ function Add-GUIPartitiontoAmigaDisk {
    
     # Write-Debug "Function: $($MyInvocation.MyCommand.Name)"
     # Write-Debug "Parameters received: $($PSBoundParameters | Out-String)"
-
-    if ($PartitionTypeAmiga){
-        $DefaultPartition = $true
-    }
-
-    if ($ImportedPartition){
-        # Write-debug "Importing Amiga Partition $PathtoImportedPartition"
-   }
 
     $SizePixels = $SizeBytes / ((Get-Variable -name  $AmigaDiskName).value.BytestoPixelFactor)
     if ($SizePixels -gt 4){
@@ -74,14 +62,11 @@ function Add-GUIPartitiontoAmigaDisk {
 
     # Write-debug "New Partition Name is: $NewPartitionName "
 
-    if ($DefaultPartition -eq $true){
+    if ($DefaultPartition){
         Set-Variable -name $NewPartitionName -Scope script -value (New-GUIPartition -PartitionName $NewPartitionName -DefaultPartition -PartitionType 'Amiga' -PartitionTypeAmiga $PartitionTypeAmiga)
     }
-    elseif ($ImportedPartition){
-        Set-Variable -name $NewPartitionName -Scope script -value (New-GUIPartition -PartitionName $NewPartitionName -PartitionType 'Amiga' -ImportedPartition -ImportedPartitionMethod $ImportedPartitionMethod)
-    }
     else {
-        Set-Variable -name $NewPartitionName -Scope script -value (New-GUIPartition -PartitionName $NewPartitionName -PartitionType 'Amiga')
+        Set-Variable -name $NewPartitionName -Scope script -value (New-GUIPartition -PartitionName $NewPartitionName -PartitionType 'Amiga' -PartitionTypeAmiga $PartitionTypeAmiga)
     }
 
     if ($ImportedFilesPath){
@@ -102,24 +87,6 @@ function Add-GUIPartitiontoAmigaDisk {
     (Get-Variable -Name $NewPartitionName).Value.Bootable = $Bootable
     (Get-Variable -Name $NewPartitionName).Value.NoMount = $NoMount
     (Get-Variable -Name $NewPartitionName).Value.Priority = $Priority
-
-
-    if ($ImportedPartition){
-        (Get-Variable -Name $NewPartitionName).Value.ImportedPartition = $true
-        (Get-Variable -Name $NewPartitionName).Value.ImportedPartitionMethod = $ImportedPartitionMethod
-        (Get-Variable -Name $NewPartitionName).Value.ImportedPartitionPath = $PathtoImportedPartition
-        (Get-Variable -Name $NewPartitionName).Value.DeviceNameOriginalImportedValue = $DeviceName
-        (Get-Variable -Name $NewPartitionName).Value.VolumeNameOriginalImportedValue = $VolumeName
-        (Get-Variable -Name $NewPartitionName).Value.BuffersOriginalImportedValue = $Buffers
-        (Get-Variable -Name $NewPartitionName).Value.DosTypeOriginalImportedValue = $DosType
-        (Get-Variable -Name $NewPartitionName).Value.MaskOriginalImportedValue = $Mask
-        (Get-Variable -Name $NewPartitionName).Value.MaxTransferOriginalImportedValue = $MaxTransfer
-        (Get-Variable -Name $NewPartitionName).Value.BootableOriginalImportedValue = $Bootable
-        (Get-Variable -Name $NewPartitionName).Value.NoMountOriginalImportedValue = $NoMount
-        (Get-Variable -Name $NewPartitionName).Value.PriorityOriginalImportedValue = $Priority
-        (Get-Variable -Name $NewPartitionName).Value.ImportedPartitionOffsetBytes = $ImportedPartitionOffsetBytes
-        (Get-Variable -Name $NewPartitionName).Value.ImportedPartitionEndBytes = $ImportedPartitionEndBytes
-    }
 
     (Get-Variable -Name $NewPartitionName).Value.ColumnDefinitions[1].Width = $SizePixels
     

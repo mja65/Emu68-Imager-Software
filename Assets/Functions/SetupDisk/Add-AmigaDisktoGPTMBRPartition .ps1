@@ -1,18 +1,12 @@
-function Add-AmigaDisktoID76Partition {
+function Add-AmigaDisktoGPTMBRPartition {
     param (
-        $ID76PartitionName,
-        [Switch]$ImportedDisk
+        $ID76PartitionName
     )
 
     # $ID76PartitionName = 'WPF_DP_Partition_MBR_2'
   
     Set-Variable -name ($ID76PartitionName+'_AmigaDisk') -Scope Script -value (New-GUIDisk -DiskType 'Amiga')
-    if ($ImportedDisk){
-        (Get-Variable -name ($ID76PartitionName+'_AmigaDisk')).value.CanAddPartition = $false
-    }
-    else{
-        (Get-Variable -name ($ID76PartitionName+'_AmigaDisk')).value.CanAddPartition = $true
-    }
+    (Get-Variable -name ($ID76PartitionName+'_AmigaDisk')).value.CanAddPartition = $true
     (Get-Variable -name ($ID76PartitionName+'_AmigaDisk')).value.ID76PartitionParent = $ID76PartitionName   
     (Get-Variable -name ($ID76PartitionName+'_AmigaDisk')).value.LeftDiskBoundary = 0 
     (Get-Variable -name ($ID76PartitionName+'_AmigaDisk')).value.RightDiskBoundary = (Get-Variable -name ($ID76PartitionName+'_AmigaDisk')).value.Children[0].Width

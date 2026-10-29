@@ -3,21 +3,15 @@ function New-GUIDisk {
     $DiskType
     )
 
-    if (-not ($DiskType)){
-        Write-ErrorMessage -Message "Error in coding - New-GUIDisk!"
-        $WPF_MainWindow.Close()
-        exit
-    } 
-
     $NewDisk_Grid = New-Object System.Windows.Controls.Grid
 
     $NewDisk = New-Object System.Windows.Shapes.Rectangle
     $NewDisk.HorizontalAlignment = "Left" 
     $NewDisk.VerticalAlignment = "Top"
-    $NewDisk.Height="100" 
-    $NewDisk.Stroke="Black"
-    $NewDisk.Fill="White"
-    $NewDisk.Width= $Script:Settings.DiskWidthPixels
+    $NewDisk.Height = $Script:Settings.DiskHeightPixels 
+    $NewDisk.Stroke = "Black"
+    $NewDisk.Fill = "White"
+    $NewDisk.Width = $Script:Settings.DiskWidthPixels
     $NewDisk.Name = "DiskBackground"
     
     if ($DiskType -eq 'MBR'){
@@ -25,11 +19,11 @@ function New-GUIDisk {
         $NewDisk_Grid | Add-Member -NotePropertyMembers @{
             CanAddPartition = $null
             DiskType = 'MBR'
-            MBROverheadBytes = $Script:Settings.MBROverheadBytes
+            GPTMBROverheadBytes = $Script:Settings.GPTMBROverheadBytes
             GPTOverheadBytes = 0
-            NumberofPartitionsMBR = 0
+            NumberofPartitionsGPTMBR = 0
             NumberofPartitionsGPT = 0
-            NextPartitionMBRNumber = 1
+            NextPartitionGPTMBRNumber = 1
             NextPartitionGPTNumber = 1
         }
     }
@@ -45,7 +39,16 @@ function New-GUIDisk {
 
     }
     elseif ($DiskType -eq 'GPT'){
-        # NOT BUILT!
+        $NewDisk_Grid | Add-Member -NotePropertyMembers @{
+            CanAddPartition = $null
+            DiskType = 'GPT'
+            GPTMBROverheadBytes = $Script:Settings.GPTMBROverheadBytes
+            GPTOverheadBytes = 0
+            NumberofPartitionsGPTMBR = 0
+            NumberofPartitionsGPT = 0
+            NextPartitionGPTMBRNumber = 1
+            NextPartitionGPTNumber = 1
+        }
     }
     
     $NewDisk_Grid | Add-Member -NotePropertyMembers @{

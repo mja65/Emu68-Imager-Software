@@ -14,26 +14,7 @@ function Update-UI {
         [Switch]$WBScreenModeChangeType,
         [Switch]$CustomResolution
     )
-
-   
-    # if (($Emu68Settings) -and (-not ($Script:GUICurrentStatus.CurrentWindow -eq 'Emu68Settings'))){
-    #     return
-    # }
-    # if ((($DiskPartitionWindow) -or ($HighlightSelectedPartitions) -or ($UpdateInputBoxes) -or ($Buttons)) -and (-not ($Script:GUICurrentStatus.CurrentWindow -eq 'DiskPartition'))){
-    #     return
-    # }
-
     
-    if ($PackageSelectionWindow){
-        if ($Script:GUICurrentStatus.PackagesChanged -ne $true -and $Script:GUICurrentStatus.IconsChanged -ne $true){
-            $WPF_PackageSelection_PackageSelection_Label.Text = "Note: If you make changes on this screen after you have performed checks on the installation media you will need to reperform those checks"
-            
-        }
-        else {
-            $WPF_PackageSelection_PackageSelection_Label.Text = "You have made changes to the packages and/or icons. You will need to reperform the check for install media."
-        }
-    }
-
     if ($MainWindowButtons){
         $WPF_Window_Button_LoadSettings.Background = '#FFDDDDDD'
         $WPF_Window_Button_LoadSettings.Foreground = '#FF000000'
@@ -84,6 +65,27 @@ function Update-UI {
 
     if ($Emu68Settings){
 
+        If ($Script:GUIActions.CreateCustomKickstart -eq $true){
+            $WPF_StartPage_CustomKickstart_CheckBox.IsChecked = 1
+        }
+        else {
+            $WPF_StartPage_CustomKickstart_CheckBox.IsChecked = 0
+        }
+
+        If ($Script:GUIActions.KickstartVersiontoUse) {
+            $WPF_StartPage_LanguageSelection_Button.IsEnabled = 0
+        }
+        else {
+            $WPF_StartPage_LanguageSelection_Button.IsEnabled = 1
+        }
+
+        If ($Script:GUIActions.KickstartVersiontoUse -eq '3.2.3'){
+            $WPF_StartPage_CustomKickstart_CheckBox.Visibility = "Visible"
+        }
+        else {
+            $WPF_StartPage_CustomKickstart_CheckBox.Visibility = "Hidden"
+        }
+
         If ($Script:GUIActions.DeleteAllDownloadedFiles -eq $true){
             $WPF_StartPage_DeleteFiles_CheckBox.IsChecked = 1
        
@@ -107,8 +109,13 @@ function Update-UI {
         }
 
         if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
-            $WPF_StartPage_SettingsMUIVersion_GroupBox.Visibility = "Hidden"
-            $WPF_StartPage_SettingsEmu68Imager_GroupBox.Visibility = "Hidden"
+            $WPF_StartPage_MUIVersion_Label.Visibility = "Hidden"
+            $WPF_StartPage_MUIVersion_38.Visibility = "Hidden"
+            $WPF_StartPage_MUIVersion_50.Visibility = "Hidden"
+            $WPF_StartPage_Emu68Version_Label.Text  = "Emu68 Version"
+            $WPF_StartPage_Emu68Version_Dropdown.IsHitTestVisible = "False"
+            $WPF_StartPage_Emu68Version_Dropdown.Focusable = "False"
+            $WPF_StartPage_Emu68Version_Dropdown.IsTabStop = "False"
             $WPF_StartPage_Unicam_button.Visibility = "Hidden" 
         }
 
@@ -153,22 +160,14 @@ function Update-UI {
        
         if ($Script:GUIActions.InstallOSFiles -eq $true){
             $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Visible'
-            $WPF_StartPage_SourceFiles_GroupBox.Visibility = 'Visible'
-            $WPF_StartPage_ADFpath_Button.Visibility = 'Visible'
-            $WPF_StartPage_ADFpath_Button_Check.Visibility = 'Visible'
-            $WPF_StartPage_ADFPath_Label.Visibility = 'Visible'
-            $WPF_StartPage_SettingsScreen_GroupBox.Visibility = 'Visible'
-            $WPF_StartPage_SettingsScreenWB_GroupBox.Visibility = 'Visible'
+            $WPF_StartPage_SourceFiles_GridRow.Visibility = 'Visible'
+            $WPF_StartPage_WorkbenchScreenSettings_GridRow.Visibility = 'Visible'                        
             $WPF_StartPage_SettingsNetworkUSB_GroupBox.Visibility = 'Visible'
         }
         elseif ($Script:GUIActions.InstallOSFiles -eq $false){
-            $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Visible'
-            $WPF_StartPage_SourceFiles_GroupBox.Visibility = 'Visible'
-            $WPF_StartPage_ADFpath_Button.Visibility = 'Hidden'
-            $WPF_StartPage_ADFpath_Button_Check.Visibility = 'Hidden'
-            $WPF_StartPage_ADFPath_Label.Visibility = 'Hidden'
-            $WPF_StartPage_SettingsScreen_GroupBox.Visibility = 'Visible'
-            $WPF_StartPage_SettingsScreenWB_GroupBox.Visibility = 'Hidden'
+            $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Hidden'
+            $WPF_StartPage_SourceFiles_GridRow.Visibility = 'Collapsed'
+            $WPF_StartPage_WorkbenchScreenSettings_GridRow.Visibility = 'Collapsed'            
             $WPF_StartPage_SettingsNetworkUSB_GroupBox.Visibility = 'Hidden'
         }
         if ($Script:GUIActions.ROMLocation){
@@ -224,6 +223,15 @@ function Update-UI {
             }
         }    
         
+        If ($Script:GUIActions.SelectedIconSet){
+            $WPF_StartPage_IconSet_DropDown.SelectedItem = $Script:GUIActions.SelectedIconSet
+            $WPF_StartPage_IconSetDescription_Label.Text = ((Get-InputFileCSV -CSV "Iconsets") | Where-Object  {$_.IconSet -eq $Script:GUIActions.SelectedIconSet}).IconSetDescription
+            $WPF_StartPage_IconSetDescription_Label.Visibility = "Visible" 
+        }
+        else {
+            $WPF_StartPage_IconSetDescription_Label.Visibility = "Hidden"
+        }
+            
         If ($Script:GUIActions.MUIVersion -eq "3.8"){
             $WPF_StartPage_MUIVersion_38.IsChecked = 1
 
@@ -397,18 +405,6 @@ function Update-UI {
 
     }
 
-    #  $WPF_DP_Partition_MBR_2.Children[0].Name
-    #  $WPF_DP_Partition_MBR_2.Children[1].Name
-    #  $WPF_DP_Partition_MBR_2.Children[2].Name
-    #  $WPF_DP_Partition_MBR_2.Children[3].Name
-    #  $WPF_DP_Partition_MBR_2.Children[4].Name
-
-    # $WPF_DP_Partition_MBR_2_AmigaDisk_Partition_1.Children[0].Name
-    # $WPF_DP_Partition_MBR_2_AmigaDisk_Partition_1.Children[1].Name
-    # $WPF_DP_Partition_MBR_2_AmigaDisk_Partition_1.Children[2].Name
-    # $WPF_DP_Partition_MBR_2_AmigaDisk_Partition_1.Children[3].Name
-    # $WPF_DP_Partition_MBR_2_AmigaDisk_Partition_1.Children[4].Name
-
 
     if ($HighlightSelectedPartitions){
         if ($Script:GUIActions.DiskSizeSelected){
@@ -438,7 +434,7 @@ function Update-UI {
                 }
 
                 $WPF_DP_MBRGPTSettings_GroupBox.Visibility = 'Visible'
-                If ($Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'ID76'){ 
+                If (($Script:GUIActions.DiskType -eq 'MBR' -and $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'ID76') -or ($Script:GUIActions.DiskType -eq 'GPT' -and $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'Amiga')) { 
                     $AmigaDiskName = "$($Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionName)_AmigaDisk"
                     if (Get-Variable -name $AmigaDiskName){
                         Set-AmigaDiskSizeOverhangPixels -AmigaDiskName $AmigaDiskName
@@ -527,11 +523,17 @@ function Update-UI {
 
     }
     if ($DiskPartitionWindow){
-        Get-InputFileCSV -CSV "DiskTypes" | ForEach-Object {
-            if ($Script:GUIActions.DiskType -eq $_.DiskType){
-                $WPF_DP_Disk_Type_DropDown.SelectedItem = $_.DiskTypeFriendlyName
+
+        $WPF_DP_AddNewGPTMBRPartition_Type_DropDown.Items.Clear()
+        $PartitionDropDownDetails = (Get-InputFileCSV -CSV 'PartitionTypes').where({ $_.DiskType -eq $Script:GUIActions.DiskType -and $_.UserCanAdd -eq $true})
+        foreach ($PartitionDropDown in $PartitionDropDownDetails){
+            $WPF_DP_AddNewGPTMBRPartition_Type_DropDown.AddChild($PartitionDropDown.PartitionLabelGUI)
+            if ($PartitionDropDown.DefaultUserAddPartition -eq $true) {
+                $WPF_DP_AddNewGPTMBRPartition_Type_DropDown.SelectedItem = $PartitionDropDown.PartitionLabelGUI
+
             }
         }
+        
     } 
               
     if (($DiskPartitionWindow) -or ($UpdateInputBoxes)){
@@ -582,19 +584,17 @@ function Update-UI {
                 If ($Script:GUICurrentStatus.OperationMode -eq "Simple"){
                        $WPF_DP_MBRPartitionSelect_LeftArrow.Visibility = "Hidden"
                        $WPF_DP_MBRPartitionSelect_RightArrow.Visibility = "Hidden"
-                       $WPF_DP_Button_DeleteMBRPartition.Visibility = "Hidden"
+                       $WPF_DP_Button_DeleteGPTMBRPartition.Visibility = "Hidden"
                        $WPF_DP_Button_RemoveFreeSpace.Visibility = "Hidden"
                        $WPF_DP_Button_AddNewGPTMBRPartition.Visibility = "Hidden"
                        $WPF_DP_AddNewGPTMBRPartition_DropDown.Visibility = "Hidden"
                        $WPF_DP_AddNewGPTMBRPartition_Type_DropDown.Visibility = "Hidden"
                        $WPF_DP_SelectedMBRPartition_Label.Visibility = "Hidden"
                        $WPF_DP_SelectedMBRPartition_Value.Visibility = "Hidden"
-                       $WPF_DP_MBRPartitionSelect_Label.Visibility = "Hidden"
                        $WPF_DP_Amiga_GroupBox.Visibility = "Visible"
                        $WPF_DP_DiskGrid_Amiga.Visibility = "Visible"
                        $WPF_DP_SelectedAmigaPartition_Label.Visibility = "Hidden"
                        $WPF_DP_SelectedAmigaPartition_Value.Visibility = "Hidden"
-                       $WPF_DP_AmigaPartitionSelect_Label.Visibility = "Hidden"
                        $WPF_DP_AmigaPartitionSelect_LeftArrow.Visibility = "Hidden"
                        $WPF_DP_AmigaPartitionSelect_RightArrow.Visibility = "Hidden"
                        $WPF_DP_Button_AmigaRemoveFreeSpace.Visibility = "Hidden"
@@ -605,19 +605,16 @@ function Update-UI {
                        $WPF_DP_Button_ImportFiles.Visibility = "Hidden"
                        $WPF_DP_Button_ImportFiles_Label.Visibility = "Hidden"
                        $WPF_DP_ImportFilesSize_Value.Visibility = "Hidden"
-                       
-                       $WPF_DP_SimpleMode_FAT32Size_Label.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_FAT32Size_Value.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_ID76Size_Label.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_ID76Size_Value.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_Legend_FAT32SizeDefault.Visibility = "Visible"
-                       #$WPF_DP_SimpleMode_Legend_ID76Size.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_Legend_WorkbenchSizeDefault.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_Legend_WorkSize.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_WorkbenchSize_Label.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_WorkbenchSize_Value.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_WorkSize_Label.Visibility = "Visible"
-                       $WPF_DP_SimpleMode_WorkSize_Value.Visibility = "Visible"
+                       $WPF_DP_AmigaPartitionSelect_NextPartition_Label.Visibility = "Hidden"
+                       $WPF_DP_MBRPartitionSelect_NextPartition_Label.Visibility = "Hidden"
+                       $WPF_DP_AmigaPartitionSelect_Partition_Label.Visibility = "Hidden"
+                       $WPF_DP_MBRPartitionSelect_Partition_Label.Visibility = "Hidden"
+
+                       $WPF_DP_RDBSimple_Legend_GroupBox.Visibility = "Visible"
+                       $WPF_DP_MBRSimple_Legend_GroupBox.Visibility = "Visible"
+                       $WPF_DP_MBR_Legend_GroupBox.Visibility = "Hidden"
+                       $WPF_DP_GPT_Legend_GroupBox.Visibility = "Hidden"
+                       $WPF_DP_RDB_Legend_GroupBox.Visibility = "Hidden"
                        
                        $FAT32Partition = (Get-Variable -Name "*_Partition_MBR_*" -Exclude "*Amiga*" | Where-Object {$_.Value.PartitionSubType -eq "FAT32"}).value
                        $FAT32PartitionSize = Get-ConvertedSize -Size $FAT32Partition.PartitionSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 2
@@ -659,7 +656,19 @@ function Update-UI {
                         $WPF_DP_DiskGrid_Amiga.AddChild((Get-Variable -Name $AmigaDiskName).value)                                             
                        
                 }
-                   
+                elseif ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
+                    $WPF_DP_RDB_Legend_GroupBox.Visibility = "Visible"
+                    $WPF_DP_RDBSimple_Legend_GroupBox.Visibility = "Hidden"
+                    $WPF_DP_MBRSimple_Legend_GroupBox.Visibility = "Hidden"
+                    if ($Script:GUIActions.DiskType -eq "MBR"){
+                        $WPF_DP_MBR_Legend_GroupBox.Visibility = "Visible"
+                        $WPF_DP_GPT_Legend_GroupBox.Visibility = "Hidden"
+                    }
+                    elseif ($Script:GUIActions.DiskType -eq "GPT"){
+                        $WPF_DP_GPT_Legend_GroupBox.Visibility = "Visible"
+                        $WPF_DP_MBR_Legend_GroupBox.Visibility = "Hidden"
+                    }
+                }     
             }
         }
         if ($Script:GUICurrentStatus.SelectedAmigaPartition){
@@ -797,21 +806,21 @@ function Update-UI {
     }
 
     If ($FreeSpaceAlert){
-        $FreeSpaceBytes_MBR = 0
+        $FreeSpaceBytes_GPTMBR = 0
         $FreeSpaceBytes_Amiga = 0
         $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries | ForEach-Object {
-            $FreeSpaceBytes_MBR += $_.BytesAvailableLeft
+            $FreeSpaceBytes_GPTMBR += $_.BytesAvailableLeft
         }
         $Script:GUICurrentStatus.AmigaPartitionsandBoundaries | ForEach-Object {
             $FreeSpaceBytes_Amiga += $_.BytesAvailableLeft               
         }
 
-        If ($FreeSpaceBytes_MBR -eq 0){
+        If ($FreeSpaceBytes_GPTMBR -eq 0){
             # Write-debug "No free space - MBR"
             $WPF_DP_MBR_FreeSpaceBetweenPartitions_Label.Visibility = 'hidden'
         }
         else {
-            # Write-debug "Free space MBR is:$FreeSpaceBytes_MBR"
+            # Write-debug "Free space MBR is:$FreeSpaceBytes_GPTMBR"
             $WPF_DP_MBR_FreeSpaceBetweenPartitions_Label.Visibility = 'visible'
         }
         
@@ -958,12 +967,3 @@ function Update-UI {
         }
     }
 }
-            
-        
-        
-                      
-
-
-
-
-

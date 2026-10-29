@@ -1,12 +1,12 @@
-$WPF_DP_Button_DeleteMBRPartition.add_click({
+$WPF_DP_Button_DeleteGPTMBRPartition.add_click({
         if ($Script:GUICurrentStatus.FileBoxOpen -eq $true){
         return
     }
     # $Script:GUICurrentStatus.SelectedGPTMBRPartition = 'WPF_DP_Partition_MBR_2'
     if ($Script:GUICurrentStatus.SelectedGPTMBRPartition){
-        If (($Script:GUIActions.InstallOSFiles -eq $true) -and ($Script:GUICurrentStatus.SelectedGPTMBRPartition.DefaultGPTMBRPartition -eq $true) -and ($Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'ID76')){
-
-$MessageBody = 
+        If (($Script:GUIActions.InstallOSFiles -eq $true) -and ($Script:GUICurrentStatus.SelectedGPTMBRPartition.DefaultGPTMBRPartition -eq $true)){
+            if ($Script:GUIActions.DiskType -eq 'MBR'-and $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'ID76' ){
+                $MessageBody = 
 @"
 You have selected the default ID 0x76 Amiga Partition for deletion! If you really want to do this you will not be installing ANY OS files! 
 
@@ -14,7 +14,17 @@ All currently selected Workbench install files, and user selected packages will 
 
 Press OK to continue otherwise cancel
 "@   
+            }
+            elseif ($Script:GUIActions.DiskType -eq 'GPT' -and $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'Amiga'){
+                $MessageBody = 
+@"
+You have selected the default Amiga Partition for deletion! If you really want to do this you will not be installing ANY OS files! 
 
+All currently selected Workbench install files, and user selected packages will be unselected. If you change your mind after deleting and want to create an image with an installed OS you will need to you will need to reset the disk (i.e. press the "Reset to Start" button) and reperform those steps. 
+
+Press OK to continue otherwise cancel
+"@                   
+            }
             if ((Show-WarningorError -Msg_Header 'Deleting Default Amiga Partition' -BoxTypeWarning -ButtonType_OKCancel  -Msg_Body $MessageBody) -eq 'Cancel'){
                 return
             }
@@ -24,7 +34,7 @@ Press OK to continue otherwise cancel
        
         }
 
-        if ($Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'ID76'){
+        if (($Script:GUIActions.DiskType -eq 'MBR'-and $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'ID76' ) -or ($Script:GUIActions.DiskType -eq 'GPT' -and $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionSubType -eq 'Amiga')){
             $DeleteUnderlyingAmigaPartitions = $true
         }
         else {
@@ -34,8 +44,10 @@ Press OK to continue otherwise cancel
 
         $PartitiontoDelete = $Script:GUICurrentStatus.SelectedGPTMBRPartition.PartitionName
 
-        if ((Remove-MBRGUIPartition -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition) -eq $false){
-            Show-WarningorError -Msg_Header 'Cannot Delete Partition' -Msg_Body 'MBR Partition is default partition. Cannot delete.' -BoxTypeError -ButtonType_OK
+        if ((Remove-GPTMBRGUIPartition -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition) -eq $false){
+            $MessageHeader = 'Cannot Delete Partition' 
+            $MessageBody = if ($Script:GUIActions.DiskType -eq "MBR") { 'MBR Partition is default partition. Cannot delete.' } elseif ($Script:GUIActions.DiskType -eq "GPT") { 'GPT Partition is default partition. Cannot delete.' }
+            Show-WarningorError -Msg_Header $MessageHeader -Msg_Body $MessageBody -BoxTypeError -ButtonType_OK
             return
         }
     
@@ -59,10 +71,9 @@ Press OK to continue otherwise cancel
         $Script:GUIActions.OSInstallMediaType = $null
         $Script:GUIActions.FoundInstallMediatoUse = $null
         $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "TRUE"
-        $Script:GUICurrentStatus.PackagesChanged = $null
         $Script:GUIActions.DefaultPackagesSelected = $null 
-        $Script:GUIActions.DefaultIconsetSelected = $null
         $Script:GUIActions.SelectedIconSet = $null 
+        $Script:GUIActions.CreateCustomKickstart = $false
         $Script:GUIActions.AvailablePackages.Clear()
         $Script:GUIActions.AvailableIconSets.Clear()
         $Script:GUIActions.ScreenModeType = $null

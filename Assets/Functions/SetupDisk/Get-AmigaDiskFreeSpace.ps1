@@ -12,7 +12,7 @@ function Get-AmigaDiskFreeSpace {
 
     #$PartitionstoCheck = [System.Collections.Generic.List[PSCustomObject]]::New()
     
-    if ($Disk.DiskType -eq 'MBR'){
+    if ($Disk.DiskType -eq 'MBR' -or $Disk.DiskType -eq 'GPT'){
         $PartitionstoCheck = $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries | Where-Object {$_.PartitionType -eq $Disk.DiskType} 
     }
     elseif ($Disk.DiskType -eq 'Amiga'){
@@ -25,7 +25,7 @@ function Get-AmigaDiskFreeSpace {
             return $PartitionstoCheck[$PartitionstoCheck.Count-1].BytesAvailableRight
         }
         else{
-            if ($Disk.DiskType -eq 'MBR'){
+            if ($Disk.DiskType -eq 'MBR' -or $Disk.DiskType -eq 'GPT'){
                 return $Disk.DiskSizeBytes - 2097152
             }
             elseif ($Disk.DiskType -eq 'Amiga'){

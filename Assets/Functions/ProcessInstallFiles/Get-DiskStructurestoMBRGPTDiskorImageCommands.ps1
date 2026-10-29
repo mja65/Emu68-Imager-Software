@@ -5,19 +5,19 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
 
     $HSTOutputPath = if ($Script:GUIActions.OutputType -eq "Image") { "`"$($Script:GUIActions.OutputPath)`""} else { $Script:GUIActions.OutputPath }
    
-    if ($Script:GUIActions.DiskTypeSelected -eq 'PiStorm - MBR'){
+    if ($Script:GUIActions.DiskType -eq 'MBR'){
         $MBRPartitionstoAddtoDisk = @($Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries)
         if (-not ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries)){
             $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -Amiga)
         }      
         $RDBPartitionstoAddtoDisk = @($Script:GUICurrentStatus.AmigaPartitionsandBoundaries)
     }
-    elseif ($Script:GUIActions.DiskTypeSelected -eq 'PiStorm - GPT'){
+    elseif ($Script:GUIActions.DiskType -eq 'GPT'){
         Write-ErrorMessage -Message "Error in Coding - WPF_Window_Button_Run !"
         $WPF_MainWindow.Close()
         exit
     }
-    elseif ($Script:GUIActions.DiskTypeSelected -eq 'Amiga - RDB'){
+    elseif ($Script:GUIActions.DiskType -eq 'RDB'){
         Write-ErrorMessage -Message "Error in Coding - WPF_Window_Button_Run !"
         $WPF_MainWindow.Close()
         exit
@@ -102,7 +102,7 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
        elseif ($MBRPartition.Partition.PartitionSubType -eq 'ID76'){
            $RDBPartitionCounter = 1       
            Write-InformationMessage -Message "Preparing commands to set up Amiga Disk for $($MBRPartition.PartitionName) - MBR Partition Number: $MBRPartitionCounter"
-           if ($MBRPartition.Partition.ImportedPartition -ne $true){
+
                If ($Script:GUIActions.OutputType -eq "Image"){
                    $Script:GUICurrentStatus.HSTImagerCommandstoProcess.DiskStructures += [PSCustomObject]@{
                        Command = "rdb init `"$($Script:GUIActions.OutputPath)\mbr\$MBRPartitionCounter`""
@@ -238,7 +238,7 @@ function Get-DiskStructurestoMBRGPTDiskorImageCommands {
                            $RDBPartitionCounter++   
                     }   
                 }
-           }
+           
         }  
        $MBRPartitionCounter ++
     }    

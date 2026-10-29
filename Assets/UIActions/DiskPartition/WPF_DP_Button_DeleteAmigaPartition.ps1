@@ -33,9 +33,7 @@ $MessageBody =
         $Script:GUIActions.OSInstallMediaType = $null
         $Script:GUIActions.FoundInstallMediatoUse = $null
         $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "TRUE"
-        $Script:GUICurrentStatus.PackagesChanged = $null
         $Script:GUIActions.DefaultPackagesSelected = $null 
-        $Script:GUIActions.DefaultIconsetSelected = $null
         $Script:GUIActions.SelectedIconSet = $null 
         $Script:GUIActions.AvailablePackages.Clear()
         $Script:GUIActions.AvailableIconSets.Clear()

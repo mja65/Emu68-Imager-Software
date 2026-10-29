@@ -23,7 +23,7 @@ function Set-GUIPartitionNewPosition {
 
     $PartitionBoundary = Get-AllGUIPartitionBoundaries -GPTMBR -Amiga | Where-Object {$_.PartitionName -eq $Partition.PartitionName}
 
-    if ($PartitionType -eq 'MBR'){
+    if ($PartitionType -eq 'MBR' -or $PartitionType -eq 'GPT'){
         $BytestoPixelFactor = $WPF_DP_Disk_GPTMBR.BytestoPixelFactor
     }
     elseif ($PartitionType -eq 'Amiga'){
@@ -47,30 +47,16 @@ function Set-GUIPartitionNewPosition {
         }
         $AmountMovedBytes = $BytestoPixelFactor*$AmountMovedPixels
 
-        # if ($PartitionType -eq 'MBR'){
-        #     $AmountMovedBytes = Get-MBRNearestSizeBytes -SizeBytes $AmountMovedBytes -RoundDown
-        # }
-        # elseif ($PartitionType -eq 'Amiga'){
-        #     $AmountMovedBytes = Get-AmigaNearestSizeBytes -SizeBytes $AmountMovedBytes -RoundDown
-        # }
-
     }
     elseif ($AmountMovedBytes){
-        # if ($PartitionType -eq 'MBR'){
-        #     $AmountMovedBytes = Get-MBRNearestSizeBytes -SizeBytes $AmountMovedBytes -RoundDown
-        # }
-        # elseif ($PartitionType -eq 'Amiga'){
-        #     $AmountMovedBytes = Get-AmigaNearestSizeBytes -SizeBytes $AmountMovedBytes -RoundDown
-        # }
         $AmountMovedPixels = $AmountMovedBytes/$BytestoPixelFactor
-        # Write-debug "Moving by: $AmountMovedPixels pixels"
     }
    
     $AmounttoSetLeft = $Partition.Margin.Left + $AmountMovedPixels
         
     $Partition.Margin = [System.Windows.Thickness]"$AmounttoSetLeft,0,0,0"
     $Partition.StartingPositionBytes = $Partition.StartingPositionBytes + $AmountMovedBytes
-    if ($PartitionType -eq 'MBR'){
+    if ($PartitionType -eq 'MBR' -or $PartitionType -eq 'GPT'){
         $Partition.StartingPositionSector = $Partition.StartingPositionBytes/$Script:Settings.MBRSectorSizeBytes
     }
     $WPF_MainWindow.UpdateLayout()
@@ -82,7 +68,7 @@ function Set-GUIPartitionNewPosition {
         }
 
     }
-    elseif ($PartitionType -eq 'MBR'){
+    elseif ($PartitionType -eq 'MBR' -or $PartitionType -eq 'GPT'){
         $WPF_DP_DiskGrid_GPTMBR.UpdateLayout()
         $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -GPTMBR)
             

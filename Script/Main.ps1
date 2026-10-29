@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 2.2.11
+.VERSION 2.3
 .GUID 73d9401c-ab81-4be5-a2e5-9fc0834be0fc
 .AUTHOR SupremeTurnip
 .COMPANYNAME
@@ -58,13 +58,15 @@ else {
     $Script:GUICurrentStatus.RunMode = "CommandLine"
 }
 
-$Script:Settings.Version = [system.version]'2.2.11'
+$Script:Settings.Version = [system.version]'2.3'
 
 $Script:GUIActions.ScriptPath = (Split-Path -Path $PSScriptRoot -Parent)
 
 Write-Emu68ImagerLog -start
 
-Show-Disclaimer
+$VersionStatustoPopulate = Get-Emu68ImagerCurrentVersion -GithubRelease  $Script:Settings.Emu68GithubRepository 
+
+Show-Disclaimer -VersionStatus $VersionStatustoPopulate
 
 $Script:Settings.TotalNumberofTasks = 4
 
@@ -126,38 +128,14 @@ if ($Script:GUICurrentStatus.RunMode -eq 'CommandLine'){
 }
 
 Write-InformationMessage -Message "Loading Emu68 Imager UI..." -NoLog 
+#####
 
 Remove-Variable -Scope Script -Name 'WPF_*'
-If ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
-    $WPF_MainWindow = Get-XAML -WPFPrefix 'WPF_Window_' -XMLFile '.\Assets\WPF\Main_Window.xaml' -ActionsPath '.\Assets\UIActions\MainWindow\' -AddWPFVariables
-}
-elseif ($Script:GUICurrentStatus.OperationMode -eq "Simple"){
-    $WPF_MainWindow = Get-XAML -WPFPrefix 'WPF_Window_' -XMLFile '.\Assets\WPF\Main_Window_Simple.xaml' -ActionsPath '.\Assets\UIActions\MainWindow\' -AddWPFVariables
-}
+$WPF_MainWindow = Get-XAML -WPFPrefix 'WPF_Window_' -XMLFile '.\Assets\WPF\Main_Window.xaml' -ActionsPath '.\Assets\UIActions\MainWindow\' -AddWPFVariables
 
 $WPF_Window_Label_Title.Content = "Emu68 Imager v$([string]$Script:Settings.Version)" 
 
-$VersionStatustoPopulate = Get-Emu68ImagerCurrentVersion -GithubRelease  $Script:Settings.Emu68GithubRepository 
-
-$WPF_Window_Label_VersionStatus.Text  = $VersionStatustoPopulate.TexttoReport
-
-if ($VersionStatustoPopulate.IsUptoDate -eq $true){
-    $WPF_Window_VersionStatus_URL_TextBlock.Visibility = "hidden"
-    $WPF_Window_Label_VersionStatus.Foreground= "Black"
-
-}
-else {
-    $WPF_Window_VersionStatus_URL_TextBlock.Visibility = "visible"
-     $WPF_Window_Label_VersionStatus.Foreground= "Red"
-}
-
-
-If ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
-    $WPF_StartPage = Get-XAML -WPFPrefix 'WPF_StartPage_' -XMLFile '.\Assets\WPF\Grid_StartPageAdvancedMode.xaml' -ActionsPath '.\Assets\UIActions\StartPage\' -AddWPFVariables
-}
-elseif ($Script:GUICurrentStatus.OperationMode -eq "Simple"){
-    $WPF_StartPage = Get-XAML -WPFPrefix 'WPF_StartPage_' -XMLFile '.\Assets\WPF\Grid_StartPageSimpleMode.xaml' -ActionsPath '.\Assets\UIActions\StartPage\' -AddWPFVariables
-}
+$WPF_StartPage = Get-XAML -WPFPrefix 'WPF_StartPage_' -XMLFile '.\Assets\WPF\Grid_StartPage.xaml' -ActionsPath '.\Assets\UIActions\StartPage\' -AddWPFVariables
 $WPF_Partition = Get-XAML -WPFPrefix 'WPF_DP_' -XMLFile '.\Assets\WPF\Grid_DiskPartition.xaml' -ActionsPath '.\Assets\UIActions\DiskPartition\' -AddWPFVariables
 
 If ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
@@ -177,10 +155,13 @@ If ($Script:GUICurrentStatus.OperationMode -eq "Simple"){
     $WPF_Window_LoadandSaveSettings_Label.Visibility = "Hidden"
 
 }
-
+ 
 update-ui -MainWindowButtons -Emu68Settings
 
 $WPF_MainWindow.ShowDialog() | out-null
+# # $WPF_MainWindow.Close()
+
+######
 
 if ($Script:GUICurrentStatus.ProcessImageConfirmedbyUser -eq $true){    
     Write-ImageCreation
@@ -192,7 +173,6 @@ else {
 
 # Copy-Emu68Imager -NewLocation "E:\Emu 68 Imager Test Files" -compress -UserFiles
 
-# # $WPF_MainWindow.Close()
 # # [System.Windows.Controls.DataGrid].GetEvents() | Select-Object Name, *Method, EventHandlerType >test.txt
 
 #$Script:GUIActions.AvailablePackages

@@ -4,37 +4,38 @@ function New-GUIPartition {
         $PartitionType,
         $PartitionSubType,
         [switch]$DefaultPartition,
-        $PartitionTypeAmiga,
-        [switch]$ImportedPartition,
-        $ImportedPartitionMethod
+        $PartitionTypeAmiga
     )
     
-    # Write-debug "PartitionType is: $PartitionType PartitionSubType is:  $PartitionSubType DefaultPartition is: $DefaultPartition"
+    # Write-debug "PartitionName is: $PartitionName PartitionType is: $PartitionType PartitionSubType is: $PartitionSubType DefaultPartition is: $DefaultPartition PartitionTypeAmiga is: $PartitionTypeAmiga"
     # $WPF_MainWindow.Close()
     # exit
 
-    if ($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'FAT32'){
-        $NewPartition_XML = get-content '.\Assets\WPF\SetupDisk\PartitionMBR.xaml'
+    # $PartitionType = "GPT"
+    # $PartitionSubType = "System"
+
+    $VisualtoUse = If ($PartitionType -eq "MBR" -or $PartitionType -eq "GPT") {
+        $Script:GUIPartitionVisuals.where({ $_.PartitionType -eq  $PartitionType -and $_.PartitionSubType -eq $PartitionSubType}) 
     }
-    elseif ($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'ID76'){
-        $NewPartition_XML = get-content '.\Assets\WPF\SetupDisk\PartitionID76.xaml'
+    elseif ($PartitionType -eq "Amiga"){
+        $Script:GUIPartitionVisuals.where({ $_.PartitionType -eq  $PartitionType -and $_.PartitionSubType -eq $PartitionTypeAmiga }) 
     }
-    elseif ($PartitionType -eq 'Amiga'){
-        $NewPartition_XML = get-content '.\Assets\WPF\SetupDisk\PartitionAmiga.xaml'
+        
+    $NewPartition_XML = get-content '.\Assets\WPF\SetupDisk\Partition.xaml'
+    [xml]$NewPartition_XAML = $NewPartition_XML -replace 'mc:Ignorable="d"','' -replace "x:N",'N' -replace '^<Win.*', '<Window'
+    $reader = (New-Object System.Xml.XmlNodeReader $NewPartition_XAML)
+    $NewPartition = [Windows.Markup.XamlReader]::Load( $reader)
+    if ($DefaultPartition){
+        $NewPartition.FindName("FullSpace_Rectangle").Fill = Get-VisualBrushDefaultPartition -Colour $VisualtoUse.DefaultColour      
     }
-    elseif ($PartitionType -eq 'GPT'){
-        Write-ErrorMessage -Message "Coding Error - New-GUIPartition!"
-        $WPF_MainWindow.Close()
-        exit
-    }
-    else {
-        Write-ErrorMessage -Message "Coding Error - New-GUIPartition! Different MBR partitions?"
-        $WPF_MainWindow.Close()
-        exit
+    else  {
+        #Write-host "Colour for New partition: $([System.Windows.Media.BrushConverter]::new().ConvertFromString($VisualtoUse.Colour))"
+        $NewPartition.FindName("FullSpace_Rectangle").Fill = [System.Windows.Media.BrushConverter]::new().ConvertFromString($VisualtoUse.Colour)
     }
 
+
     If ($DefaultPartition){
-        if (($PartitionType -eq 'MBR') -and ($PartitionSubType -eq 'FAT32' -or $PartitionSubType -eq 'ID76')){
+        if ($PartitionType -eq 'MBR' -or $PartitionType -eq 'GPT'){
             $DefaultGPTMBRPartition = $true
         }
         elseif ($PartitionType -eq 'Amiga'){
@@ -52,19 +53,10 @@ function New-GUIPartition {
         $DefaultAmigaWorkPartition = $false
     }
 
-    [xml]$NewPartition_XAML = $NewPartition_XML -replace 'mc:Ignorable="d"','' -replace "x:N",'N' -replace '^<Win.*', '<Window'
-    
-    $reader = (New-Object System.Xml.XmlNodeReader $NewPartition_XAML)
-
-    $NewPartition = [Windows.Markup.XamlReader]::Load( $reader)
-
     $NewPartition | Add-Member -NotePropertyMembers @{
         PartitionName = $PartitionName
         VolumeName = $null
         CanRenameVolume = $null
-        ImportedPartition = $false
-        ImportedPartitionMethod = $null
-        ImportedPartitionPath = $null
         PartitionType = $PartitionType
         PartitionSubType = $PartitionSubType 
         StartingPositionBytes = $null
@@ -84,29 +76,16 @@ function New-GUIPartition {
         ImportedFilesPath  = $null
     }
 
-    # $Fields =  ('FullPath','Size','LastWriteTime','CreationTime','Type')
-         
-    # [void]$NewPartition.ImportedFiles.Columns.AddRange($Fields)
-
-    # $NewPartition.ImportedFiles.Add("FullPath", [string])
-    # $NewPartition.ImportedFiles.Add("Size", [decimal])
-    # $NewPartition.ImportedFiles.Add("LastWriteTime", [datetime])
-    # $NewPartition.ImportedFiles.Add("CreationTime", [datetime])
-    # $NewPartition.ImportedFiles.Add("Type", [string])
-
-    If (($PartitionType -eq 'MBR') -and ($PartitionSubType -eq 'FAT32' -or $PartitionSubType -eq 'ID76')){  
-        $NewPartition | Add-Member -NotePropertyMembers @{
-            ImportedGPTMBRPartitionNumber = $null
-        }       
+    If (($PartitionType -eq 'MBR') -or ($PartitionType -eq 'GPT')){    
         $NewPartition.PartitionTypeGPTMBRorAmiga = 'GPTMBR'
-        if ($PartitionSubType -eq 'ID76'){
-            $NewPartition | Add-Member -NotePropertyName AmigaDiskName -NotePropertyValue $null  
+        if (($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'ID76') -or ($PartitionType -eq 'GPT' -and $PartitionSubType -eq "Amiga")){
+            $NewPartition | Add-Member -NotePropertyName AmigaDiskName -NotePropertyValue $null -Force
         }
         if ($DefaultGPTMBRPartition -eq $true){
             $NewPartition.CanRenameVolume = $false
             $NewPartition.CanImportFiles = $false
             $NewPartition.CanResizeRight = $true
-            if ($PartitionSubType -eq 'FAT32'){
+            if (($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'FAT32') -or ($PartitionType -eq 'GPT' -and $PartitionSubType -eq 'Data') -or ($PartitionType -eq 'GPT' -and $PartitionSubType -eq 'System') ){
                 $NewPartition.CanDelete = $false
                 $NewPartition.CanMove = $false
                 $NewPartition.CanResizeLeft =$false
@@ -117,21 +96,12 @@ function New-GUIPartition {
                 $NewPartition.CanResizeLeft =$true
             }
         }
-        elseif ($ImportedPartition){
-            $NewPartition.CanImportFiles = $false
-            $NewPartition.CanRenameVolume = $false
-            $NewPartition.CanDelete = $true
-            $NewPartition.CanResizeLeft = $false
-            $NewPartition.CanResizeRight = $false
-            $NewPartition.CanMove = $true
-
-        }
         else{
             $NewPartition.CanDelete = $true
             $NewPartition.CanResizeRight = $true
             $NewPartition.CanResizeLeft =$true
             $NewPartition.CanMove = $true
-            if ($PartitionSubType -eq 'FAT32'){
+            if (($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'FAT32') -or ($PartitionType -eq 'GPT' -and $PartitionSubType -eq 'Data')){
                 $NewPartition.CanRenameVolume = $true
             }
             else {
@@ -151,8 +121,6 @@ function New-GUIPartition {
             Bootable = $null
             NoMount = $null
             Priority = $null
-            ImportedPartitionOffsetBytes = $null
-            ImportedPartitionEndBytes = $null
             VolumeNameOriginalImportedValue = $null
             DeviceNameOriginalImportedValue = $null
             BuffersOriginalImportedValue = $null
@@ -205,38 +173,6 @@ function New-GUIPartition {
             $NewPartition.CanRenameVolume = $true
             $NewPartition.CanChangeMaxTransfer = $true
         }
-        elseif (($ImportedPartition)-and $ImportedPartitionMethod -eq 'Direct'){
-            $NewPartition.CanImportFiles = $false
-            $NewPartition.CanDelete = $true
-            $NewPartition.CanResizeLeft = $false
-            $NewPartition.CanResizeRight = $false
-            $NewPartition.CanMove = $true
-            $NewPartition.CanChangeMask = $true
-            $NewPartition.CanChangeBootable = $true
-            $NewPartition.CanChangeDosType = $false
-            $NewPartition.CanChangeBuffers =$true
-            $NewPartition.CanChangePriority = $true
-            $NewPartition.CanChangeMountable = $true
-            $NewPartition.CanRenameDevice = $true
-            $NewPartition.CanRenameVolume = $true
-            $NewPartition.CanChangeMaxTransfer = $true    
-        }
-        elseif (($ImportedPartition)  -and $ImportedPartitionMethod -eq 'Derived'){
-            $NewPartition.CanImportFiles = $false
-            $NewPartition.CanDelete = $false
-            $NewPartition.CanResizeLeft = $false
-            $NewPartition.CanResizeRight = $false
-            $NewPartition.CanMove = $false
-            $NewPartition.CanChangeMask = $true
-            $NewPartition.CanChangeBootable = $true
-            $NewPartition.CanChangeDosType = $false
-            $NewPartition.CanChangeBuffers =$true
-            $NewPartition.CanChangePriority = $true
-            $NewPartition.CanChangeMountable = $true
-            $NewPartition.CanRenameDevice = $true
-            $NewPartition.CanRenameVolume = $true
-            $NewPartition.CanChangeMaxTransfer = $true    
-        }
         else{
             $NewPartition.CanImportFiles = $true
             $NewPartition.CanDelete = $true
@@ -254,44 +190,6 @@ function New-GUIPartition {
             $NewPartition.CanChangeMaxTransfer = $true    
         }
     }
-     
-    #$NewPartition.PartitionSizeBytes = $SizeBytes
-
-    $TotalChildren = $NewPartition.Children.Count-1
-    
-    for ($i = 0; $i -le $TotalChildren; $i++) {
-        if ($NewPartition.Children[$i].Name -eq 'FullSpace_Rectangle'){
-            if ($DefaultPartition){
-                if ($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'FAT32'){
-                    $NewPartition.Children[$i].Fill = $WPF_MainWindow.Resources.DefaultMBRBrush
-                }
-                elseif ($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'ID76'){
-                    $NewPartition.Children[$i].Fill = $WPF_MainWindow.Resources.DefaultID76Brush
-                }
-                elseif ($DefaultAmigaWorkbenchPartition -eq $true){
-                    $NewPartition.Children[$i].Fill = $WPF_MainWindow.Resources.DefaultAmigaWorkbenchPartitionBrush
-                }
-                # elseif ($DefaultAmigaWorkPartition -eq $true){
-                #     $NewPartition.Children[$i].Fill=$WPF_MainWindow.Resources.DefaultAmigaWorkPartitionBrush
-                # }
-            }
-            else {
-                if ($ImportedPartition){
-                    if ($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'FAT32'){
-                        $NewPartition.Children[$i].Fill = $WPF_MainWindow.Resources.ImportedMBRBrush
-                    }
-                    elseif ($PartitionType -eq 'MBR' -and $PartitionSubType -eq 'ID76'){
-                        $NewPartition.Children[$i].Fill = $WPF_MainWindow.Resources.ImportedID76Brush
-                    }
-                    elseif ($PartitionType -eq 'Amiga'){
-                        $NewPartition.Children[$i].Fill = $WPF_MainWindow.Resources.ImportedAmigaPartitionBrush
-                    }
-
-                }
-
-            }
-        }
-    }
-
+      
     return $NewPartition
 }

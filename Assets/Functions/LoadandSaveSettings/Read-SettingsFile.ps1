@@ -4,7 +4,7 @@ function Read-SettingsFile {
     )
     
     
-   # $SettingsFile = "C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Settings\3.2.e68"
+   # $SettingsFile = "C:\Users\Matt\OneDrive\Documents\DiskPartitioner\Settings\3.9.e68"
 
    $Script:GUICurrentStatus.LoadingSettings = $true
    
@@ -33,16 +33,11 @@ function Read-SettingsFile {
    $Script:GUICurrentStatus.PathstoRDBPartitions = [System.Collections.Generic.List[PSCustomObject]]::New()
    $Script:GUICurrentStatus.StartTimeForRunningInstall = $null
    $Script:GUICurrentStatus.EndTimeForRunningInstall  = $null
-   $Script:GUICurrentStatus.ImportedPartitionType = $null
    $Script:GUICurrentStatus.SelectedPhysicalDiskforImport = $null
-   $Script:GUICurrentStatus.ImportedImagePath = $null
-   $Script:GUICurrentStatus.ProcessImportedPartition = $false
    $Script:GUICurrentStatus.TransferSourceLocation  = $null
    $Script:GUICurrentStatus.TransferSourceType = $null
    $Script:GUICurrentStatus.LastCommandTime = $null
    $Script:GUICurrentStatus.CurrentWindow = $null
-   $Script:GUICurrentStatus.PackagesChanged = $null
-   $Script:GUICurrentStatus.IconsChanged = $null
    $Script:GUICurrentStatus.TextBoxEntryFocus = $null
    $Script:GUICurrentStatus.MouseStatus = $null
    $Script:GUICurrentStatus.CurrentMousePositionX = $null
@@ -53,28 +48,20 @@ function Read-SettingsFile {
    $Script:GUICurrentStatus.ActionToPerform = $null
    $Script:GUICurrentStatus. SelectedAmigaPartition = $null
    $Script:GUICurrentStatus.PartitionHoveredOver = $null
-   $Script:GUICurrentStatus.AvailableSpaceforImportedMBRGPTPartitionBytes = $null
-   $Script:GUICurrentStatus.MBRPartitionstoImportDataTable = New-Object System.Data.DataTable
-   $Script:GUICurrentStatus.RDBPartitionstoImportDataTable = New-Object System.Data.DataTable
+
    
    $Script:GUICurrentStatus.RunOptionstoReport.Columns.Add((New-Object System.Data.DataColumn "Setting",([string])))
    $Script:GUICurrentStatus.RunOptionstoReport.Columns.Add((New-Object System.Data.DataColumn "Value",([string])))
    $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Columns.Add((New-Object System.Data.DataColumn "Area",([string])))
    $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Columns.Add((New-Object System.Data.DataColumn "Issue",([string])))
-   
-   for ($i = 0; $i -lt $Script:GUICurrentStatus.MBRPartitionstoImportDataTable.Columns.Count; $i++) {
-       if (($Script:GUICurrentStatus.MBRPartitionstoImportDataTable.Columns[$i].ColumnName) -eq 'SizeBytes'){
-           $Script:GUICurrentStatus.MBRPartitionstoImportDataTable.Columns[$i].ColumnMapping= [System.Data.MappingType]::Hidden
-       }
-   }
-   
+     
    $Script:GUIActions.DeleteAllDownloadedFiles = $null
+   $Script:GUIActions.CreateCustomKickstart = $false
    $Script:GUIActions.RunParallel = $false
    $Script:GUIActions.InstallType = 'PiStorm'
    $Script:GUIActions.ScreenModetoUse = $null
    $Script:GUIActions.ScreenModetoUseFriendlyName =$null
    $Script:GUIActions.DefaultPackagesSelected = $null 
-   $Script:GUIActions.DefaultIconsetSelected = $null
    $Script:GUIActions.AvailablePackages = New-Object System.Data.DataTable
    $Script:GUIActions.AvailableIconSets = New-Object System.Data.DataTable 
    $Script:GUIActions.SelectedIconSet = $null 
@@ -84,13 +71,14 @@ function Read-SettingsFile {
    $Script:GUIActions.KickstartVersiontoUseFriendlyName = $null
    $Script:GUIActions.OSInstallMediaType = $null
    $Script:GUIActions.SSID = $null
+   $Script:GUIActions.Languages = [System.Collections.Generic.List[PSCustomObject]]::New()
    $Script:GUIActions.WifiPassword = $null
    $Script:GUIActions.FoundInstallMediatoUse = $null
    $Script:GUIActions.FoundKickstarttoUse = $null 
    $Script:GUIActions.ListofRemovableMedia = $null
    $Script:GUIActions.ImportPartitionWindowStatus = $null
    $Script:GUIActions.SelectedPhysicalDiskforTransfer = $null
-   $Script:GUIActions.DiskTypeSelected = $null
+   $Script:GUIActions.DiskType = $null
    $Script:GUIActions.DiskSizeSelected = $null
    $Script:GUIActions.ImageSizeSelected = $null
    $Script:GUIActions.OutputPath = $null
@@ -215,7 +203,7 @@ function Read-SettingsFile {
     $LoadedSettingsHeader = $null
     $GPTMBRHeader = $null
     $RDBHeader = $null
-    $MBRPartitionHeader = $null
+    $GPTMBRPartitionHeader = $null
     $RDBPartitionHeader = $null
     $AvailablePackagesHeader = $null 
     $FoundInstallMediaHeader = $null
@@ -224,7 +212,7 @@ function Read-SettingsFile {
     $LoadedSettings = @()
     $GPTMBR = @()
     $RDB = @()
-    $MBRPartitions = @()
+    $GPTMBRPartitions = @()
     $RDBPartitions = @()
     $ImportFiles = @()
     $AvailableIconSets = New-Object System.Data.DataTable
@@ -245,9 +233,9 @@ function Read-SettingsFile {
             $HeaderValue = $_.Replace('RDBHeader;','')
             $RDBHeader = $HeaderValue.Split(';')
         }
-        elseif ($_.split(';')[0] -eq 'MBRPartitionHeader'){
-            $HeaderValue = $_.Replace('MBRPartitionHeader;','')
-            $MBRPartitionHeader = $HeaderValue.Split(';')
+        elseif ($_.split(';')[0] -eq 'GPTMBRPartitionHeader'){
+            $HeaderValue = $_.Replace('GPTMBRPartitionHeader;','')
+            $GPTMBRPartitionHeader = $HeaderValue.Split(';')
         }
         elseif ($_.split(';')[0] -eq 'RDBPartitionHeader'){
             $HeaderValue = $_.Replace('RDBPartitionHeader;','')
@@ -281,8 +269,8 @@ function Read-SettingsFile {
         elseif (($_.split(';')[0] -eq 'RDBDetails') -and ($RDBHeader)) {
             $RDB += ConvertFrom-Csv -InputObject $_ -Delimiter ';' -Header $RDBHeader
         }
-        elseif (($_.split(';')[0] -eq 'MBRPartitionDetails') -and ($MBRPartitionHeader)) {
-            $MBRPartitions += ConvertFrom-Csv -InputObject $_ -Delimiter ';' -Header $MBRPartitionHeader
+        elseif (($_.split(';')[0] -eq 'GPTMBRPartitionDetails') -and ($GPTMBRPartitionHeader)) {
+            $GPTMBRPartitions += ConvertFrom-Csv -InputObject $_ -Delimiter ';' -Header $GPTMBRPartitionHeader
         }
         elseif (($_.split(';')[0] -eq 'RDBPartitionDetails') -and ($RDBPartitionHeader)) {
             $RDBPartitions += ConvertFrom-Csv -InputObject $_ -Delimiter ';' -Header $RDBPartitionHeader
@@ -298,6 +286,9 @@ function Read-SettingsFile {
         }
         elseif (($_.split(';')[0] -eq 'FoundKickstarttoUseDetails') -and ($FoundKickstarttoUseHeader)) {
             $FoundKickstarttoUse += ConvertFrom-Csv -InputObject $_.replace('FoundKickstarttoUseDetails;','')  -Delimiter ';' -Header $FoundKickstarttoUseHeader
+        }
+        elseif ($_.split(';')[0] -eq 'LanguagesDetails') {
+            $FoundLanguages = $_.replace('LanguagesDetails;','').split(';')
         }
     }
 
@@ -317,10 +308,10 @@ function Read-SettingsFile {
 
     $GPTMBR | ForEach-Object {
         $_.DiskSizeBytes = [decimal]$_.DiskSizeBytes
-        $_.MBROverheadBytes = [decimal]$_.MBROverheadBytes
+        $_.GPTMBROverheadBytes = [decimal]$_.GPTMBROverheadBytes
     }
 
-    $MBRPartitions | ForEach-Object {
+    $GPTMBRPartitions | ForEach-Object {
         $_.StartingPositionBytes  = [int64]$_.StartingPositionBytes  
         $_.PartitionSizeBytes = [int64]$_.PartitionSizeBytes
         $_.ImportedFilesSpaceBytes = [int64]$_.ImportedFilesSpaceBytes
@@ -333,10 +324,7 @@ function Read-SettingsFile {
     }
 
     $LoadedSettings | ForEach-Object {
-        if ($_.Setting -eq 'DiskTypeSelected'){
-            $DiskTypetouse = $_.Value       
-        }
-        elseif ($_.Setting -in @('KickstartVersiontoUse')){
+        if ($_.Setting -in @('KickstartVersiontoUse')){
             (Get-Variable -Scope Script -Name "GUIActions").Value.$($_.Setting) = [system.version]$_.Value
         }        
         else {
@@ -346,6 +334,12 @@ function Read-SettingsFile {
    
     If ($Script:GUICurrentStatus.RunParallelInstalled -ne "Yes"){
         $Script:GUIActions.RunParallel = $false
+    }
+
+    if ($FoundLanguages){
+        foreach ($Language in $FoundLanguages) {
+            $Script:GUIActions.Languages.Add($Language)
+        }
     }
 
     $AllROMHashes = Get-InputFileCSV -CSV 'ROMHashes'
@@ -416,13 +410,7 @@ function Read-SettingsFile {
     $Script:GUIActions.AvailablePackages.DefaultView.RowFilter = "PackageinScope = true"
     
     $WPF_PackageSelection_Datagrid_Packages.ItemsSource = $Script:GUIActions.AvailablePackages.DefaultView  
-    $WPF_PackageSelection_Datagrid_IconSets.ItemsSource = $Script:GUIActions.AvailableIconSets.DefaultView
-
-    if ($IndexForSelectedIconSet -ne $null){
-        $WPF_PackageSelection_Datagrid_IconSets.SelectedIndex  =  $IndexForSelectedIconSet
-        $WPF_PackageSelection_CurrentlySelectedIconSet_Value.text = $WPF_PackageSelection_Datagrid_IconSets.SelectedItem.IconSet
-    }
-    
+  
     $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
 
     $WPF_StartPage_ScreenMode_Dropdown.SelectedItem = $Script:GUIActions.ScreenModetoUseFriendlyName
@@ -451,12 +439,10 @@ function Read-SettingsFile {
     }
     
     if ($MissingFiles -eq $false){        
-        $Script:GUICurrentStatus.IconsChanged = $false
-        $Script:GUICurrentStatus.PackagesChanged =$false
         $Script:GUIActions.FoundInstallMediatoUse = $FoundInstallMedia 
     }
 
-    if ($DiskTypetouse){
+    if ($Script:GuiActions.DiskType){
         $ImportDisk = $true
         if ($Script:GUIActions.OutputType -eq "Disk"){
             $Script:GUIActions.ListofRemovableMedia = Get-RemovableMedia
@@ -491,34 +477,35 @@ function Read-SettingsFile {
 
         if ($ImportDisk -eq $true){
             
-                Set-InitialDiskValues -DiskType $DiskTypetouse -SizeBytes $GPTMBR.DiskSizeBytes -LoadSettings
-                $WPF_DP_Disk_GPTMBR.NumberofPartitionsMBR = $GPTMBR.NumberofPartitionsMBR
-                $WPF_DP_Disk_GPTMBR.NextPartitionMBRNumber = $GPTMBR.NextPartitionMBRNumber
+                Set-InitialDiskValues -DiskType $Script:GuiActions.DiskType -SizeBytes $GPTMBR.DiskSizeBytes -LoadSettings
+                $WPF_DP_Disk_GPTMBR.NumberofPartitionsGPTMBR = $GPTMBR.NumberofPartitionsGPTMBR
+                $WPF_DP_Disk_GPTMBR.NextPartitionGPTMBRNumber = $GPTMBR.NextPartitionGPTMBRNumber
     
-                $MBRPartitions | ForEach-Object {
+                $GPTMBRPartitions | ForEach-Object {
                     if ($_.PartitionType -eq 'MBR' -and $_.PartitionSubType -eq 'FAT32'){
                         if ($_.DefaultGPTMBRPartition -eq 'True'){
                             Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -DefaultPartition $true -SizeBytes ($($_.PartitionSizeBytes)) -VolumeName $_.VolumeName -StartingPositionBytes ($($_.StartingPositionBytes))                             
-                        }
-                        elseif ($_.ImportedPartition -eq 'True') { 
-                            Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -PathtoImportedPartition $_.ImportedPartitionPath -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) -VolumeName $_.VolumeName
                         }
                         else {
                             Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) -VolumeName $_.VolumeName
                         } 
                     }
-                    elseif ($_.PartitionType -eq 'MBR' -and $_.PartitionSubType -eq 'ID76'){
+                    elseif ($_.PartitionType -eq 'GPT' -and ($_.PartitionSubType -eq 'System' -or $_.PartitionSubType -eq 'Data')){
+                        if ($_.DefaultGPTMBRPartition -eq 'True'){
+                            Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -DefaultPartition $true -SizeBytes ($($_.PartitionSizeBytes)) -VolumeName $_.VolumeName -StartingPositionBytes ($($_.StartingPositionBytes))                            
+                        }
+                        else {
+                            Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) -VolumeName $_.VolumeName
+                        }
+                    }
+                    elseif ($_.PartitionType -eq 'MBR' -and $_.PartitionSubType -eq 'ID76' -or $_.PartitionType -eq 'GPT' -and $_.PartitionSubType -eq 'Amiga'){
                         if ($_.DefaultGPTMBRPartition -eq 'True'){
                             Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -DefaultPartition $true -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes)) 
-                            Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name
-                        }
-                        elseif ($_.ImportedPartition -eq 'True') {
-                            Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -PathtoImportedPartition $_.ImportedPartitionPath -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes))
-                            Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name -ImportedDisk
+                            Add-AmigaDisktoGPTMBRPartition -ID76PartitionName $_.Name
                         }
                         else {
                             Add-GUIPartitiontoGPTMBRDisk -LoadSettings -PartitionType $_.PartitionType -PartitionSubType $_.PartitionSubType -NewPartitionNameFromSettings $_.Name -AddType 'SpecificPosition' -SizeBytes ($($_.PartitionSizeBytes)) -StartingPositionBytes ($($_.StartingPositionBytes))
-                            Add-AmigaDisktoID76Partition -ID76PartitionName $_.Name 
+                            Add-AmigaDisktoGPTMBRPartition -ID76PartitionName $_.Name 
                         }
             
                         foreach ($AmigaDisk in $RDB) {
@@ -541,11 +528,8 @@ function Read-SettingsFile {
                     elseif ($_.DefaultAmigaWorkPartition -eq 'True'){
                         Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -PartitionTypeAmiga 'Work' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask -ImportedFilesPath $_.ImportedFilesPath -ImportedFilesSpaceBytes $_.ImportedFilesSpaceBytes  
                     }
-                    elseif ($_.ImportedPartition -eq 'True'){
-                        Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -ImportedPartition $true -ImportedPartitionMethod $_.ImportedPartitionMethod -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask   
-                    }
                     else {
-                        Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask -ImportedFilesPath $_.ImportedFilesPath -ImportedFilesSpaceBytes $_.ImportedFilesSpaceBytes  
+                        Add-GUIPartitiontoAmigaDisk -LoadSettings -NewPartitionNameFromSettings $_.Name -AmigaDiskName $AmigaDiskName -SizeBytes ($($_.PartitionSizeBytes)) -AddType 'AtEnd' -PartitionTypeAmiga 'Work' -VolumeName $_.VolumeName -DeviceName $_.DeviceName -Buffers $_.Buffers -DosType $_.DosType -MaxTransfer $_.MaxTransfer -Bootable $_.Bootable -NoMount $_.NoMount -Priority $_.Priority -Mask $_.Mask -ImportedFilesPath $_.ImportedFilesPath -ImportedFilesSpaceBytes $_.ImportedFilesSpaceBytes  
                     } 
             
                 }   
@@ -582,6 +566,15 @@ function Read-SettingsFile {
         }
     }
     
+    $WPF_StartPage_IconSet_DropDown.ItemsSource = $null
+    $AvailableIconsSet = @(Get-InputFileCSV -CSV "IconSets")
+    foreach ($item in $AvailableIconsSet) {
+        $WPF_StartPage_IconSet_DropDown.AddChild($item.IconSet)
+        if ($item.IconsDefaultInstall -eq $true) {
+            $Script:GUIActions.SelectedIconSet = $item.IconSet
+        }
+    }
+
     if ($ImportDisk -eq $true){
         Update-UI -MainWindowButtons -Emu68Settings -DiskPartitionWindow -UpdateInputBoxes -Buttons -PhysicalvsImage -CheckforRunningImage -freespacealert -WBScreenModeUpdate
 
@@ -597,6 +590,7 @@ function Read-SettingsFile {
         $Script:GUIActions.ListofRemovableMedia = Get-RemovableMedia
     }
 
+                
 
     $Script:GUICurrentStatus.LoadingSettings = $null
 

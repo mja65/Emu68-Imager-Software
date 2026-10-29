@@ -39,10 +39,7 @@ $WPF_StartPage_ADFpath_Button_Check.Add_Click({
          if ($MissingFlag -eq $true) {
             $Script:GUIActions.FoundInstallMediatoUse = $null
          }
-         else {
-            $Script:GUICurrentStatus.PackagesChanged = $null
-            $Script:GUICurrentStatus.IconsChanged = $null
-         }
+
          Update-UI -Emu68Settings -CheckforRunningImage
     }
     else{

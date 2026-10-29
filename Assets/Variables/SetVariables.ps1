@@ -5,14 +5,13 @@ $osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
 
 $Script:Settings = [PSCustomObject]@{
     MBRSectorSizeBytes = [int]512
-    MBRPartitionsMaximum = [int]4
-    AmigaPartitionsperDiskMaximum = [int]10
     AmigaRDBHeads = [int]16
     AmigaRDBSectors = [int]63
     AmigaRDBBlockSize = [int]512
     AmigaRDBSides = [int]2
     DiskWidthPixels = 1000
-    MBROverheadBytes = 1048576+50688 # Allowing for partition to start at sector 2048 and leave space HST Imager appears to require
+    DiskHeightPixels = 80
+    GPTMBROverheadBytes = 1048576+50688 # Allowing for partition to start at sector 2048 and leave space HST Imager appears to require
     MBRFirstPartitionStartSector = 2048
     PartitionPixelBuffer = 5 # To account for not exact mouse pointer precision
     AmigaWorkDiskIconXPosition = 15
@@ -116,6 +115,7 @@ $Script:GUICurrentStatus = [PSCustomObject]@{
     AllowVirtualDrives =$false
     RunParallelInstalled = $null
     GithubAPIToken = $null
+    CustomKickstartROMPath = $null
     HaveRunHSTImager = $false
     MiamiUserFiles = $null
     RoadshowUserFiles = $null
@@ -154,10 +154,7 @@ $Script:GUICurrentStatus = [PSCustomObject]@{
     PathstoRDBPartitions = [System.Collections.Generic.List[PSCustomObject]]::New()
     StartTimeForRunningInstall = $null
     EndTimeForRunningInstall  = $null
-    ImportedPartitionType = $null
     SelectedPhysicalDiskforImport = $null
-    ImportedImagePath = $null
-    ProcessImportedPartition = $false
     TransferSourceLocation  = $null
     TransferSourceType = $null
     LastCommandTime = $null
@@ -174,9 +171,6 @@ $Script:GUICurrentStatus = [PSCustomObject]@{
     ActionToPerform = $null
     SelectedAmigaPartition = $null
     PartitionHoveredOver = $null
-    AvailableSpaceforImportedMBRGPTPartitionBytes = $null
-    MBRPartitionstoImportDataTable = New-Object System.Data.DataTable
-    RDBPartitionstoImportDataTable = New-Object System.Data.DataTable
 #   MBRPartitionContextMenuEnabled = $false
 #    AmigaPartitionContextMenuEnabled = $false
 }
@@ -200,6 +194,9 @@ $Script:GUIActions = [PSCustomObject]@{
     #InstallType = $null
     InstallType = 'PiStorm'
     #Not in GUI - End
+    SelectedP96Resolutions = $null
+    Languages = [System.Collections.Generic.List[PSCustomObject]]::New()
+    CreateCustomKickstart = $null
     DeleteAllDownloadedFiles = $null
     DiskType = $null
     RunParallel = $null
@@ -244,7 +241,6 @@ $Script:GUIActions = [PSCustomObject]@{
     AvailableScreenModes = $null
     AvailableScreenModesWB = $null
     DefaultPackagesSelected = $null 
-    DefaultIconsetSelected = $null
     AvailablePackages = New-Object System.Data.DataTable
     AvailableIconSets = New-Object System.Data.DataTable 
     SelectedIconSet = $null 
@@ -261,14 +257,12 @@ $Script:GUIActions = [PSCustomObject]@{
     FoundKickstarttoUse = $null
     ListofRemovableMedia = $null
     ImportPartitionWindowStatus = $null
-
     # TransferFilesImagePath = $null
     # TransferSourceLocation = $null
     # TransferSourceType = $null
     # TransferAmigaSourceType = $null
     SelectedPhysicalDiskforTransfer = $null
     ScriptPath = $null
-    DiskTypeSelected = $null
     DiskSizeSelected = $null
     ImageSizeSelected = $null
     OutputPath = $null
@@ -283,6 +277,8 @@ $Script:GUIActions = [PSCustomObject]@{
     # AmigaPartitionIsUnselectedAction =$false
     # IsAmigaPartitionShowing = $false
 }
+
+$Script:GUIActions.Languages.Add("English")
 
 $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSet",([String])))
 $Script:GUIActions.AvailableIconSets.Columns.Add((New-Object System.Data.DataColumn "IconSetDescription",([String])))
@@ -322,34 +318,18 @@ $Script:GUIActions.AvailablePackages.Columns["PackageNameDescription"].ReadOnly 
 $Script:GUIActions.AvailablePackages.Columns["PackageDefaultDrive"].ReadOnly = $true
 $Script:GUIActions.AvailablePackages.Columns["PackageDefaultPath"].ReadOnly = $true
 
-$Script:GUIVisuals = [PSCustomObject]@{
-    ColourFAT32 = "#FF3B67A2"
-    ColourID76 = "#FF7B7B7B"
-    ColourWorkbench = "#FFFFA997"
-    ColourWork = "#FFAA907C" 
-    ColourImported = "#FFAFAFAF"
-}
-
-$Script:SDCardMinimumsandMaximums = [PSCustomObject]@{
-    EMU68BOOTMinimum  = $null
-    GPTMinimum = $null
-    MBRMinimum = $null
-    ID76Minimum = $null  
-    PFS3Maximum = $null
-    SystemMinimum = $null  
-    PFS3Minimum = $null
-    EMU68BOOTDefault = $null   
-    WorkbenchDefault = $null
-    DefaultAddMBRSize = $null
-    DefaultAddGPTSize = $null
-    DefaultAddID76Size = $null
-    DefaultAddPFS3Size  = $null
-}
+$Script:GUIPartitionVisuals = @(
+    [PSCustomObject]@{ PartitionType = "MBR";   PartitionSubType = "FAT32";       Colour = "#FF3B67A2" ;DefaultColour = "#FF3B67A2" }
+    [PSCustomObject]@{ PartitionType = "MBR";   PartitionSubType = "ID76";        Colour = "#FF7B7B7B" ;DefaultColour = "#FF7B7B7B" }
+    [PSCustomObject]@{ PartitionType = "GPT";   PartitionSubType = "System";      Colour = "#FF3B67A2" ;DefaultColour = "#FF3B67A2" }
+    [PSCustomObject]@{ PartitionType = "GPT";   PartitionSubType = "Data";        Colour = "#FFCA7235" ;DefaultColour = "#FFCA7235"}
+    [PSCustomObject]@{ PartitionType = "GPT";   PartitionSubType = "Amiga";       Colour = "#FF7B7B7B" ;DefaultColour = "#FF7B7B7B"}
+    [PSCustomObject]@{ PartitionType = "Amiga"; PartitionSubType = "Work";        Colour = "#FFAA907C" ;DefaultColour = "#FFAA907C"}
+    [PSCustomObject]@{ PartitionType = "Amiga"; PartitionSubType = "Workbench";   Colour = "#FFFFA997" ;DefaultColour = "#FFFFA997" }
+)
 
 $Script:ExternalProgramSettings = [PSCustomObject]@{
-    UnADFFilePath = '.\Programs\unadf\bin\unadf.exe'
     SevenZipFilePath = '.\Programs\7z\7z.exe'
-    UnlzxFilePath = '.\Programs\Unlzx\unlzx.exe'
     HSTImagerPath = '.\Programs\HSTImager\hst.imager.exe'
     HSTAmigaPath =  '.\Programs\HSTAmiga\Hst.amiga.exe'
     CapCLIPath = '.\Programs\Capitoline\Capitoline'

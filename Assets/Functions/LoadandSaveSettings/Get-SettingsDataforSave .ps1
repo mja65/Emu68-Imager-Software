@@ -29,9 +29,10 @@ function Get-SettingsDataforSave {
     $Output += "Setting;OSInstallMediaType;$($Script:GUIActions.OSInstallMediaType)" 
     $Output += "Setting;NetworkStack;$($Script:GUIActions.NetworkStack)"
     $Output += "Setting;MUIVersion;$($Script:GUIActions.MUIVersion)" 
+    $Output += "Setting;CreateCustomKickstart;$($Script:GUIActions.CreateCustomKickstart )"
     $Output += "Setting;SSID;$($Script:GUIActions.SSID)"
     $Output += "Setting;WifiPassword;$($Script:GUIActions.WifiPassword)"
-    $Output += "Setting;DiskTypeSelected;$($Script:GUIActions.DiskTypeSelected)"
+    $Output += "Setting;DiskType;$($Script:GUIActions.DiskType)"
     $Output += "Setting;OutputPath;$($Script:GUIActions.OutputPath)"
     $Output += "Setting;OutputType;$($Script:GUIActions.OutputType)"
     $Output += "Setting;InstallMediaLocation;$($Script:GUIActions.InstallMediaLocation)"
@@ -39,7 +40,6 @@ function Get-SettingsDataforSave {
     $Output += "Setting;SelectedIconSet;$($Script:GUIActions.SelectedIconSet)"
     $Output += "Setting;InstallOSFiles;$($Script:GUIActions.InstallOSFiles)"
     $Output += "Setting;DefaultPackagesSelected;$($Script:GUIActions.DefaultPackagesSelected)"
-    $Output += "Setting;DefaultIconsetSelected;$($Script:GUIActions.DefaultIconsetSelected)"
     $Output += "Setting;ScreenModeType;$($Script:GUIActions.ScreenModeType)"
     $Output += "Setting;ScreenModetoUseWB;$($Script:GUIActions.ScreenModetoUseWB)"
     $Output += "Setting;WorkbenchBackDropEnabled;$($Script:GUIActions.WorkbenchBackDropEnabled)"
@@ -77,9 +77,9 @@ function Get-SettingsDataforSave {
 
    
     $Output += "GPTMBR Disk Details:"
-    $Output += "GPTMBRHeader;Type;GPTMBRDisk;DiskType;DiskSizeBytes;MBROverheadBytes;NumberofPartitionsMBR;NextPartitionMBRNumber"
+    $Output += "GPTMBRHeader;Type;GPTMBRDisk;DiskType;DiskSizeBytes;GPTMBROverheadBytes;NumberofPartitionsGPTMBR;NextPartitionGPTMBRNumber"
     if ($WPF_DP_Disk_GPTMBR){
-        $Output += "GPTMBRDetails;WPF_DP_Disk_GPTMBR;$($WPF_DP_Disk_GPTMBR.DiskType);$($WPF_DP_Disk_GPTMBR.DiskSizeBytes);$($WPF_DP_Disk_GPTMBR.MBROverheadBytes);$($WPF_DP_Disk_GPTMBR.NumberofPartitionsMBR);$($WPF_DP_Disk_GPTMBR.NextPartitionMBRNumber)"
+        $Output += "GPTMBRDetails;WPF_DP_Disk_GPTMBR;$($WPF_DP_Disk_GPTMBR.DiskType);$($WPF_DP_Disk_GPTMBR.DiskSizeBytes);$($WPF_DP_Disk_GPTMBR.GPTMBROverheadBytes);$($WPF_DP_Disk_GPTMBR.NumberofPartitionsGPTMBR);$($WPF_DP_Disk_GPTMBR.NextPartitionGPTMBRNumber)"
     }
     else {
         $Output += "GPTMBRDetails;NOTAVAILABLE"
@@ -98,15 +98,15 @@ function Get-SettingsDataforSave {
     }
   
     $Output += "MBR Partition Details:"
-    $Output += "MBRPartitionHeader;Type;PartitionName;ImportedPartitionMethod;ImportedPartition;ImportedFilesSpaceBytes;VolumeName;StartingPositionBytes;PartitionSizeBytes;PartitionType;DefaultGPTMBRPartition;PartitionSubType;PartitionTypeGPTMBRorAmiga;ImportedPartitionPath;ImportedGPTMBRPartitionNumber;Name;ImportedFilesPath "
-    $MBRPartitions = $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries
-    if ($MBRPartitions){
-        $MBRPartitions | ForEach-Object {
-           $Output += "MBRPartitionDetails;$($_.Partition.PartitionName);$($_.Partition.ImportedPartitionMethod);$($_.Partition.ImportedPartition);$($_.Partition.ImportedFilesSpaceBytes);$($_.Partition.VolumeName);$($_.Partition.StartingPositionBytes);$($_.Partition.PartitionSizeBytes);$($_.Partition.PartitionType);$($_.Partition.DefaultGPTMBRPartition);$($_.Partition.PartitionSubType);$($_.Partition.PartitionTypeGPTMBRorAmiga);$($_.Partition.ImportedPartitionPath);$($_.Partition.ImportedGPTMBRPartitionNumber);$($_.Partition.Name);$($_.Partition.ImportedFilesPath)"           
+    $Output += "MBRPartitionHeader;Type;PartitionName;ImportedFilesSpaceBytes;VolumeName;StartingPositionBytes;PartitionSizeBytes;PartitionType;DefaultGPTMBRPartition;PartitionSubType;PartitionTypeGPTMBRorAmiga;Name;ImportedFilesPath "
+    $GPTMBRPartitions = $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries
+    if ($GPTMBRPartitions){
+        $GPTMBRPartitions | ForEach-Object {
+           $Output += "GPTMBRPartitionDetails;$($_.Partition.PartitionName);$($_.Partition.ImportedFilesSpaceBytes);$($_.Partition.VolumeName);$($_.Partition.StartingPositionBytes);$($_.Partition.PartitionSizeBytes);$($_.Partition.PartitionType);$($_.Partition.DefaultGPTMBRPartition);$($_.Partition.PartitionSubType);$($_.Partition.PartitionTypeGPTMBRorAmiga);$($_.Partition.Name);$($_.Partition.ImportedFilesPath)"           
         }
     }
     else {
-        $Output += "MBRPartitionDetails;NOTAVAILABLE"
+        $Output += "GPTMBRPartitionDetails;NOTAVAILABLE"
     }
     
     if (-not ($Script:GUICurrentStatus.AmigaPartitionsandBoundaries)){
@@ -114,11 +114,11 @@ function Get-SettingsDataforSave {
     }     
             
     $Output += "RDB Partition Details:"
-    $Output += "RDBPartitionHeader;Type;Name;ImportedPartitionMethod;ImportedPartition;ImportedFilesSpaceBytes;StartingPositionBytes;PartitionSizeBytes;PartitionType;ImportedFilesPath;DefaultAmigaWorkbenchPartition;PartitionTypeGPTMBRorAmiga;DefaultAmigaWorkPartition;ImportedPartitionPath;VolumeName;VolumeNameOriginalImportedValue;Bootable;BootableOriginalImportedValue;DosType;DosTypeOriginalImportedValue;NoMount;NoMountOriginalImportedValue;Priority;PriorityOriginalImportedValue;MaxTransfer;MaxTransferOriginalImportedValue;DeviceName;DeviceNameOriginalImportedValue;Buffers;BuffersOriginalImportedValue;Mask;MaskOriginalValue"    
+    $Output += "RDBPartitionHeader;Type;Name;ImportedFilesSpaceBytes;StartingPositionBytes;PartitionSizeBytes;PartitionType;ImportedFilesPath;DefaultAmigaWorkbenchPartition;PartitionTypeGPTMBRorAmiga;DefaultAmigaWorkPartition;VolumeName;VolumeNameOriginalImportedValue;Bootable;BootableOriginalImportedValue;DosType;DosTypeOriginalImportedValue;NoMount;NoMountOriginalImportedValue;Priority;PriorityOriginalImportedValue;MaxTransfer;MaxTransferOriginalImportedValue;DeviceName;DeviceNameOriginalImportedValue;Buffers;BuffersOriginalImportedValue;Mask;MaskOriginalValue"    
     $RDBPartitions = $Script:GUICurrentStatus.AmigaPartitionsandBoundaries
     if ($RDBPartitions){
         $RDBPartitions | ForEach-Object {
-           $Output += "RDBPartitionDetails;$($_.PartitionName);$($_.Partition.ImportedPartitionMethod);$($_.Partition.ImportedPartition);$($_.Partition.ImportedFilesSpaceBytes);$($_.Partition.StartingPositionBytes);$($_.Partition.PartitionSizeBytes);$($_.Partition.PartitionType);$($_.Partition.ImportedFilesPath);$($_.Partition.DefaultAmigaWorkbenchPartition);$($_.Partition.PartitionTypeGPTMBRorAmiga);$($_.Partition.DefaultAmigaWorkPartition);$($_.Partition.ImportedPartitionPath);$($_.Partition.VolumeName);$($_.Partition.VolumeNameOriginalImportedValue);$($_.Partition.Bootable);$($_.Partition.BootableOriginalImportedValue);$($_.Partition.DosType);$($_.Partition.DosTypeOriginalImportedValue);$($_.Partition.NoMount);$($_.Partition.NoMountOriginalImportedValue);$($_.Partition.Priority);$($_.Partition.PriorityOriginalImportedValue);$($_.Partition.MaxTransfer);$($_.Partition.MaxTransferOriginalImportedValue);$($_.Partition.DeviceName);$($_.Partition.DeviceNameOriginalImportedValue);$($_.Partition.Buffers);$($_.Partition.BuffersOriginalImportedValue);$($_.Partition.Mask);$($_.Partition.MaskOriginalImportedValue)"
+           $Output += "RDBPartitionDetails;$($_.PartitionName);$($_.Partition.ImportedFilesSpaceBytes);$($_.Partition.StartingPositionBytes);$($_.Partition.PartitionSizeBytes);$($_.Partition.PartitionType);$($_.Partition.ImportedFilesPath);$($_.Partition.DefaultAmigaWorkbenchPartition);$($_.Partition.PartitionTypeGPTMBRorAmiga);$($_.Partition.DefaultAmigaWorkPartition);$($_.Partition.VolumeName);$($_.Partition.VolumeNameOriginalImportedValue);$($_.Partition.Bootable);$($_.Partition.BootableOriginalImportedValue);$($_.Partition.DosType);$($_.Partition.DosTypeOriginalImportedValue);$($_.Partition.NoMount);$($_.Partition.NoMountOriginalImportedValue);$($_.Partition.Priority);$($_.Partition.PriorityOriginalImportedValue);$($_.Partition.MaxTransfer);$($_.Partition.MaxTransferOriginalImportedValue);$($_.Partition.DeviceName);$($_.Partition.DeviceNameOriginalImportedValue);$($_.Partition.Buffers);$($_.Partition.BuffersOriginalImportedValue);$($_.Partition.Mask);$($_.Partition.MaskOriginalImportedValue)"
                
         }
     }
@@ -225,9 +225,20 @@ function Get-SettingsDataforSave {
 
     $Output += "Found InstallMedia:"
     $Output += $FoundInstallMediatoUseOutput 
-
+   
+    $DetailRow = "LanguagesDetails;"
+    
+    if ($Script:GUIActions.Languages) {
+        $Script:GUIActions.Languages | ForEach-Object {
+            $DetailRow += "$($_);"
+        }
+    }
+    
+    $DetailRow = $DetailRow.TrimEnd(';')
+    
+    $Output += $DetailRow
+  
     $FoundKickstarttoUseOutput = @()
-
     $HeaderRow = "FoundKickstarttoUseHeader"
 
     if ($Script:GUIActions.FoundKickstarttoUse) {

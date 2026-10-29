@@ -19,7 +19,7 @@ function Get-MBRDiskFreeSpace {
             return $PartitionstoCheck[$PartitionstoCheck.Count-1].BytesAvailableRight
         }
         else{
-            return $Disk.DiskSizeBytes - $Disk.MBROverheadBytes
+            return $Disk.DiskSizeBytes - $Disk.GPTMBROverheadBytes
         }
     }
     else{

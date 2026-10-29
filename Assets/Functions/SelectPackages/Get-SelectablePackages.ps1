@@ -25,7 +25,7 @@ function Get-SelectablePackages {
     $NetworkPackages = Get-ConfigurablePackages -NetworkStackPackages
     $USBPackages = Get-ConfigurablePackages -USBStackPackages
 
-    $basePackageTypes    = 'Selectable OS', 'Selectable OS - DefaultInstall', 'Selectable Package', 'Selectable Package - DefaultInstall'
+    $basePackageTypes    = 'Selectable Package', 'Selectable Package - DefaultInstall'
     $networkPackageTypes = 'Selectable Package - Network - DefaultInstall', 'Selectable Package - Network'
     $usbPackageTypes     = 'Selectable Package - USB - DefaultInstall', 'Selectable Package - USB'
 
@@ -41,7 +41,7 @@ function Get-SelectablePackages {
     } | Sort-Object -Property PackageNameFriendlyName
             
     foreach ($line in $Packages) {
-        $PackageNameDefaultInstall = $Line.PackageType -in  @('Selectable OS - DefaultInstall', 'Selectable Package - DefaultInstall', "Selectable Package - Network - DefaultInstall", "Selectable Package - USB - DefaultInstall")
+        $PackageNameDefaultInstall = $Line.PackageType -in  @('Selectable Package - DefaultInstall', "Selectable Package - Network - DefaultInstall", "Selectable Package - USB - DefaultInstall")
         If ($ExistingPackageDetails.ContainsKey($Line.PackageName)){
             $PackageDetailstoUse = $ExistingPackageDetails[$Line.PackageName]
             $PackageNameUserSelected = $PackageDetailstoUse.PackageNameUserSelected 
@@ -80,10 +80,6 @@ function Get-SelectablePackages {
 
     $Script:GUIActions.AvailablePackages.DefaultView.RowFilter = "PackageinScope = true"
 
-    If (-not ($PackagesOnly)){ 
-        Write-AvailableIconsets
-
-    }
 
     $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
    

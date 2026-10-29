@@ -9,7 +9,8 @@ $WPF_DP_Button_SetImageSize.add_click({
 
     $SizeofImage = Get-NewImageSize -DefaultScale "GiB"
     if ($SizeofImage) {
-        Set-InitialDiskValues -DiskType $WPF_DP_Disk_Type_DropDown.SelectedItem -SizeBytes $SizeofImage 
+        # $WPF_DP_Disk_GPTMBR = $null
+        Set-InitialDiskValues -DiskType $Script:GUIActions.DiskType -SizeBytes $SizeofImage 
         $Script:GUIActions.ImageSizeSelected = $true
         Update-UI -DiskPartitionWindow -freespacealert
     }

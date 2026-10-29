@@ -1,6 +1,7 @@
 function Get-ConfigTXT {
     param (
         $PathtoConfigTXT,
+        $KickstartRomPath,
         [Switch]$NoBuptest
     )
     
@@ -100,7 +101,7 @@ function Get-ConfigTXT {
                 break
             }
             "[ROMPATH]" {
-                "initramfs /$($Script:GUIActions.FoundKickstarttoUse.Where({$_.KickstartVersion}).Fat32Name)"
+                "initramfs /$KickstartRomPath"
                 break
             }
             "[VIDEOMODES]" {

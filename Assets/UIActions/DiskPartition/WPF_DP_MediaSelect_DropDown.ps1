@@ -16,7 +16,7 @@ $WPF_DP_MediaSelect_DropDown.add_selectionChanged({
                     Set-RevisedDiskValues -SizeBytes ($_.SizeofDisk*1024)
                 }
                 else {
-                    Set-InitialDiskValues -SizeBytes ($_.SizeofDisk*1024) -DiskType $WPF_DP_Disk_Type_DropDown.SelectedItem
+                    Set-InitialDiskValues -SizeBytes ($_.SizeofDisk*1024) -DiskType $Script:GUIActions.DiskType
                 }
             }
         }

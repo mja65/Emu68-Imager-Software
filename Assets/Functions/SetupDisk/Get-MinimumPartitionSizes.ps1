@@ -1,82 +1,46 @@
 function Get-MinimumPartitionSizes {
     param (
-        $SizeofDiskBytes,
-        $EMU68BOOTDivider,
-        $EMU68BOOTMinimum,
-        $MBRMinimum,
-        $GPTMinimum,
-        $ID76Minimum,
-        $PFS3Maximum,
-        $SystemMinimum,
-        $PFS3Minimum, 
-        $DefaultAddMBRSize, 
-        $DefaultAddGPTSize,   
-        $DefaultAddID76Size,  
-        $DefaultAddPFS3Size,  
-        $DiskType,
-        $EMU68BOOTDefaultMaximum,
-        $WorkbenchDefaultMaximum, 
-        $WorkbenchDivider     
+        $DiskSizeBytes,
+        $DiskType
     )
 
-    if  (-not ($DiskType)){
-        Write-ErrorMessage -Message "Error in coding - Set-MinimumPartitionSizes!"
-        $WPF_MainWindow.Close()
-        exit
-    } 
+    # $DiskType = "MBR"
+    # $DiskSizeBytess = 2147483648
 
-    # $FAT32Divider = 15
-    # $Fat32DefaultMaximum = 1024*1024*1024
-    # $WorkbenchDefaultMaximum = 1024*1024*1024
-    # $WorkbenchDivider = 15
-    # $Fat32Minimum = 35840*1024
-    # $PFS3Maximum = 101*1024*1024*1024
-    # $SystemMinimum = 100*1024*1024
-    # $PFS3Minimum = 10*1024*1024*1024
-
+    $DiskTypeDetails = (Get-InputFileCSV -CSV 'DiskTypes').where({ $_.DiskType -eq $DiskType }) 
+    $PartitionTypeDetails = (Get-InputFileCSV -CSV 'PartitionTypes').where({ $_.DiskType -eq $DiskType }) 
+    $AmigaPartitionDefaults = (Get-InputFileCSV -CSV 'DiskDefaults')
 
     $DiskMinimumSizesBytes = [PSCustomObject]@{
-        EMU68BOOTMinimum = $EMU68BOOTMinimum
-        MBRMinimum = $MBRMinimum
-        GPTMinimum = $GPTMinimum
-        ID76Minimum = $ID76Minimum
-        PFS3Maximum = $PFS3Maximum 
-        SystemMinimum = $SystemMinimum
-        PFS3Minimum = $PFS3Minimum 
-        EMU68BOOTDefault = $null
-        WorkbenchDefault = $null
-        DefaultAddMBRSize = $DefaultAddMBRSize 
-        DefaultAddGPTSize = $DefaultAddGPTSize   
-        DefaultAddID76Size = $DefaultAddID76Size  
-        DefaultAddPFS3Size = $DefaultAddPFS3Size  
-    }
-
-
-    if ($DiskType -eq 'PiStorm - MBR'){
-        if ($SizeofDiskBytes/$EMU68BOOTDivider -ge $EMU68BOOTDefaultMaximum){
-            $DiskMinimumSizesBytes.EMU68BOOTDefault =  $EMU68BOOTDefaultMaximum
+        MaximumNumberPartitions = $DiskTypeDetails.MaximumNumberPartitions
+        MaximumNumberRDBPartitions = $AmigaPartitionDefaults.where({ $_.Disk -eq "Work" }).MaximumNumberPartitions
+        EMU68BOOTMinimum = $DiskTypeDetails.EMU68PartitionMinimumSizeBytes
+        GPTDataMinimum = $DiskTypeDetails.GPTDataMinimumSizeBytes
+        MBRMinimum = $DiskTypeDetails.DataPartitionMinimumSizeBytes
+        GPTMinimum = $null
+        ID76Minimum = $DiskTypeDetails.AmigaPartitionMinimumSizeBytes
+        PFS3Maximum = $AmigaPartitionDefaults.where({ $_.Disk -eq "Work" }).MaximumSizeBytes
+        SystemMinimum = $AmigaPartitionDefaults.where({ $_.Disk -eq "System" }).MinimumSizeBytes
+        PFS3Minimum = $AmigaPartitionDefaults.where({ $_.Disk -eq "Work" }).MinimumSizeBytes
+        EMU68BOOTDefault = if ($DiskSizeBytes/$DiskTypeDetails.Emu68PartitionSizeBootDivider -ge $DiskTypeDetails.Emu68PartitionDefaultMaximumAddSizeBytes){ 
+            $DiskTypeDetails.Emu68PartitionDefaultMaximumAddSizeBytes 
+            } 
+            else {  
+                $DiskSizeBytes/$DiskTypeDetails.Emu68PartitionSizeBootDivider 
+            }
+        WorkbenchDefault = if ($DiskSizeBytes/$DiskTypeDetails.AmigaPartitionSizeBootDivider  -ge $DiskTypeDetails.AmigaPartitionDefaultMaximumAddSizeBytes){
+            $DiskTypeDetails.AmigaPartitionDefaultMaximumAddSizeBytes
         }
         else {
-            $DiskMinimumSizesBytes.EMU68BOOTDefault =  $SizeofDiskBytes/$EMU68BOOTDivider
+            $DiskSizeBytes/$DiskTypeDetails.AmigaPartitionSizeBootDivider
+            
         }
-    }
-    elseif ($DiskType -eq 'PiStorm - GPT'){
-        Write-ErrorMessage -Message "Error in coding - PiStorm - GPT!"
-        $WPF_MainWindow.Close()
-        exit
-    }
-    elseif ($DiskType -eq 'Amiga - RDB'){
-        Write-ErrorMessage -Message "Error in coding - Amiga - RDB!"
-        $WPF_MainWindow.Close()
-        exit
-    }
-
-    if ($SizeofDiskBytes/$WorkbenchDivider -ge $WorkbenchDefaultMaximum){
-        $DiskMinimumSizesBytes.WorkbenchDefault =  $WorkbenchDefaultMaximum
-    }
-    else {
-        $DiskMinimumSizesBytes.WorkbenchDefault =  $SizeofDiskBytes/$WorkbenchDivider 
+        DefaultAddMBRSize = $DiskTypeDetails.DataPartitionDefaultAddSizeBytes
+        DefaultAddGPTSize = $null 
+        DefaultAddID76Size = $DiskTypeDetails.AmigaPartitionDefaultAddSizeBytes
+        DefaultAddPFS3Size = $AmigaPartitionDefaults.where({ $_.Disk -eq "Work" }).DefaultAddSizeBytes  
     }
 
     return $DiskMinimumSizesBytes
+
 }

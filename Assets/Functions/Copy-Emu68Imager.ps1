@@ -25,29 +25,9 @@ Function Copy-Emu68Imager {
         ".\LICENSE",
         ".\Programs\7z\7z.dll",
         ".\Programs\7z\7z.exe",
-        ".\Programs\7z\\7zLicense",
-        ".\Programs\UnLzx\unlzx.exe"
-        ".\Programs\UnLzx\W95unlzx.readme"
-        ".\Programs\UnADF\bin"
-        ".\Programs\UnADF\AUTHORS"
-        ".\Programs\UnADF\ChangeLog"
-        ".\Programs\UnADF\COPYING"
-        ".\Programs\UnADF\COPYING-GPL2"
-        ".\Programs\UnADF\README.md"
-        ".\Programs\UnADF\bin\adf.dll"
-        ".\Programs\UnADF\bin\adf.exp"
-        ".\Programs\UnADF\bin\adf.lib"
-        ".\Programs\UnADF\bin\adfbitmap.exe"
-        ".\Programs\UnADF\bin\adfformat.exe"
-        ".\Programs\UnADF\bin\adfimgcreate.exe"
-        ".\Programs\UnADF\bin\adfinfo.exe"
-        ".\Programs\UnADF\bin\adfls.exe"
-        ".\Programs\UnADF\bin\adfsalvage.exe"
-        ".\Programs\UnADF\bin\unadf.exe"
+        ".\Programs\7z\\7zLicense"
     )
         
-
-
     foreach ($File in $FilesToCopy) {
         $RelativePath = Split-Path $File -NoQualifier
         $DestinationPath = Join-Path $NewLocation $RelativePath

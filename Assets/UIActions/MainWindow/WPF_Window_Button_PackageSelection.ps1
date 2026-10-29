@@ -68,27 +68,6 @@ $WPF_Window_Button_PackageSelection.Add_Click({
         Update-AvailablePackagesInScope
 
         $WPF_PackageSelection_Datagrid_Packages.ItemsSource = $Script:GUIActions.AvailablePackages.DefaultView 
-        $WPF_PackageSelection_Datagrid_IconSets.ItemsSource = $Script:GUIActions.AvailableIconSets.DefaultView
-        
-         if (-not ($WPF_PackageSelection_Datagrid_IconSets.SelectedItem)){
-             If ($Script:GUIActions.SelectedIconSet){
-                 for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.DefaultView.Count; $i++) {
-                     if ($Script:GUIActions.SelectedIconSet -eq $Script:GUIActions.AvailableIconSets.DefaultView[$i].IconSet){
-                         $RowNumbertoUse = $i
-                     }
-                 }  
-             }
-             else {
-                 for ($i = 0; $i -lt $Script:GUIActions.AvailableIconSets.DefaultView.Count; $i++) {
-                     if ($Script:GUIActions.AvailableIconSets.DefaultView[$i].IconSetDefaultInstall -eq $true){
-                         $RowNumbertoUse = $i
-                     }
-                 }  
-             }
-    
-             $WPF_PackageSelection_Datagrid_IconSets.SelectedItem = $Script:GUIActions.AvailableIconSets.DefaultView[$RowNumbertoUse]
-    
-         }
         
         $WPF_PackageSelection_Datagrid_Packages.SelectedItem = $null
 

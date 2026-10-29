@@ -16,9 +16,10 @@ function Get-GUIPartitionStartEnd {
         EndingPositionBytes = 0
     }
 
-    if ($PartitionType -eq 'MBR'){
+    if (($PartitionType -eq 'MBR') -or ($PartitionType -eq 'GPT')){
         $ListofPartitions  = @(Get-AllGUIPartitions -PartitionType $PartitionType | Sort-Object {[int64]$_.value.StartingPositionBytes})
     }
+
     elseif ($PartitionType -eq 'Amiga'){
         $ID76Partition = $AmigaDiskName.Substring(0,$AmigaDiskName.IndexOf('_AmigaDisk'))        
         $ListofPartitions  = @(Get-AllGUIPartitions -PartitionType $PartitionType | Where-Object {$_.Name -Match $ID76Partition } | Sort-Object {[int64]$_.value.StartingPositionBytes})

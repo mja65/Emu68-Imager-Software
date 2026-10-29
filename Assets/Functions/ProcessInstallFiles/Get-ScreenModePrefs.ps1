@@ -15,6 +15,9 @@ function Get-ScreenModePrefs {
        #$ColourDepth = "3"
 
         If ($ModeID){
+              [string]0x50001000
+              "{0:X}" -f 0x50001000
+
             $ScreenModeToUse = $ModeID -replace '\$'
         }
         else {

@@ -18,7 +18,7 @@ function Get-NextGUIPartition {
         }
         $ExistingPartitionstoCheck = $Script:GUICurrentStatus.AmigaPartitionsandBoundaries | Where-Object {$_.PartitionName -match $AmigaDiskName }
     }
-    elseif ($PartitionType -eq 'MBR'){
+    elseif ($PartitionType -eq 'MBR' -or $PartitionType -eq 'GPT'){
         $ExistingPartitionstoCheck = $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries
     }
     

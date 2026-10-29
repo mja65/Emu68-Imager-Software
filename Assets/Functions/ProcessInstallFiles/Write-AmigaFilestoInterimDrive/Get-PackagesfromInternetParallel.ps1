@@ -56,8 +56,6 @@
             TempFolder = [System.IO.Path]::GetFullPath($Script:Settings.TempFolder)
             ParallelRunDebugLogFolderToUse = $ParallelRunDebugLogFolder
             SevenZipFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.SevenZipFilePath) 
-            UnADFFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnADFFilePath) 
-            UnLZXFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLZXFilePath)
             Packages = $CurrentBatch
             Mirrors  = $AminetMirrors
             HttpClientPowerShell = $Script:GUICurrentStatus.HttpClientPowerShell 
@@ -77,10 +75,10 @@
             $TempFolder = $Bundle.TempFolder
             $ParallelRunDebugLogFolderToUse = $Bundle.ParallelRunDebugLogFolderToUse
             $SevenZipFilePath = $Bundle.SevenZipFilePath 
-            $UnADFFilePath = $Bundle.UnADFFilePath
-            $UnLZXFilePath = $Bundle.UnLZXFilePath
             $HttpClientTurran = $Bundle.HttpClientTurran
             $HttpClientPowerShell = $Bundle.HttpClientPowerShell
+            . .\Assets\Functions\Expand-ADF.ps1
+            . .\Assets\Functions\Expand-LZXArchive.ps1
             . .\Assets\Functions\Expand-LhaArchive.ps1
             . .\Assets\Functions\Test-ArchiveFileType.ps1
             . .\Assets\Functions\Get-AmigaFileWeb.ps1
@@ -101,11 +99,9 @@
                 $Time = (Get-Date -Format "HH:mm:ss")
                 $ThreadDetails = "[Thread-$([System.Threading.Thread]::CurrentThread.ManagedThreadId)][$Time] Dedicated OS"
                 $FileNametoUse = if ($Line.SourceType -eq "UserFiles - Local - Archive" -or $Line.SourceType -eq "Local - Archive") { $Line.SourceLocation } else { $Line.OutputLocation }
-                $ADFUseMangledNames = if ($line.ADFUseMangledNames -eq $true) { $true } else { $false }
                 $Result = [PSCustomObject]@{
                     Thread                             = $ThreadDetails
                     FileName                           = $FileNametoUse
-                    ADFUseMangledNames                 = $ADFUseMangledNames
                     CDParent                           = $Line.CDParent
                     ArchivePassword                    = $null
                     DownloadStatus                     = $null
@@ -181,7 +177,6 @@
                     $Result_AIA = [PSCustomObject]@{
                         Thread                             = $ThreadDetails
                         FileName                           = $FileName_AIA
-                        ADFUseMangledNames                 = $false
                         CDParent                           = $null
                         ArchivePassword                    = $Line.ArchiveinArchivePassword
                         DownloadStatus                     = "Not Needed" 
@@ -216,27 +211,15 @@
                 if ($DownloadstoProcess){
                     foreach ($DownloadtoProcess in $DownloadstoProcess) {
                         if ($DownloadtoProcess.FileNameExtension -eq '.adf'){
-                            $OutputMessage = & $UnADFFilePath -w -d $DownloadtoProcess.ExtractionFolder $($DownloadtoProcess.FileName) 2>&1 
-                            If ($LASTEXITCODE -ne 0) {
-                                If ($DownloadtoProcess.AiA){
-                                    $Result_AIA.ExtractionSuccess = $false
-                                    $Result_AIA.ExtractMessage = $OutputMessage
-                                }
-                                else {
-                                    $Result.ExtractionSuccess = $false
-                                    $Result.ExtractMessage = $OutputMessage
-                                }                            
+                            Expand-ADF -Path $DownloadtoProcess.FileName -DestinationPath $DownloadtoProcess.ExtractionFolder -Quiet
+                            If ($DownloadtoProcess.AiA){ 
+                                $Result_AIA.ExtractionSuccess = $true
                             }
                             else {
-                                If ($DownloadtoProcess.AiA){ 
-                                    $Result_AIA.ExtractionSuccess = $true
-                                }
-                                else {
-                                    $Result.ExtractionSuccess = $true
-                                }                                
-                            }                    
-                        }
-                        elseif ($DownloadtoProcess.FileNameExtension -eq '.lha' -and $DownloadtoProcess.UseLHASAFlag -match "TRUE"){
+                                $Result.ExtractionSuccess = $true
+                            }                                
+                        }                          
+                        elseif ($DownloadtoProcess.FileNameExtension -eq '.lha'){
                             Expand-LhaArchive -Path $DownloadtoProcess.FileName -DestinationPath $DownloadtoProcess.ExtractionFolder -ReplaceChar "_" -Quiet -NoProgress
                             If ($DownloadtoProcess.AiA){
                                 $Result_AIA.ExtractionSuccess = $true
@@ -246,10 +229,7 @@
                             }                                     
                         }
                         elseif ($DownloadtoProcess.FileNameExtension -eq '.lzx'){
-                            Push-location -Path $DownloadtoProcess.ExtractionFolder
-                            try {
-                                $OutputMessage = & $UnlzxFilePath "$($DownloadtoProcess.FileName)" 2>&1
-                                if ($LASTEXITCODE -ne 0) {
+                            if (-not (Expand-LzxArchive -Path $DownloadtoProcess.FileName -DestinationPath $DownloadtoProcess.ExtractionFolder -Quiet)){
                                     If ($DownloadtoProcess.AiA){
                                         $Result_AIA.ExtractionSuccess = $false
                                         $Result_AIA.ExtractMessage = $OutputMessage
@@ -257,20 +237,16 @@
                                     else {
                                         $Result.ExtractionSuccess = $false
                                         $Result.ExtractMessage = $OutputMessage
-                                    }                              
-                                }
-                                else {
+                                    }                                    
+                            }
+                            else {
                                     If ($DownloadtoProcess.AiA){
                                         $Result_AIA.ExtractionSuccess = $true
                                     }
                                     else {
                                         $Result.ExtractionSuccess = $true
                                     }   
-                                }
                             }
-                            finally {
-                                Pop-location
-                            }  
                         }                                                               
                         else{
                             if ($DownloadtoProcess.ArchivePassword){

@@ -5,52 +5,35 @@ function Set-InitialDiskValues {
        [Switch]$LoadSettings
     )
 
-    $Emu68BootVolumeNametouse = ((Get-InputFileCSV -CSV 'DiskDefaults') | Where-Object {$_.Type -eq "Non-Amiga"} | Select-Object 'VolumeName').VolumeName
+    # $DiskType = "GPT"
+    # $DiskType = "MBR"
+    # $SizeBytes = 124733221376
 
     $Script:GUIActions.DiskSizeSelected = $true
-    $Script:GUIActions.DiskTypeSelected = $DiskType
     #$WPF_DP_Amiga_GroupBox.Visibility = 'Visible'
     $WPF_DP_GPTMBR_GroupBox.Visibility = 'Visible'
+    Write-Host "SizeBytes is: $SizeBytes"
+    Add-InitialGPTMBRDisk -DiskSizeBytes $SizeBytes -DiskType $Script:GUIActions.DiskType
 
-    if ($DiskType -eq 'PiStorm - MBR'){
-        $DiskTypetouse = 'MBR'
-        Add-InitialGPTMBRDisk -DiskSizeBytes $SizeBytes -DiskType $Script:GUIActions.DiskTypeSelected 
-        $Script:SDCardMinimumsandMaximums = Get-MinimumPartitionSizes  -DiskType $Script:GUIActions.DiskTypeSelected `
-                            -SizeofDiskBytes $WPF_DP_Disk_GPTMBR.DiskSizeBytes `
-                            -EMU68BOOTDivider 15 `
-                            -EMU68BOOTMinimum (35840*1024) `
-                            -MBRMinimum (35840*1024) `
-                            -GPTMinimum $null `
-                            -ID76Minimum (35840*1024) `
-                            -PFS3Minimum (10*1024*1024) `
-                            -PFS3Maximum (101*1024*1024*1024) `
-                            -SystemMinimum (100*1024*1024) `
-                            -EMU68BOOTDefaultMaximum (1024*1024*1024) `
-                            -WorkbenchDefaultMaximum (1024*1024*1024) `
-                            -WorkbenchDivider 15 `
-                            -DefaultAddMBRSize 1073741824 `
-                            -DefaultAddGPTSize $null `
-                            -DefaultAddID76Size 1073741824 `
-                            -DefaultAddPFS3Size 536870912
- 
-    }
-    elseif ($DiskType -eq 'PiStorm - GPT'){
-        $DiskTypetouse = 'GPT'
-        Write-ErrorMessage -Message "Error in coding - PiStorm - GPT!"
-        $WPF_MainWindow.Close()
-        exit
-    }
-    elseif ($DiskType -eq 'Amiga - RDB'){
-        Write-ErrorMessage -Message "Error in coding - Amiga - RDB!"
-        $WPF_MainWindow.Close()
-        exit
-    }
-                                                               
+                                                           
     if (-not ($LoadSettings)){
-        if ($DiskType -eq 'PiStorm - MBR'){
-            Add-GUIPartitiontoGPTMBRDisk -PartitionType 'MBR' -PartitionSubType 'FAT32' -AddType 'Initial' -DefaultPartition -SizeBytes (Get-MBRNearestSizeBytes -RoundDown -SizeBytes $Script:SDCardMinimumsandMaximums.EMU68BOOTDefault) -VolumeName  $Emu68BootVolumeNametouse 
-            $RemainingSpace = ($WPF_DP_Disk_GPTMBR.DiskSizeBytes - $WPF_DP_Disk_GPTMBR.MBROverheadBytes - (Get-MBRNearestSizeBytes -RoundDown -SizeBytes $Script:SDCardMinimumsandMaximums.EMU68BOOTDefault))
-            Add-GUIPartitiontoGPTMBRDisk -PartitionType 'MBR' -PartitionSubType 'ID76' -AddType 'Initial' -DefaultPartition -SizeBytes (Get-MBRNearestSizeBytes -RoundDown -SizeBytes $RemainingSpace)    
+        if ($DiskType -eq 'MBR'){
+            $Emu68BootDetails = Get-GPTMBRPartitionDefaultDetails -DiskType "MBR" -DiskSizeBytes $SizeBytes -PartitionType "Emu68Boot"
+            $SizeBytesFAT32 = Get-MBRNearestSizeBytes -RoundDown -SizeBytes $Emu68BootDetails.PartitionSizeBytes
+            $RemainingSpace = Get-MBRNearestSizeBytes -RoundDown -SizeBytes ($WPF_DP_Disk_GPTMBR.DiskSizeBytes - $WPF_DP_Disk_GPTMBR.GPTMBROverheadBytes - $SizeBytesFAT32) 
+            #Write-host "SizeBytesFAT32 is: $SizeBytesFAT32 RemainingSpace is: $RemainingSpace"
+            Add-GUIPartitiontoGPTMBRDisk -PartitionType 'MBR' -PartitionSubType 'FAT32' -AddType 'Initial' -DefaultPartition -SizeBytes $SizeBytesFAT32 -VolumeName $Emu68BootDetails.PartitionName 
+            Add-GUIPartitiontoGPTMBRDisk -PartitionType 'MBR' -PartitionSubType 'ID76' -AddType 'Initial' -DefaultPartition -SizeBytes $RemainingSpace    
+        }
+        elseif ($DiskType -eq 'GPT'){
+            $SystemDetails = Get-GPTMBRPartitionDefaultDetails -DiskType "GPT" -DiskSizeBytes $SizeBytes -PartitionType "Emu68Boot"
+            $DataDetails = Get-GPTMBRPartitionDefaultDetails -DiskType "GPT" -DiskSizeBytes $SizeBytes -PartitionType "Data"
+            $SizeBytesSystem = Get-MBRNearestSizeBytes -RoundDown -SizeBytes $SystemDetails.PartitionSizeBytes
+            $SizeBytesData = Get-MBRNearestSizeBytes -RoundDown -SizeBytes $DataDetails.PartitionSizeBytes
+            $RemainingSpace = Get-MBRNearestSizeBytes -RoundDown -SizeBytes ($WPF_DP_Disk_GPTMBR.DiskSizeBytes - $WPF_DP_Disk_GPTMBR.GPTMBROverheadBytes - $SizeBytesSystem - $SizeBytesData)
+            Add-GUIPartitiontoGPTMBRDisk -PartitionType 'GPT' -PartitionSubType 'System' -AddType 'Initial' -DefaultPartition -SizeBytes $SizeBytesSystem -VolumeName $SystemDetails.PartitionName
+            Add-GUIPartitiontoGPTMBRDisk -PartitionType 'GPT' -PartitionSubType 'Data' -AddType 'Initial' -DefaultPartition -SizeBytes $SizeBytesData -VolumeName $DataDetails.PartitionName
+            Add-GUIPartitiontoGPTMBRDisk -PartitionType 'GPT' -PartitionSubType 'Amiga' -AddType 'Initial' -DefaultPartition -SizeBytes (Get-MBRNearestSizeBytes -RoundDown -SizeBytes $RemainingSpace)           
         }
     }
 }

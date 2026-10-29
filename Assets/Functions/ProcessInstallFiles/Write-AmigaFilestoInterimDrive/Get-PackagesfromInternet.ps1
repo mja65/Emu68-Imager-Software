@@ -16,9 +16,7 @@ function Get-PackagesfromInternet {
 
     $TotalDownloads = $ListofPackagestoDownload.count
 
-    $UnADFFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnADFFilePath) 
     $SevenZipFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.SevenZipFilePath) 
-    $UnLZXFilePath = [System.IO.Path]::GetFullPath($Script:ExternalProgramSettings.UnLZXFilePath)
        
     $SourceTypesforDownload = @('Web - Aminet','Web - Github','Web - AminetSearch','Web','Web - Github Emu68 Documentation','Web - WHDLoadWrapper')
     #$SourceTypesforDownload = $null
@@ -31,7 +29,6 @@ function Get-PackagesfromInternet {
 
     foreach ( $Line in $ListofPackagestoDownload ){
         $DownloadNumber ++
-        $ADFUseMangledNames = if ($line.ADFUseMangledNames -eq $true) { $true } else { $false }
         $DownloadFileExtension = [System.IO.Path]::GetExtension($line.OutputLocation)
         $NameofDLNoExtension  = [System.IO.Path]::GetFileNameWithoutExtension($line.OutputLocation)      
         Write-InformationMessage -Message  "Processing $($line.OutputLocation) `($DownloadNumber/$TotalDownloads`)" -NewLineBefore
@@ -86,7 +83,6 @@ function Get-PackagesfromInternet {
             $DownloadstoProcess = @(
                 [PSCustomObject]@{
                     ArchiveFileName = $FileNametoUse
-                    ADFUseMangledNames = $ADFUseMangledNames
                     ArchiveFileNameNoExtension = [System.IO.Path]::GetFileNameWithoutExtension($FileNametoUse)
                     ArchiveFileExtension = [System.IO.Path]::GetExtension($FileNametoUse)
                     ExtractionFolder = $ExtractionFolder
@@ -106,7 +102,6 @@ function Get-PackagesfromInternet {
                 $DownloadstoProcess += @(
                     [PSCustomObject]@{
                         ArchiveFileName = $ArchiveFileName
-                        ADFUseMangledNames = $false
                         ArchiveFileNameNoExtension = [System.IO.Path]::GetFileNameWithoutExtension($ArchiveFileName)
                         ArchiveFileExtension = [System.IO.Path]::GetExtension($ArchiveFileName)
                         ExtractionFolder = $ExtractionFolderAiA
@@ -122,28 +117,15 @@ function Get-PackagesfromInternet {
                 if ($DownloadtoProcess.ArchiveFileExtension -eq '.adf'){
                     $LogPathStandardOutput = Join-Path  $LogTempFolder "$($DownloadtoProcess.ArchiveFileNameNoExtension)LogStd.txt"
                     Write-informationMessage -Message "Extracting ADF $($DownloadtoProcess.ArchiveFileName)"
-                    $oldPreference = $ErrorActionPreference
-                    $ErrorActionPreference = 'SilentlyContinue'
-                    $OutputMessage = & $UnADFFilePath -w -d $($DownloadtoProcess.ExtractionFolder) $($DownloadtoProcess.ArchiveFileName) 2>&1  
-                    $ErrorActionPreference = $oldPreference
+                    Expand-ADF -Path $DownloadtoProcess.ArchiveFileName -DestinationPath $DownloadtoProcess.ExtractionFolder -Quiet
                 }                   
                 elseif ($DownloadtoProcess.ArchiveFileExtension -eq '.lzx'){
-                    $LogPathStandardOutput = Join-Path  $LogTempFolder "$($DownloadtoProcess.ArchiveFileNameNoExtension)LogStd.txt"
-                    Push-location -Path $DownloadtoProcess.ExtractionFolder
-                    try {
-                        & $UnlzxFilePath "$($DownloadtoProcess.ArchiveFileName)" 2>&1 | Out-File -FilePath $LogPathStandardOutput -Encoding UTF8
-                        if ($LASTEXITCODE -ne 0) {
-                            Write-ErrorMessage -Message "Error extracting $($DownloadtoProcess.ArchiveFileName)! Exiting"
-                            exit
-
-                        }
-                    }
-                    finally {
-                        Pop-location
+                    if (-not (Expand-LzxArchive -Path "$($DownloadtoProcess.ArchiveFileName)" -DestinationPath $DownloadtoProcess.ExtractionFolder)){
+                        Write-ErrorMessage -Message "Error extracting $($DownloadtoProcess.ArchiveFileName)! Exiting"
                     }
                 }                    
                   
-                elseif ($DownloadtoProcess.ArchiveFileExtension -eq '.lha' -and $DownloadtoProcess.UseLHASAFlag -match "TRUE"){
+                elseif ($DownloadtoProcess.ArchiveFileExtension -eq '.lha'){
                     Expand-LhaArchive -Path $DownloadtoProcess.ArchiveFileName -DestinationPath $DownloadtoProcess.ExtractionFolder -ReplaceChar "_" -Quiet -NoProgress        
                  }
                 else{

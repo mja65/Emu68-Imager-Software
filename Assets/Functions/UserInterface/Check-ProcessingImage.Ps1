@@ -25,18 +25,6 @@ function Check-ProcessingImage {
                $null = $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Rows.Add("Disk Setup","No Output location has been defined")
                $Script:GUICurrentStatus.ProcessImageStatus = $false
            }
-           else {
-               if ($Script:GUIActions.OutputType -eq 'Disk'){
-                   $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries| ForEach-Object {
-                       if ($_.Partition.ImportedPartition -eq $true -and $_.Partition.ImportedPartitionMethod -eq 'Direct'){
-                          if ($_.Partition.ImportedPartitionPath -match $Script:GUIActions.OutputPath){
-                              $null = $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Rows.Add("Disk Setup","The output location is the same physical disk set for one or more imported partitions")
-                              $Script:GUICurrentStatus.ProcessImageStatus = $false
-                          }
-                       }         
-                  }
-               }
-           }
     
            If (-not ($Script:GUIActions.DiskSizeSelected)){
                $null = $Script:GUICurrentStatus.IssuesFoundBeforeProcessing.Rows.Add("Disk Setup","Disk Partitioning has not been performed")

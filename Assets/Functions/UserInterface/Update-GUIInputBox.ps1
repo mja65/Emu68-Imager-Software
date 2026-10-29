@@ -70,7 +70,7 @@ function Update-GUIInputBox {
                 if (-not ($Script:GUICurrentStatus.SelectedGPTMBRPartition)){
                     return
                 }
-                $ResizeCheck = (Set-GUIPartitionNewSize -ResizeBytes -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition -SizeBytes (Get-ConvertedSize -Size $InputBox.Text -ScaleFrom $DropDownBox.SelectedItem -Scaleto 'B').size -PartitionType 'MBR' -ActiontoPerform 'MBR_ResizeFromRight')
+                $ResizeCheck = (Set-GUIPartitionNewSize -ResizeBytes -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition -SizeBytes (Get-ConvertedSize -Size $InputBox.Text -ScaleFrom $DropDownBox.SelectedItem -Scaleto 'B').size -PartitionType $Script:GUIActions.DiskType -ActiontoPerform 'GPTMBR_ResizeFromRight')
             }
             elseif ($AmigaResize){
                 # Write-debug 'Changing size based on input - Amiga'
@@ -112,7 +112,7 @@ function Update-GUIInputBox {
             else {
                 $InputBox.Background = 'White'
                 if (($MBRMove_SpaceatBeginning) -or ($MBRMove_SpaceatEnd)){
-                    Set-GUIPartitionNewPosition -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition -AmountMovedBytes $AmounttoMove -PartitionType 'MBR'                    
+                    Set-GUIPartitionNewPosition -Partition $Script:GUICurrentStatus.SelectedGPTMBRPartition -AmountMovedBytes $AmounttoMove -PartitionType $Script:GUIActions.DiskType                    
                 } 
                 elseif (($AmigaMove_SpaceatBeginning) -or ($AmigaMove_SpaceatEnd)){
                     Set-GUIPartitionNewPosition -Partition $Script:GUICurrentStatus.SelectedAmigaPartition -AmountMovedBytes $AmounttoMove -PartitionType 'Amiga'                         
