@@ -60,37 +60,37 @@ mc:Ignorable="d">
 
                     <GroupBox x:Name="GPT_Legend_GroupBox" Style="{DynamicResource BorderlessGroupBoxStyle}" Width="580" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,145,0,0" Visibility="Hidden">
                         <Grid>
-                            <Rectangle x:Name="Legend_GPT_System" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
-                            <TextBox x:Name="Legend_GPT_System_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="System" VerticalAlignment="Top" Width="45" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="GPT_Legend_System" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
+                            <TextBox x:Name="GPT_Legend_System_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="System" VerticalAlignment="Top" Width="45" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
-                            <Rectangle x:Name="Legend_GPT_Data" HorizontalAlignment="Left" Height="25" Width="25" Margin="85,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_GPT_Data_Label" HorizontalAlignment="Left" Margin="115,0,0,0" TextWrapping="Wrap" Text="Data" VerticalAlignment="Top"  Width="35" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="GPT_Legend_Data" HorizontalAlignment="Left" Height="25" Width="25" Margin="85,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="GPT_Legend_Data_Label" HorizontalAlignment="Left" Margin="115,0,0,0" TextWrapping="Wrap" Text="Data" VerticalAlignment="Top"  Width="35" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
-                            <Rectangle x:Name="Legend_GPT_DataDefault" HorizontalAlignment="Left" Height="25" Width="25" Margin="155,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_GPT_DataDefault_Label" HorizontalAlignment="Left" Margin="185,0,0,0" TextWrapping="Wrap" Text="Data (Default)" VerticalAlignment="Top"  Width="80" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="GPT_Legend_DataDefault" HorizontalAlignment="Left" Height="25" Width="25" Margin="155,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="GPT_Legend_DataDefault_Label" HorizontalAlignment="Left" Margin="185,0,0,0" TextWrapping="Wrap" Text="Data (Default)" VerticalAlignment="Top"  Width="80" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
-                            <Rectangle x:Name="Legend_GPT_AmigaDefault" HorizontalAlignment="Left" Height="25" Width="25" Margin="270,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_GPT_AmigaDefault_Label" HorizontalAlignment="Left" Margin="300,0,0,0" TextWrapping="Wrap" Text="Amiga Host(Default)" VerticalAlignment="Top"  Width="115" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="GPT_Legend_AmigaDefault" HorizontalAlignment="Left" Height="25" Width="25" Margin="270,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="GPT_Legend_AmigaDefault_Label" HorizontalAlignment="Left" Margin="300,0,0,0" TextWrapping="Wrap" Text="Amiga Host(Default)" VerticalAlignment="Top"  Width="115" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
-                            <Rectangle x:Name="Legend_GPT_Amiga" HorizontalAlignment="Left" Height="25" Width="25" Margin="420,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_GPT_Amiga_Label" HorizontalAlignment="Left" Margin="450,0,0,0" TextWrapping="Wrap" Text="Amiga Host" VerticalAlignment="Top"  Width="114" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="GPT_Legend_Amiga" HorizontalAlignment="Left" Height="25" Width="25" Margin="420,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="GPT_Legend_Amiga_Label" HorizontalAlignment="Left" Margin="450,0,0,0" TextWrapping="Wrap" Text="Amiga Host" VerticalAlignment="Top"  Width="114" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
                         </Grid>
                     </GroupBox>
 
                     <GroupBox x:Name="MBR_Legend_GroupBox" Style="{DynamicResource BorderlessGroupBoxStyle}" Width="580" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,145,0,0" Visibility="Hidden">
                         <Grid>
-                            <Rectangle x:Name="Legend_MBR_FAT32" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
-                            <TextBox x:Name="Legend_MBR_Fat32_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="FAT32" VerticalAlignment="Top" Width="40" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="MBR_Legend_FAT32" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
+                            <TextBox x:Name="MBR_Legend_Fat32_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="FAT32" VerticalAlignment="Top" Width="40" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
-                            <Rectangle x:Name="Legend_MBR_FAT32Default" HorizontalAlignment="Left" Height="25" Width="25" Margin="85,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_MBR_FAT32Default_Label" HorizontalAlignment="Left" Margin="115,0,0,0" TextWrapping="Wrap" Text="FAT32 (Default)" VerticalAlignment="Top"  Width="90" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="MBR_Legend_FAT32Default" HorizontalAlignment="Left" Height="25" Width="25" Margin="85,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="MBR_Legend_FAT32Default_Label" HorizontalAlignment="Left" Margin="115,0,0,0" TextWrapping="Wrap" Text="FAT32 (Default)" VerticalAlignment="Top"  Width="90" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
-                            <Rectangle x:Name="Legend_MBR_ID76" HorizontalAlignment="Left" Height="25" Width="25" Margin="230,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_MBR_ID76_Label" HorizontalAlignment="Left" Margin="260,0,0,0" TextWrapping="Wrap" Text="0x76" VerticalAlignment="Top"  Width="40" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="MBR_Legend_ID76" HorizontalAlignment="Left" Height="25" Width="25" Margin="230,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="MBR_Legend_ID76_Label" HorizontalAlignment="Left" Margin="260,0,0,0" TextWrapping="Wrap" Text="0x76" VerticalAlignment="Top"  Width="40" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
-                            <Rectangle x:Name="Legend_MBR_ID76Default" HorizontalAlignment="Left" Height="25" Width="25" Margin="330,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_MBR_ID76Default_Label" HorizontalAlignment="Left" Margin="360,0,0,0" TextWrapping="Wrap" Text="0x76 (Default)" VerticalAlignment="Top"  Width="80" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="MBR_Legend_ID76Default" HorizontalAlignment="Left" Height="25" Width="25" Margin="330,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="MBR_Legend_ID76Default_Label" HorizontalAlignment="Left" Margin="360,0,0,0" TextWrapping="Wrap" Text="0x76 (Default)" VerticalAlignment="Top"  Width="80" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
                         </Grid>
                     </GroupBox>
@@ -98,13 +98,13 @@ mc:Ignorable="d">
                     <GroupBox x:Name="MBRSimple_Legend_GroupBox" Style="{DynamicResource BorderlessGroupBoxStyle}" Width="580" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,145,0,0" Visibility="Visible">
                         <Grid>
 
-                            <Rectangle x:Name="Legend_MBRSimple_FAT32Default" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_MBRSimple_FAT32Default_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="FAT32 (Default)" VerticalAlignment="Top"  Width="90" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
-                            <TextBox x:Name="SimpleMode_FAT32Size_Value" Visibility="Visible" HorizontalAlignment="Left" Margin="125,0,0,0" TextWrapping="Wrap" Text="XXXX" Height="25" VerticalAlignment="Top" Width="100" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
+                            <Rectangle x:Name="MBRSimple_Legend_FAT32Default" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="MBRSimple_Legend_FAT32Default_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="FAT32 (Default)" VerticalAlignment="Top"  Width="90" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <TextBox x:Name="MBRSimple_Legend_FAT32Size_Value" Visibility="Visible" HorizontalAlignment="Left" Margin="125,0,0,0" TextWrapping="Wrap" Text="XXXX" Height="25" VerticalAlignment="Top" Width="100" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
 
-                            <Rectangle x:Name="Legend_MBRSimple_ID76Default" HorizontalAlignment="Left" Height="25" Width="25" Margin="235,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
-                            <TextBox x:Name="Legend_MBRSimple_ID76Default_Label" HorizontalAlignment="Left" Margin="270,0,0,0" TextWrapping="Wrap" Text="0x76 (Default)" VerticalAlignment="Top"  Width="80" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
-                            <TextBox x:Name="SimpleMode_ID76Size_Value" Visibility="Visible" HorizontalAlignment="Left" Margin="355,0,0,0" TextWrapping="Wrap" Text="XXXX" Height="25" VerticalAlignment="Top" Width="100" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
+                            <Rectangle x:Name="MBRSimple_Legend_ID76Default" HorizontalAlignment="Left" Height="25" Width="25" Margin="235,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White"  />
+                            <TextBox x:Name="MBRSimple_Legend_ID76Default_Label" HorizontalAlignment="Left" Margin="270,0,0,0" TextWrapping="Wrap" Text="0x76 (Default)" VerticalAlignment="Top"  Width="80" Height="25" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <TextBox x:Name="MBRSimple_Legend_ID76Size_Value" Visibility="Visible" HorizontalAlignment="Left" Margin="355,0,0,0" TextWrapping="Wrap" Text="XXXX" Height="25" VerticalAlignment="Top" Width="100" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
 
                         </Grid>
                     </GroupBox>
@@ -203,26 +203,26 @@ mc:Ignorable="d">
                     <TextBox x:Name="ImportFilesSize_Label" HorizontalAlignment="Left" Margin="955,25,0,0" TextWrapping="Wrap" Text="Imported File Size:" VerticalAlignment="Top" Width="110" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
                     <TextBox x:Name="ImportFilesSize_Value" HorizontalAlignment="Left" Margin="1070,25,0,0" TextWrapping="Wrap" Text="XXXX" VerticalAlignment="Top" Width="80" Height="20"  BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False"/>
 
-                    <GroupBox x:Name="RDBSimple_Legend_GroupBox" Style="{DynamicResource BorderlessGroupBoxStyle}" Width="470" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,145,0,0" Visibility="Visible">
+                    <GroupBox x:Name="RDBSimple_Legend_GroupBox" Style="{DynamicResource BorderlessGroupBoxStyle}" Width="600" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,145,0,0" Visibility="Visible">
                         <Grid>
-                            <Rectangle x:Name="Legend_Simple_Workbench" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
-                            <TextBox x:Name="Legend_Simple_Workbench_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="Workbench (Default)" VerticalAlignment="Center" Width="120" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
-                            <TextBox x:Name="Legend_Simple_WorkbenchSize_Value" Visibility="Visible" HorizontalAlignment="Left" Margin="160,0,0,0" TextWrapping="Wrap" Text="XXXX" Height="25" VerticalAlignment="Top" Width="100" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
+                            <Rectangle x:Name="RDBSimple_Legend_Workbench" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
+                            <TextBox x:Name="RDBSimple_Legend_Workbench_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="Workbench (Default)" VerticalAlignment="Center" Width="120" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <TextBox x:Name="RDBSimple_Legend_WorkbenchSize_Value" Visibility="Visible" HorizontalAlignment="Left" Margin="160,0,0,0" TextWrapping="Wrap" Text="XXXX" Height="25" VerticalAlignment="Top" Width="100" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
 
-                            <Rectangle x:Name="Legend_Simple_Work" HorizontalAlignment="Left" Height="25" Width="25" Margin="265,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
-                            <TextBox x:Name="Legend_Simple_Work_Label" HorizontalAlignment="Left" Margin="295,0,0,0" TextWrapping="Wrap" Text="Other" VerticalAlignment="Top" Width="40" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
-                            <TextBox x:Name="Legend_Simple_WorkSize_Value" Visibility="Visible" HorizontalAlignment="Left" Margin="340,0,0,0" TextWrapping="Wrap" Text="XXXX" Height="25" VerticalAlignment="Top" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
+                            <Rectangle x:Name="RDBSimple_Legend_Work" HorizontalAlignment="Left" Height="25" Width="25" Margin="265,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
+                            <TextBox x:Name="RDBSimple_Legend_Work_Label" HorizontalAlignment="Left" Margin="295,0,0,0" TextWrapping="Wrap" Text="Other" VerticalAlignment="Top" Width="40" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <TextBox x:Name="RDBSimple_Legend_WorkSize_Value" Visibility="Visible" HorizontalAlignment="Left" Margin="340,0,0,0" TextWrapping="Wrap" Text="XXXX" Height="25" VerticalAlignment="Top" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent"/>
 
                         </Grid>
                     </GroupBox>
 
                     <GroupBox x:Name="RDB_Legend_GroupBox" Style="{DynamicResource BorderlessGroupBoxStyle}" Width="470" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,145,0,0" Visibility="Hidden">
                         <Grid>
-                            <Rectangle x:Name="Legend_Workbench" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
-                            <TextBox x:Name="Legend_Workbench_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="Workbench (Default)" VerticalAlignment="Center" Width="120" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="RDB_Legend_Workbench" HorizontalAlignment="Left" Height="25" Width="25" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
+                            <TextBox x:Name="RDB_Legend_Workbench_Label" HorizontalAlignment="Left" Margin="30,0,0,0" TextWrapping="Wrap" Text="Workbench (Default)" VerticalAlignment="Center" Width="120" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
-                            <Rectangle x:Name="Legend_Work" HorizontalAlignment="Left" Height="25" Width="25" Margin="160,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
-                            <TextBox x:Name="Legend_Work_Label" HorizontalAlignment="Left" Margin="190,0,0,0" TextWrapping="Wrap" Text="Other" VerticalAlignment="Top" Width="40" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
+                            <Rectangle x:Name="RDB_Legend_Work" HorizontalAlignment="Left" Height="25" Width="25" Margin="160,0,0,0" Stroke="Black" VerticalAlignment="Top" Fill="White" />
+                            <TextBox x:Name="RDB_Legend_Work_Label" HorizontalAlignment="Left" Margin="190,0,0,0" TextWrapping="Wrap" Text="Other" VerticalAlignment="Top" Width="40" Height="35" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" BorderBrush="Transparent" />
 
                         </Grid>
                     </GroupBox>

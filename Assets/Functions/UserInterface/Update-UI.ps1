@@ -73,10 +73,12 @@ function Update-UI {
         }
 
         If ($Script:GUIActions.KickstartVersiontoUse) {
-            $WPF_StartPage_LanguageSelection_Button.IsEnabled = 0
+            $WPF_StartPage_LanguageSelection_Button.IsEnabled = 1
+            $WPF_StartPage_IconSet_DropDown.IsEnabled = 1
         }
         else {
-            $WPF_StartPage_LanguageSelection_Button.IsEnabled = 1
+            $WPF_StartPage_LanguageSelection_Button.IsEnabled = 0
+            $WPF_StartPage_IconSet_DropDown.IsEnabled = 0
         }
 
         If ($Script:GUIActions.KickstartVersiontoUse -eq '3.2.3'){
@@ -109,14 +111,12 @@ function Update-UI {
         }
 
         if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
-            $WPF_StartPage_MUIVersion_Label.Visibility = "Hidden"
-            $WPF_StartPage_MUIVersion_38.Visibility = "Hidden"
-            $WPF_StartPage_MUIVersion_50.Visibility = "Hidden"
             $WPF_StartPage_Emu68Version_Label.Text  = "Emu68 Version"
-            $WPF_StartPage_Emu68Version_Dropdown.IsHitTestVisible = "False"
-            $WPF_StartPage_Emu68Version_Dropdown.Focusable = "False"
-            $WPF_StartPage_Emu68Version_Dropdown.IsTabStop = "False"
+            $WPF_StartPage_Emu68Version_Dropdown.IsHitTestVisible = 0
+            $WPF_StartPage_Emu68Version_Dropdown.Focusable = 0
+            $WPF_StartPage_Emu68Version_Dropdown.IsTabStop = 0
             $WPF_StartPage_Unicam_button.Visibility = "Hidden" 
+            $WPF_StartPage_P96Resolutions_Button.Visibility = "Hidden"
         }
 
         Get-InputFileCSV -CSV "Emu68Versions" | ForEach-Object {
@@ -165,9 +165,16 @@ function Update-UI {
             $WPF_StartPage_ADFPath_Label.Visibility = 'Visible'
             $WPF_StartPage_WorkbenchScreenSettings_GridRow.Visibility = 'Visible'                        
             $WPF_StartPage_SettingsNetworkUSB_GroupBox.Visibility = 'Visible'
-            $WPF_StartPage_MUIVersion_Label = 'Visible'
-            $WPF_StartPage_MUIVersion_38 = 'Visible'
-            $WPF_StartPage_MUIVersion_50 = 'Visible'
+            if ($Script:GUICurrentStatus.OperationMode -eq "Simple") {
+                $WPF_StartPage_MUIVersion_Label.Visibility = 'Hidden'
+                $WPF_StartPage_MUIVersion_38.Visibility = 'Hidden'
+                $WPF_StartPage_MUIVersion_50.Visibility = 'Hidden'
+            }
+            elseif ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
+                $WPF_StartPage_MUIVersion_Label.Visibility = 'Visible'
+                $WPF_StartPage_MUIVersion_38.Visibility = 'Visible'
+                $WPF_StartPage_MUIVersion_50.Visibility = 'Visible'
+            }  
         }
         elseif ($Script:GUIActions.InstallOSFiles -eq $false){
             $WPF_StartPage_OSSelection_GroupBox.Visibility = 'Hidden'
@@ -176,9 +183,9 @@ function Update-UI {
             $WPF_StartPage_ADFPath_Label.Visibility = 'Hidden'
             $WPF_StartPage_WorkbenchScreenSettings_GridRow.Visibility = 'Collapsed'            
             $WPF_StartPage_SettingsNetworkUSB_GroupBox.Visibility = 'Hidden'
-            $WPF_StartPage_MUIVersion_Label = 'Hidden'
-            $WPF_StartPage_MUIVersion_38 = 'Hidden'
-            $WPF_StartPage_MUIVersion_50 = 'Hidden'
+            $WPF_StartPage_MUIVersion_Label.Visibility = 'Hidden'
+            $WPF_StartPage_MUIVersion_38.Visibility = 'Hidden'
+            $WPF_StartPage_MUIVersion_50.Visibility = 'Hidden'
         }
         if ($Script:GUIActions.ROMLocation){
             $WPF_StartPage_RomPath_Label.Text = Get-FormattedPathforGUI -PathtoTruncate $Script:GUIActions.ROMLocation
@@ -543,7 +550,21 @@ function Update-UI {
 
             }
         }
+
+        if ($Script:GUIActions.DiskType){
+            $DiskTypeDetails = (Get-InputFileCSV -CSV "DiskTypes").where({ $Script:GUIActions.DiskType -eq $_.DiskType }) 
+            $WPF_DP_Disk_Type_DropDown.SelectedItem = $DiskTypeDetails.DiskTypeFriendlyName
+        }
         
+        If ($Script:GUICurrentStatus.OperationMode -eq "Simple"){
+            $WPF_DP_Disk_Type_DropDown.IsEnabled = 0
+            $WPF_DP_Disk_Type_Label.Text = "Disk Type"
+        }
+        If ($Script:GUICurrentStatus.OperationMode -eq "Advanced"){
+            $WPF_DP_Disk_Type_DropDown.IsEnabled = 1  
+            $WPF_DP_Disk_Type_Label.Text = "Select Disk Type"          
+        }
+
     } 
               
     if (($DiskPartitionWindow) -or ($UpdateInputBoxes)){
@@ -615,36 +636,34 @@ function Update-UI {
                        $WPF_DP_Button_ImportFiles.Visibility = "Hidden"
                        $WPF_DP_Button_ImportFiles_Label.Visibility = "Hidden"
                        $WPF_DP_ImportFilesSize_Value.Visibility = "Hidden"
-                       $WPF_DP_AmigaPartitionSelect_NextPartition_Label.Visibility = "Hidden"
-                       $WPF_DP_MBRPartitionSelect_NextPartition_Label.Visibility = "Hidden"
-                       $WPF_DP_AmigaPartitionSelect_Partition_Label.Visibility = "Hidden"
-                       $WPF_DP_MBRPartitionSelect_Partition_Label.Visibility = "Hidden"
-
+                       $WPF_DP_MBRPartitionSelect_Label.Visibility = "Hidden"
+                       $WPF_DP_AmigaPartitionSelect_Label.Visibility = "Hidden"
                        $WPF_DP_RDBSimple_Legend_GroupBox.Visibility = "Visible"
                        $WPF_DP_MBRSimple_Legend_GroupBox.Visibility = "Visible"
                        $WPF_DP_MBR_Legend_GroupBox.Visibility = "Hidden"
+                       $WPF_DP_GPT_Legend_GroupBox.Visibility = "Hidden"
                        $WPF_DP_GPT_Legend_GroupBox.Visibility = "Hidden"
                        $WPF_DP_RDB_Legend_GroupBox.Visibility = "Hidden"
                        
                        $FAT32Partition = (Get-Variable -Name "*_Partition_MBR_*" -Exclude "*Amiga*" | Where-Object {$_.Value.PartitionSubType -eq "FAT32"}).value
                        $FAT32PartitionSize = Get-ConvertedSize -Size $FAT32Partition.PartitionSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 2
-                       $WPF_DP_SimpleMode_FAT32Size_Value.Text = "$($FAT32PartitionSize.size) $($FAT32PartitionSize.scale)"
+                       $WPF_DP_MBRSimple_Legend_FAT32Size_Value.Text = "$($FAT32PartitionSize.size) $($FAT32PartitionSize.scale)"
 
                        $ID76Partition = (Get-Variable -Name "*_Partition_MBR_*" -Exclude "*Amiga*" | Where-Object {$_.Value.PartitionSubType -eq "ID76"}).Value
                        $ID76PartitionSize = Get-ConvertedSize -Size $ID76Partition.PartitionSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 2
-                       $WPF_DP_SimpleMode_ID76Size_Value.Text = "$($ID76PartitionSize.size) $($ID76PartitionSize.scale)"
+                       $WPF_DP_MBRSimple_Legend_ID76Size_Value.Text = "$($ID76PartitionSize.size) $($ID76PartitionSize.scale)"
 
                        $WorkbenchPartition = (Get-Variable -Name "$($ID76Partition.PartitionName)_AmigaDisk_*" | Where-Object {$_.Value.VolumeName -eq "Workbench"}).value
                        $WorkbenchPartitionSize = Get-ConvertedSize -Size $WorkbenchPartition.PartitionSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 2
-                       $WPF_DP_SimpleMode_WorkbenchSize_Value.Text = "$($WorkbenchPartitionSize.size) $($WorkbenchPartitionSize.scale)"
+                       $WPF_DP_RDBSimple_Legend_WorkbenchSize_Value.Text = "$($WorkbenchPartitionSize.size) $($WorkbenchPartitionSize.scale)"
 
                        if ((Get-Variable -Name "$($ID76Partition.PartitionName)_AmigaDisk_*").count -ne 2){
-                           $WPF_DP_SimpleMode_WorkSize_Value.Text = "N/A (Multiple Work Partitions)"
+                           $WPF_DP_RDBSimple_Legend_WorkSize_Value.Text = "N/A - Multiple partitions"
                        }
                        else {
                            $WorkPartition = (Get-Variable -Name "$($ID76Partition.PartitionName)_AmigaDisk_*" | Where-Object {$_.Value.VolumeName -eq "Work"}).value
                            $WorkPartitionSize = Get-ConvertedSize -Size $WorkPartition.PartitionSizeBytes -ScaleFrom 'B' -AutoScale -NumberofDecimalPlaces 2
-                           $WPF_DP_SimpleMode_WorkSize_Value.Text = "$($WorkPartitionSize.size) $($WorkPartitionSize.scale)"
+                           $WPF_DP_RDBSimple_Legend_WorkSize_Value.Text = "$($WorkPartitionSize.size) $($WorkPartitionSize.scale)"
                        }
                        $AmigaDiskName =  (Get-Variable -Name "*_AmigaDisk").Name
                        $AmigaDiskSizeBytes = [int64](Get-Variable -name  $AmigaDiskName).value.DiskSizeBytes

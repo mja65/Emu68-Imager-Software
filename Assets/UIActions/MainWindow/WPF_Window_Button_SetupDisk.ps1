@@ -35,38 +35,38 @@ $WPF_Window_Button_SetupDisk.Add_Click({
             $ColourVisual = [System.Windows.Media.BrushConverter]::new().ConvertFromString($Visual.Colour)
             if ($Visual.PartitionType -eq "MBR"){
                 if ($Visual.PartitionSubType -eq "FAT32"){
-                    $WPF_DP_Legend_MBRSimple_FAT32Default.Fill = $DefaultColourVisual
-                    $WPF_DP_Legend_MBR_FAT32Default.Fill = $DefaultColourVisual 
-                    $WPF_DP_Legend_MBR_FAT32.Fill = $ColourVisual
+                    $WPF_DP_MBRSimple_Legend_FAT32Default.Fill = $DefaultColourVisual
+                    $WPF_DP_MBR_Legend_FAT32Default.Fill = $DefaultColourVisual 
+                    $WPF_DP_MBR_Legend_FAT32.Fill = $ColourVisual
                 }
                 elseif ($Visual.PartitionSubType -eq "ID76"){
-                    $WPF_DP_Legend_MBRSimple_ID76Default.Fill = $DefaultColourVisual
-                    $WPF_DP_Legend_MBR_ID76Default.Fill = $DefaultColourVisual
-                    $WPF_DP_Legend_MBR_ID76.Fill = $ColourVisual
+                    $WPF_DP_MBRSimple_Legend_ID76Default.Fill = $DefaultColourVisual
+                    $WPF_DP_MBR_Legend_ID76Default.Fill = $DefaultColourVisual
+                    $WPF_DP_MBR_Legend_ID76.Fill = $ColourVisual
                 }
             }
             elseif ($Visual.PartitionType -eq "GPT"){
                 if ($Visual.PartitionSubType -eq "System"){
-                    $WPF_DP_Legend_GPT_System.Fill = $DefaultColourVisual
+                    $WPF_DP_GPT_Legend_System.Fill = $DefaultColourVisual
                 }
                 elseif ($Visual.PartitionSubType -eq "Data"){
-                    $WPF_DP_Legend_GPT_Data.Fill = $ColourVisual
-                    $WPF_DP_Legend_GPT_DataDefault.Fill = $DefaultColourVisual
+                    $WPF_DP_GPT_Legend_Data.Fill = $ColourVisual
+                    $WPF_DP_GPT_Legend_DataDefault.Fill = $DefaultColourVisual
                 }
                 elseif ($Visual.PartitionSubType -eq "Amiga"){
-                    $WPF_DP_Legend_GPT_Amiga.Fill = $ColourVisual
-                    $WPF_DP_Legend_GPT_AmigaDefault.Fill = $DefaultColourVisual
+                    $WPF_DP_GPT_Legend_Amiga.Fill = $ColourVisual
+                    $WPF_DP_GPT_Legend_AmigaDefault.Fill = $DefaultColourVisual
                 }
         
             }
             elseif ($Visual.PartitionType -eq "Amiga"){
                 if ($Visual.PartitionSubType -eq "Workbench"){
-                    $WPF_DP_Legend_Simple_Workbench.Fill = $DefaultColourVisual
-                    $WPF_DP_Legend_Workbench.Fill = $DefaultColourVisual
+                    $WPF_DP_RDBSimple_Legend_Workbench.Fill = $DefaultColourVisual
+                    $WPF_DP_RDB_Legend_Workbench.Fill = $DefaultColourVisual
                 }        
                 if ($Visual.PartitionSubType -eq "Work"){
-                    $WPF_DP_Legend_Simple_Work.Fill = $ColourVisual
-                    $WPF_DP_Legend_Work.Fill = $ColourVisual
+                    $WPF_DP_RDBSimple_Legend_Work.Fill = $ColourVisual
+                    $WPF_DP_RDB_Legend_Work.Fill = $ColourVisual
                 } 
             }
         }
@@ -75,7 +75,7 @@ $WPF_Window_Button_SetupDisk.Add_Click({
         $Script:GUICurrentStatus.AmigaPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -Amiga) 
         $Script:GUICurrentStatus.GPTMBRPartitionsandBoundaries = @(Get-AllGUIPartitionBoundaries -GPTMBR)        
 
-        update-ui -MainWindowButtons -HighlightSelectedPartitions -DiskPartitionWindow -FreeSpaceAlert 
+        update-ui -MainWindowButtons -HighlightSelectedPartitions -DiskPartitionWindow -FreeSpaceAlert  
 
 })
  

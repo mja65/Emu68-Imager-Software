@@ -3,17 +3,13 @@ $WPF_Window_Button_PackageSelection.Add_Click({
         return
     }
 
-        if (-not ($Script:GUIActions.KickstartVersiontoUse)){
-            $null = Show-WarningorError -Msg_Header 'No OS Selected' -Msg_Body 'You cannot select the packages to install or uninstall until you have selected an OS! Please return to this screen after you have selected the OS' -BoxTypeError -ButtonType_OK
-            return
-        }
-    
-        if ($Script:GUICurrentStatus.CurrentWindow -ne 'PackageSelection'){
+    if (-not ($Script:GUIActions.KickstartVersiontoUse)){
+        $null = Show-WarningorError -Msg_Header 'No OS Selected' -Msg_Body 'You cannot select the packages to install or uninstall until you have selected an OS! Please return to this screen after you have selected the OS' -BoxTypeError -ButtonType_OK
+        return
+    }
 
-        }
-
-        $Script:GUICurrentStatus.CurrentWindow = 'PackageSelection' 
-    
+    $Script:GUICurrentStatus.CurrentWindow = 'PackageSelection' 
+        
     if ($Script:GUICurrentStatus.AvailablePackagesNeedingGeneration -eq "TRUE"){
         Get-SelectablePackages
         $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "FALSE"
