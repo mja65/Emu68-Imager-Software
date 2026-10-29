@@ -33,13 +33,13 @@ foreach ($Kickstart in $Script:GUIActions.AvailableKickstarts) {
                     $Script:GUIActions.CreateCustomKickstart = $false
                 }
 
-                If ($Script:GUIActions.Languages -ne "English"){
-                    $OSandPackageLanguages = ((@(Get-InputFileCSV -CSV "OSLanguages").Language) + (@(Get-InputFileCSV -CSV "PackageLanguages").Language))  | Sort-Object -Unique
+                If (-not ($Script:GUIActions.Languages.Count -eq 1 -and @($Script:GUIActions.Languages) -eq "English")){
+                    $OSandPackageLanguages = ((@(Get-InputFileCSV -CSV "OSLanguages").Language) + (@(Get-InputFileCSV -CSV "PackageLanguages").Language)) | Sort-Object -Unique
                     $ExistingLanguages = $Script:GUIActions.Languages 
                     $Script:GUIActions.Languages = [System.Collections.Generic.List[PSCustomObject]]::New()
                     foreach ($Language in $ExistingLanguages) {
-                        If ($Language -in $OSandPackageLanguages){
-                            $Script:GUIActions.Languages.Add($Language.Language) 
+                        If ($Language -eq "English" -or $Language -in $OSandPackageLanguages){
+                            $Script:GUIActions.Languages.Add($Language) 
                         }
                     }
                 }
