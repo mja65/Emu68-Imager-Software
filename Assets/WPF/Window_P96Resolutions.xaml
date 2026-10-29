@@ -1,0 +1,81 @@
+<Window x:Class="WpfApp14.P96ResolutionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Title="P96 Resolution Manager" Height="520" Width="720"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Select and manage resolutions for inclusion in your P96 Prefs file (Hold Ctrl or Shift for multi-select):" 
+                   FontWeight="Bold" Margin="0,0,0,10"/>
+
+        <!-- Dual Column Selector -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="95"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Available Presets -->
+            <GroupBox Header="Available Presets" Padding="5">
+                <ListBox Name="AvailableResolutionsList" SelectionMode="Extended" DisplayMemberPath="Display"/>
+            </GroupBox>
+
+            <!-- Transfer Controls -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button Name="Add_Selected_Resolution_Button" Content="Add &gt;&gt;" Width="80" Margin="0,0,0,8" Padding="5,3"/>
+                <Button Name="Remove_Selected_Resolution_Button" Content="&lt;&lt; Remove" Width="80" Padding="5,3"/>
+            </StackPanel>
+
+            <!-- Included in File -->
+            <GroupBox Grid.Column="2" Header="Included in P96 Prefs" Padding="5">
+                <ListBox Name="IncludedResolutionsList" SelectionMode="Extended" DisplayMemberPath="Display"/>
+            </GroupBox>
+        </Grid>
+
+        <!-- Explanatory Note -->
+        <TextBlock Grid.Row="2" 
+                   Text="Note: All relevant color depths and formats (such as 8-bit, 16-bit, 24/32-bit) will automatically be included for each chosen resolution." 
+                   TextWrapping="Wrap" FontStyle="Italic" Foreground="DimGray" Margin="0,8,0,8"/>
+
+        <!-- Custom Add Panel -->
+        <GroupBox Grid.Row="3" Header="Add Custom Resolution" Margin="0,0,0,10" Padding="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Width:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBox Name="Input_Width" Grid.Column="1" Text="1280" VerticalAlignment="Center" Margin="0,0,15,0"/>
+
+                <TextBlock Text="Height:" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBox Name="Input_Height" Grid.Column="3" Text="800" VerticalAlignment="Center" Margin="0,0,15,0"/>
+
+                <Button Name="Add_Custom_Resolution_Button" Grid.Column="5" Content="Add Custom" Width="100" Padding="5,3"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Footer Actions -->
+        <Grid Grid.Row="4" Margin="0,5,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Name="ResetDefaults_Button" Content="Reset to Defaults" Width="110" Margin="0,0,10,0" Padding="5,3"/>
+                <Button Name="ClearAll_Button" Content="Clear Included" Width="100" Padding="5,3"/>
+            </StackPanel>
+            <Button Name="Save_Button" Content="Save P96 Prefs" Width="110" FontWeight="Bold" HorizontalAlignment="Right" Padding="5,3"/>
+        </Grid>
+    </Grid>
+</Window>

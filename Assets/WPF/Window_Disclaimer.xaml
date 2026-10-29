@@ -11,10 +11,27 @@
             Text="Emu68 Imager v" FontSize="14" BorderThickness="0,0,0,0" SelectionOpacity="0"
             VerticalAlignment="Top" Width="772" IsReadOnly="True" Height="20" VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" FontWeight="Bold"
                  />
+        <!-- Standard Update Status (Visible by default) -->
+        <TextBlock x:Name="UpdateStatus" Text="Program is up to date." FontSize="12" Foreground="#FF004400" HorizontalAlignment="Center" Margin="0,50,0,0"/>
+        <!-- High-Visibility Update Notification Banner (Hidden by default) -->
+        <Border x:Name="UpdateBanner" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,42,0,0" Width="880" Height="32" Background="#FFFFF3E0" BorderBrush="#FFFFA726" BorderThickness="1.5" CornerRadius="4" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock FontSize="13" FontWeight="Bold" Foreground="#FFE65100" Text="&#x26A0; Update Available: " VerticalAlignment="Center"/>
+                <TextBlock FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0">
+                    <Run Text="A newer version of Emu68 Imager is available." Foreground="#FF37474F"/>
+                </TextBlock>
+                <TextBlock FontSize="13" VerticalAlignment="Center">
+                    <Hyperlink x:Name="Emu68ImagerReleasePageURL" NavigateUri="https://github.com/mja65/Emu68-Imager-Software/releases" Foreground="#FF1565C0">
+                        <Run Text="Open GitHub Releases" FontWeight="Bold"/>
+                    </Hyperlink>
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
         <Button x:Name="Button_Acknowledge_Simple" Content="Start in Simple Mode " HorizontalAlignment="Left" Height="40" VerticalAlignment="Bottom" Width="320" BorderBrush="Black" UseLayoutRounding="False" Background="#FF6688BB" Margin="50,0,0,20"  />
         <Button x:Name="Button_Acknowledge_Advanced" Content="Start in Advanced Mode" HorizontalAlignment="Right" Height="40" VerticalAlignment="Bottom" Width="320" BorderBrush="Black" UseLayoutRounding="False" Background="#FF6688BB" Margin="0,0,50,20" />
 
-        <TextBlock Width="880" TextWrapping="Wrap" VerticalAlignment="Top"  Margin="50,50,50,0" Height="310">
+        <TextBlock Width="880" TextWrapping="Wrap" VerticalAlignment="Top"  Margin="50,82,50,0">
             <Run Foreground="Black" FontSize="14" Text="This software is used at your own risk! Efforts were made to test the software but it should be used with caution. Data will be written to physical media devices attached to your computer and all data on that device will be erased. If the incorrect device is chosen, data on that device will also be erased." /><LineBreak/>
             <Run Foreground="Black"/><LineBreak/>
             <Run Foreground="Black" FontSize="14" Text="If you do not accept this risk, then do not use this software! "/><LineBreak/>
@@ -29,7 +46,7 @@
             <Run Foreground="Black"/><LineBreak/>
             <Run Foreground="Black" FontSize="14" Text="No one likes reading manuals! However, you are strongly encouraged to read at least the Quick Start section of the documentation! This can be accessed through the link "/> 
             <Hyperlink x:Name="QuickStartDocumentationURL" FontSize="14" NavigateUri="https://mja65.github.io/Emu68-Imager/quickstart.html"> here</Hyperlink>
-            <Run Foreground="Black" FontSize="14" Text= " along with links to the other sections of the documentation. A link to the documentation is also available in the tool should you wish to access from there."/>
+            <Run Foreground="Black" FontSize="14" Text= " along with links to the other sections of the documentation."/>
             <Span Background="White" FontSize="14" Foreground="Black"/><LineBreak/><Run/></TextBlock>
     </Grid>
 </Window>
