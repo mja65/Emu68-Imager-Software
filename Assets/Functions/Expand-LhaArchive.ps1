@@ -118,7 +118,9 @@ function Expand-LhaArchive {
                             }
                         } else {
                             $safeName = [System.Text.RegularExpressions.Regex]::Replace($entry.CleansedPath, '[p{C}]', '_')
-                            Write-Warning "Failed extracting '$safeName': $($result.ErrorMessage)"
+                            if (-not $Quiet) {
+                                Write-Warning "Failed extracting '$safeName': $($result.ErrorMessage)"
+                            }
                         }
                     }
                 }
