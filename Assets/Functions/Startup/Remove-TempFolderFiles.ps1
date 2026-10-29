@@ -10,18 +10,24 @@
     $CleanupScript = {
         # Remove all items in TempFolder except "WebPackagesDownload"
         Get-ChildItem -Path $using:TempFolder | Where-Object { $_.Name -ne "WebPackagesDownload" } | ForEach-Object {
-            Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Continue 2>&1
         }
     
         # Remove subfolders within "WebPackagesDownload" if it exists
         if (Test-Path $using:WebPackagesPath) {
             Get-ChildItem -Path $using:WebPackagesPath -Directory | ForEach-Object {
-                Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Continue 2>&1
             }
         }
     }
         
-    Show-SpinnerWhileDeleting -ScriptBlock $cleanupScript 
+    $DeletionErrors = Show-SpinnerWhileDeleting -ScriptBlock $cleanupScript 
 
+    If ($DeletionErrors) {
+        Write-ErrorMessage "Unable to delete files!"
+        Write-InformationMessage $DeletionErrors
+        Exit
+    }
+    
     write-informationMessage -Message "Removal of temporary files complete " 
 }

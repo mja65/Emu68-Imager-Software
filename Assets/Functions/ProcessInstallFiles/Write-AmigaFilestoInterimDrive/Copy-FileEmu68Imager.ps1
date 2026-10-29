@@ -1,7 +1,8 @@
 Function Copy-FileEmu68Imager {
     param(
         $SourcePath,
-        $DestinationPath
+        $DestinationPath,
+        $OriginalLinetoProcess
     )
 
     try {
@@ -18,6 +19,8 @@ Function Copy-FileEmu68Imager {
         }
         catch {
             Write-ErrorMessage -Message "Error copying file! SourcePath is: [$SourcePath] Destination is: [$DestinationPath]"
+            Write-ErrorMessage -Message "Original Line to Process was:"
+            Write-ErrorMessage -Message $OriginalLinetoProcess
             throw $_
         }
 

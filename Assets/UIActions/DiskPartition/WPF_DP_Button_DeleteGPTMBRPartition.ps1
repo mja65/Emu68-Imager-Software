@@ -65,62 +65,7 @@ Press OK to continue otherwise cancel
         }
 
         if ($DeleteDefaultAmigaPartition -eq $true){
-
-        $Script:GUIActions.InstallOSFiles = $false
-        $Script:GUIActions.InstallMediaLocation = $null
-        $Script:GUIActions.OSInstallMediaType = $null
-        $Script:GUIActions.FoundInstallMediatoUse = $null
-        $Script:GUICurrentStatus.AvailablePackagesNeedingGeneration = "TRUE"
-        $Script:GUIActions.DefaultPackagesSelected = $null 
-        $Script:GUIActions.SelectedIconSet = $null 
-        $Script:GUIActions.CreateCustomKickstart = $false
-        $Script:GUIActions.AvailablePackages.Clear()
-        $Script:GUIActions.AvailableIconSets.Clear()
-        $Script:GUIActions.ScreenModeType = $null
-        $Script:GUIActions.ScreenModetoUseWB = $null
-        $Script:GUIActions.EnableBupTest = $true
-        $Script:GUIActions.SCSIDeviceDisabled = $false
-        $Script:GUIActions.DMAEnabled = $false
-        $Script:GUIActions.IRQEnabled = $false
-        $Script:GUIActions.AgnusType = $null
-        $Script:GUIActions.SDLowSpeed = $true
-        $Script:GUIActions.SDOverClock = $false
-        $Script:GUIActions.SDOverClockSpeed = $null
-        $Script:GUIActions.UnicamEnabled = $false
-                Get-InputFileCSV -CSV "Emu68Versions" | ForEach-Object {
-            if ($Script:GUIActions.Emu68VersionType -eq $_.Emu68VersionType){
-                $Script:GUIActions.PoseidonVersion = $_.PoseidonVersion
-                if ($Script:GUIActions.PoseidonVersion){
-                    $Script:GUIActions.EnableUSBStack = $true
-                }
-                else {
-                    $Script:GUIActions.EnableUSBStack = $false
-                }
-                If ($Script:GUIActions.NetworkStack -notin @($_.NetworkStack -split ',')){
-                    $Script:GUIActions.NetworkStack = $_.NetworkStackDefault
-                }
-            }
-        }
-        $Script:GUIActions.UnicamEnabled = $false       
-        $Script:GUIActions.UnicamDeviceType = $null    
-        $Script:GUIActions.UnicamStartonBoot = [bool]$null
-        $Script:GUIActions.UnicamScalingType = $null
-        $Script:GUIActions.UnicamBParameter = $null
-        $Script:GUIActions.UnicamCParameter = $null
-        $Script:GUIActions.UnicamPhase = $null
-        $Script:GUIActions.UnicamAspectRatio = $null
-        $Script:GUIActions.UnicamScanLinesNonLaced = $null
-        $Script:GUIActions.UnicamScanLinesLaced = $null  
-        $Script:GUIActions.UnicamSizeX = $null
-        $Script:GUIActions.UnicamSizeY = $null
-        $Script:GUIActions.UnicamOffsetX = $null
-        $Script:GUIActions.UnicamOffsetY = $null  
-        $Script:GUIActions.WorkbenchBackDropEnabled = $null
-        $Script:GUIActions.AvailableScreenModesWB = $null
-        $Script:GUIActions.NetworkStack = $null
-        $Script:GUIActions.MUIVersion = $null
-        $Script:GUIActions.EnableUSBStack = $null
-
+            Remove-OSFilesfromInstall 
         }
 
         $Script:GUICurrentStatus.SelectedGPTMBRPartition = $null

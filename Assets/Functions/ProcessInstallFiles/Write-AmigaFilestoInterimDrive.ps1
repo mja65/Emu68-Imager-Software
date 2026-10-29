@@ -19,13 +19,19 @@ function Write-AmigaFilestoInterimDrive {
         $PathtoDelete = [System.IO.Path]::GetFullPath($($Script:Settings.WebPackagesDownloadLocation))
         Write-informationMessage -Message "Deleting existing files in $PathtoDelete"
         if (Test-Path $PathtoDelete) {
-            Show-SpinnerWhileDeleting -ScriptBlock {
+            $DeletionErrors = Show-SpinnerWhileDeleting -ScriptBlock {
                 $PathtoDeletetoUse = Join-Path $using:PathtoDelete "\*"
-                Remove-Item $PathtoDeletetoUse -Recurse -Force -ErrorAction SilentlyContinue               
-            }      
+                Remove-Item $PathtoDeletetoUse -Recurse -ErrorAction Continue 2>&1
+               }      
         }
     }
-   
+    
+    If ($DeletionErrors) {
+        Write-ErrorMessage "Unable to delete files!"
+        Write-InformationMessage $DeletionErrors
+        Exit
+    }
+
     $Script:Settings.CurrentSubTaskNumber ++
     $Script:Settings.CurrentSubTaskName = "Identifying files to be installed"
     Write-StartSubTaskMessage
@@ -195,9 +201,14 @@ function Write-AmigaFilestoInterimDrive {
     $ValidPackages = $ListofPackagestoInstall | ForEach-Object { ($_.PackageName -split ",").Trim() } | Select-Object -Unique
     $PackageFilestoInstall = (Get-InputFileCSV -CSV "PackagestoInstall").where({ ($_.PackageName.Trim() -in $ValidPackages) -and (([string]::IsNullOrWhiteSpace($Line.Language)) -or  ($Line.Language -in $Script:GUIActions.Languages)) }) 
     
-    $ValidOSPackages = @((($OSSources | select-object PackageName).PackageName -split ",").Trim() | Select-Object  -Unique)
-    $OSFilestoInstall = (Get-InputFileCSV -CSV "OSFilestoInstall").where({ $_.PackageName -in $ValidOSPackages }) 
-
+    If ($Script:GUIActions.InstallOSFiles -eq $true){
+        $ValidOSPackages = @((($OSSources | select-object PackageName).PackageName -split ",").Trim() | Select-Object  -Unique)
+        $OSFilestoInstall = (Get-InputFileCSV -CSV "OSFilestoInstall").where({ $_.PackageName -in $ValidOSPackages }) 
+    }
+    else {
+        $OSFilestoInstall = $null
+    }
+    
     $CreatedDirectories = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 
     $OSPathLookup = @{}
@@ -308,12 +319,12 @@ function Write-AmigaFilestoInterimDrive {
                 ExtractedZFileSourcePath = $ExtractedZFileSourcePath
                 DestinationPath = $DestinationPath
             })
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $StagingDestinationPath
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $StagingDestinationPath -OriginalLinetoProcess $Line
             $ZFileNameCounter ++
         }
         else {
             #Write-host "SourcePath is: $SourcePath DestinationPath is: $DestinationPath"
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $Line
         }
         If ($Line.ProtectionBits){
             $FileName = [System.IO.Path]::GetFileName($DestinationPath)
@@ -356,7 +367,7 @@ function Write-AmigaFilestoInterimDrive {
                 $null = [System.IO.Directory]::CreateDirectory($DestinationFolder)
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $ZFile
         }
 
     }
@@ -394,7 +405,7 @@ function Write-AmigaFilestoInterimDrive {
                 $null = [System.IO.Directory]::CreateDirectory($DestinationFolder)
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }             
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath 
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $ROM
        
         }
         if (($Script:GUIActions.InstallOSFiles -eq $true) -and (-not [string]::IsNullOrWhiteSpace($ROM.WHDLoadName))){
@@ -406,7 +417,7 @@ function Write-AmigaFilestoInterimDrive {
                 $null = $CreatedDirectories.Add($DestinationFolder)            
             }
             #Write-host "SourcePath is: $SourcePath DestinationPath is: $DestinationPath"
-            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath                  
+            Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $ROM                 
        }
     }    
 
@@ -520,13 +531,13 @@ function Write-AmigaFilestoInterimDrive {
                     }
                 }
                 'Web - Github Emu68 Documentation'{
-                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination
+                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination -OriginalLinetoProcess $Item
                     if ([System.IO.Path]::GetExtension($Item.Destination) -eq ".html"){
                         Update-Emu68ImagerDocumentation -Emu68ImagerDocumentationPath $Item.Destination                   
                     }
                 }
                 default {
-                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination
+                    Copy-FileEmu68Imager -SourcePath $Item.Source -DestinationPath $Item.Destination -OriginalLinetoProcess $Item
                     If ($Item.ProtectionBits){
                         $FileName = [System.IO.Path]::GetFileName($Item.Destination)
                         $ProtectionBits = $Item.ProtectionBits.ToUpperInvariant()
@@ -799,7 +810,7 @@ function Write-AmigaFilestoInterimDrive {
         }
         else {
             #Write-host "Source: $SourcePathtoUse Destination: $DestinationPathToUse"
-            $null = Copy-Item $SourcePathtoUse $DestinationPathToUse -Force -Recurse 
+            Copy-FileEmu68Imager -SourcePath $SourcePathtoUse -DestinationPath $DestinationPathToUse -OriginalLinetoProcess $_
         }
         If ($IconsPathHash[$_.IconType].ModifyInfoFileType){
             $Script:GUICurrentStatus.HSTAmigaCommandstoProcess.UpdateDefaultIcons.Add([PSCustomObject]@{
@@ -1025,8 +1036,8 @@ function Write-AmigaFilestoInterimDrive {
         if ($Folder.CreateInfoFile -eq $true){
             $DestinationPath = "$DestinationFolder.info"
             if (-not (Test-Path $DestinationPath)){
-                $SourcePath = Join-PathMulti $Script:Settings.TempFolder "IconFiles" "NewFolder.info"  
-                $null = Copy-Item $SourcePath $DestinationPath           
+                $SourcePath = Join-PathMulti $Script:Settings.TempFolder "IconFiles" "NewFolder.info"
+                Copy-FileEmu68Imager -SourcePath $SourcePath -DestinationPath $DestinationPath -OriginalLinetoProcess $Folder  
             }
         }
 
