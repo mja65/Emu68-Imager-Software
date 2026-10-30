@@ -67,6 +67,7 @@ function Read-SettingsFile {
    $Script:GUIActions.SelectedIconSet = $null 
    $Script:GUIActions.KickstartVersiontoUse = $null
    $Script:GUIActions.Emu68VersionType = $null
+   $Script:GUIActions.AHIVersion = $null
    $Script:GUIActions.MUIVersion = $null
    $Script:GUIActions.KickstartVersiontoUseFriendlyName = $null
    $Script:GUIActions.OSInstallMediaType = $null

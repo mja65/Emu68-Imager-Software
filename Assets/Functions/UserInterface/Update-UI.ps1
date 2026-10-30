@@ -256,7 +256,18 @@ function Update-UI {
         elseIf ($Script:GUIActions.MUIVersion -eq "5.0"){
             $WPF_StartPage_MUIVersion_50.IsChecked = 1
         }
-        
+
+        If ($Script:GUIActions.AHIVersion -eq "4.18"){
+            $WPF_StartPage_AHIVersion_RadioButton4.IsChecked = 1
+        }
+        elseif ($Script:GUIActions.AHIVersion -eq "6.0"){
+            $WPF_StartPage_AHIVersion_RadioButton6.IsChecked = 1
+            
+        }
+        else {
+            $WPF_StartPage_AHIVersion_RadioButtonNone.IsChecked = 1           
+        }
+
         If ($Script:GUIActions.PoseidonVersion -eq "4.x") {
             $WPF_StartPage_PoseidonVersion_RadioButton45.IsChecked = 1
 

@@ -114,6 +114,8 @@ function Get-OptionsBeforeRunningImage {
         }        
         # $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("--- Network and USB ---", "")
         $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("MUI Version to install:",$Script:GUIActions.MUIVersion)
+        $AHIVersiontoReport = if ($Script:GUIActions.AHIVersion) { $Script:GUIActions.AHIVersion } else { "None" }
+        $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("AHI Version to install:",$AHIVersiontoReport)
         If ($Script:GUIActions.Emu68VersionType -ne "Release"){
             $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("USB Stack Enabled:",$Script:GUIActions.EnableUSBStack)
             $null = $Script:GUICurrentStatus.RunOptionstoReport.Rows.Add("Poseidon Version:",$Script:GUIActions.PoseidonVersion)

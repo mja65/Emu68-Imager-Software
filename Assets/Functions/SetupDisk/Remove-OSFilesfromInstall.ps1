@@ -42,6 +42,7 @@ function Remove-OSFilesfromInstall {
     $Script:GUIActions.UnicamOffsetY = $null
     $Script:GUIActions.WorkbenchBackDropEnabled = $null
     $Script:GUIActions.AvailableScreenModesWB = $null
+    $Script:GUIActions.AHIVersion = $null
     $Script:GUIActions.MUIVersion = $null
     $Script:GUIActions.EnableUSBStack = $null
     $Script:GUIActions.PoseidonVersion = $null

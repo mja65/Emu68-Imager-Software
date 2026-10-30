@@ -5,7 +5,8 @@ function Get-ConfigurablePackages {
         [switch]$GenetPackages,
         [switch]$PoseidonPackages,
         [switch]$NetworkStackPackages,
-        [switch]$MUIPackages
+        [switch]$MUIPackages,
+        [switch]$AHIPackages
       
     )
 
@@ -77,6 +78,15 @@ function Get-ConfigurablePackages {
         $CSVName = "MUIVersions"
         $FilterBlock = {
             $Script:GUIActions.MUIVersion -in ($_.MUIVersion -split '\s*,\s*')
+        }
+        
+    }
+    
+    If ($AHIPackages) { 
+        if (-not $Script:GUIActions.AHIVersion) { return }
+        $CSVName = "AHIVersions"
+        $FilterBlock = {
+            $Script:GUIActions.AHIVersion -in ($_.AHIVersion -split '\s*,\s*')
         }
         
     }

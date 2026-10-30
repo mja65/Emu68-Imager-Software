@@ -52,11 +52,12 @@ function Get-PackageSources {
         $AdditionalPackagesList += Get-ConfigurablePackages -PoseidonPackages
         $AdditionalPackagesList += Get-ConfigurablePackages -NetworkStackPackages
         $AdditionalPackagesList += Get-ConfigurablePackages -MUIPackages 
+        $AdditionalPackagesList += Get-ConfigurablePackages -AHIPackages 
         $PackagesList = (Get-InputFileCSV -CSV 'Packages').Where({ (($_.PackageName -in $AdditionalPackagesList) -or ($_.PackageType -in $AllowedTypes)) })
     }
     
     $PackagesList.foreach({
-        $IsSelected = ($_.PackageType -in @("Mandatory Package","Emu68","Genet","MUI","NetworkStack","Poseidon","USB Stack","UserFile"))
+        $IsSelected = ($_.PackageType -in @("Mandatory Package","Emu68","Genet","MUI","AHI","NetworkStack","Poseidon","USB Stack","UserFile"))
         $PackageStatus[$_.PackageName] = [PSCustomObject]@{    
             PackageType = $_.PackageType 
             PackageSelected = $IsSelected
