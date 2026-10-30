@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 2.2.12
+.VERSION 2.2.13
 .GUID 73d9401c-ab81-4be5-a2e5-9fc0834be0fc
 .AUTHOR SupremeTurnip
 .COMPANYNAME
@@ -58,7 +58,7 @@ else {
     $Script:GUICurrentStatus.RunMode = "CommandLine"
 }
 
-$Script:Settings.Version = [system.version]'2.2.12'
+$Script:Settings.Version = [system.version]'2.2.13'
 
 $Script:GUIActions.ScriptPath = (Split-Path -Path $PSScriptRoot -Parent)
 

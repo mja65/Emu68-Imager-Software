@@ -254,6 +254,7 @@ $Script:GUIActions = [PSCustomObject]@{
     OSInstallMediaType = $null
     #UseGlowIcons = $null
     NetworkStack = $null
+    AHIVersion = $null
     MUIVersion = $null
     SSID = $null
     WifiPassword = $null

@@ -73,6 +73,7 @@ $WPF_DP_ResettoDefault.Add_Click({
             $Script:GUIActions.InstallOSFiles = $true
             $Script:GUIActions.DiskSizeSelected = $null 
             $Script:GUIActions.NetworkStack = ((Get-InputFileCSV -CSV "NetworkStackVersions").where({ $_.Default -eq $true })).NetworkStackFriendlyName 
+            $Script:GUIActions.AHIVersion = $null
             $Script:GUIActions.MUIVersion = "3.8"    
             $Script:GUIActions.PoseidonVersion = $null 
         

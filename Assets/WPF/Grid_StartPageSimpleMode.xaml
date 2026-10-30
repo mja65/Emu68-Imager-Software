@@ -56,14 +56,20 @@ mc:Ignorable="d">
               </Grid>
           </GroupBox>
 
-          <GroupBox x:Name="SettingsMUIVersion_GroupBox" Header="MUI Version" Height="50" Background="Transparent" Margin="154,250,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Right">
-              <Grid>
-                 
-                  <RadioButton x:Name="MUIVersion_38" Content="3.8" HorizontalAlignment="Left" Margin="10,5,0,0" Height="20" VerticalAlignment="Top" Width="75" />
-                  <RadioButton x:Name="MUIVersion_50" Content="5.0" HorizontalAlignment="Left" Margin="60,5,0,0" Height="20" VerticalAlignment="Top" Width="55"/>
+            <GroupBox x:Name="SettingsMUIVersion_GroupBox" Header="MUI Version" Height="50" Background="Transparent" Margin="0,250,210,0" Width="190" VerticalAlignment="Top" HorizontalAlignment="Right" Visibility="Hidden" >
+                <Grid>
+                    <RadioButton x:Name="MUIVersion_38" Content="3.8" HorizontalAlignment="Left" Margin="10,5,0,0" Height="20" VerticalAlignment="Top" Width="75" />
+                    <RadioButton x:Name="MUIVersion_50" Content="5.0" HorizontalAlignment="Left" Margin="60,5,0,0" Height="20" VerticalAlignment="Top" Width="55"/>
+                </Grid>
+            </GroupBox>
 
-              </Grid>
-          </GroupBox>
+            <GroupBox x:Name="SettingsAHIVersion_GroupBox" Header="AHI Version" Height="50" Background="Transparent" Margin="0,250,0,0" Width="190" VerticalAlignment="Top" HorizontalAlignment="Right" Visibility="Hidden">
+                <Grid>
+                    <RadioButton x:Name="AHIVersion_RadioButtonNone" Content="None" HorizontalAlignment="Left" Margin="10,5,0,0" Height="20" VerticalAlignment="Top" Width="75" />
+                    <RadioButton x:Name="AHIVersion_RadioButton4" Content="4.x" HorizontalAlignment="Left" Margin="70,5,0,0" Height="20" VerticalAlignment="Top" Width="75" />
+                    <RadioButton x:Name="AHIVersion_RadioButton6" Content="6.x" HorizontalAlignment="Left" Margin="120,5,0,0" Height="20" VerticalAlignment="Top" Width="55"/>
+                </Grid>
+            </GroupBox>
 
           <GroupBox x:Name="SettingsSDCard_GroupBox" Header="Emu68 Settings" Height="200" Background="Transparent" Margin="154,475,0,0" Width="400" VerticalAlignment="Top" HorizontalAlignment="Right" Visibility="Visible">
               <Grid>
