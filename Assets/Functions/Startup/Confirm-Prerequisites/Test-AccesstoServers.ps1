@@ -43,15 +43,24 @@ function Test-AccesstoServers {
     foreach ($Server in $ServerList) {
         write-informationMessage -Message "Testing connection to $($server.Servername)"
         if ($Server.ServerName -eq "ftp2.grandis.nu") {
-            $webPage = Invoke-WebRequest -Uri "https://grandis.nu:444/quick.php" -UseBasicParsing
-            if ($webPage.Content -eq "false"){
-                write-informationMessage -Message "Connection to $($server.Servername) successful"
+            try {
+                $webPage = Invoke-WebRequest -Uri "https://grandis.nu:444/quick.php" -UseBasicParsing
+                if ($webPage.Content -eq "false"){
+                    write-informationMessage -Message "Connection to $($server.Servername) successful"
+                }
+                else {
+                    Write-WarningMessage -Message "Connection to $($server.Servername) unsuccessful! Possible connection issues with site."
+                    $ErrorCount ++
+                    $FatalErrorCount += $server.FatalError
+                }
+                            
             }
-            else {
-                Write-WarningMessage -Message "Connection to $($server.Servername) unsuccessful! Possible connection issues with site."
-                $ErrorCount ++
-                $FatalErrorCount += $server.FatalError
+            catch {
+                    Write-WarningMessage -Message "Connection to $($server.Servername) unsuccessful! Possible connection issues with site."
+                    $ErrorCount ++
+                    $FatalErrorCount += $server.FatalError
             }
+
         }
         else {
             if (Test-Connection $server.Servername -count 1 -Quiet){
