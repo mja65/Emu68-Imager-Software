@@ -139,6 +139,9 @@ function Get-GithubRelease {
                 $GithubDetails_Filtered = $GithubDetails | Where-Object  {($_.draft).tostring() -eq 'False' -and ($_.prerelease).tostring() -eq 'False' }
             }
         }        
+        elseif ($GithubReleaseType -eq "Release-AminetXDuo"){
+            $GithubDetails_Filtered = $GithubDetails | Where-Object  {($_.draft).tostring() -eq 'False'}            
+        }   
         else {
             Write-ErrorMessage -Message "Error with input! Exiting!"
             return                        
