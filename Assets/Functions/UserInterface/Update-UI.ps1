@@ -138,7 +138,7 @@ function Update-UI {
             $WPF_startpage_OverclockSD_Slider.Visibility = 'Hidden'
             $WPF_startpage_OverclockSD_Value.Visibility = 'Hidden'
             $WPF_startpage_OverclockSD_Value_Text.Visibility = 'Hidden'
-            $WPF_startpage_USBStackEnable_CheckBox.Visibility = 'Hidden'
+            $WPF_startpage_USBStackEnable_CheckBox.Visibility = 'Visible'
             $WPF_startpage_SettingsPoseidonVersion_GroupBox.Visibility = 'Hidden'
 
         }
