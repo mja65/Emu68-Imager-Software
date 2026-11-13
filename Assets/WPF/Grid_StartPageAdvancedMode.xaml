@@ -45,7 +45,7 @@ mc:Ignorable="d">
                 <TextBox x:Name="Password_Label" HorizontalAlignment="Left" Margin="10,50,0,0" TextWrapping="Wrap" Text="Wifi password"  VerticalAlignment="Top" Width="85" BorderBrush="Transparent" Background="Transparent" IsReadOnly="True" IsUndoEnabled="False" IsTabStop="False" IsHitTestVisible="False" Focusable="False" />
                 <TextBox x:Name="SSID_Textbox" ToolTip="Set your SSID for wifi on the Amiga (leave empty if you wish to configure on the Amiga)" HorizontalAlignment="Left" Margin="100,30,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="275" />
                 <TextBox x:Name="Password_Textbox" ToolTip="Set your password for wifi on the Amiga (leave empty if you wish to configure on the Amiga)" HorizontalAlignment="Left" Margin="100,50,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="275" />
-                <CheckBox x:Name="USBStackEnable_CheckBox" Content="Enable USB Stack (Raspberry Pi 4/CM4 Only)"  HorizontalAlignment="Left" Margin="10,75,0,0" VerticalAlignment="Top" IsChecked="False"/>
+                <CheckBox x:Name="USBStackEnable_CheckBox" Content="Enable USB Stack"  HorizontalAlignment="Left" Margin="10,75,0,0" VerticalAlignment="Top" IsChecked="False"/>
                 <GroupBox x:Name="SettingsPoseidonVersion_GroupBox" Header="Poseidon Version" Height="50" Background="Transparent" Margin="0,100,0,0" Width="375" VerticalAlignment="Top" HorizontalAlignment="Center">
                    <Grid>
                           <RadioButton x:Name="PoseidonVersion_RadioButton45" Content="4.5" HorizontalAlignment="Left" Margin="10,5,0,0" Height="20" VerticalAlignment="Top" Width="75"/>

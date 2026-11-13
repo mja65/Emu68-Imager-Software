@@ -76,7 +76,7 @@ function Get-OptionsBeforeRunningImage {
     }
 
     If ($Script:GUIActions.EnableUSBStack -eq $true){
-        $NotesText += "You have enabled USB. The installed driver will only work with either a RaspberryPi4 or a Compute Module 4`r`r"          
+        $NotesText += "You have enabled USB. Both Xhci.device (Pi4/CM4) and dwc2usb.device (Pi3) will be installed. Xhci.device currently requires Emu68 1.1`r`r"          
     }
 
     if ($NotesText){
