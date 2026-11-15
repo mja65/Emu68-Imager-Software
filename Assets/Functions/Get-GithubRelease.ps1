@@ -150,10 +150,10 @@ function Get-GithubRelease {
             Write-InformationMessage "Using Tag: $Tag_Name"
             if ($GithubNameExclude) {
                 $ExcludeRegex = ($GithubNameExcludeList | ForEach-Object { [regex]::Escape($_) }) -join '|'
-                $GithubDetails_ForDownload = $GithubDetails_Filtered | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name -and $_.name -notmatch $ExcludeRegex }  
+                $GithubDetails_ForDownload = $GithubDetails_Filtered | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -like $Name -and $_.name -notmatch $ExcludeRegex }  
             }
             else {
-                $GithubDetails_ForDownload = $GithubDetails_Filtered | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -match $Name }    
+                $GithubDetails_ForDownload = $GithubDetails_Filtered | Where-Object { $_.tag_name -eq $Tag_Name } | Select-Object -ExpandProperty assets | Where-Object { $_.name -like $Name }    
             }
         }
         else {
